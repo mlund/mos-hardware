@@ -20,9 +20,8 @@ Use bitflags to control hardware behaviour, e.g. where the VIC-II chip accesses
 screen memory and character sets:
 
 ~~~ rust
-let bank = vic2::ScreenBanks::SCREEN_3C00 | vic2::ScreenBanks::CHARSET_2800;
+let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
 (*c64::VIC).screen_and_charset_bank.write(bank);
-let charset_address = bank.get_charset(); // 0x2800
 ~~~
 
 Convenience functions to perform hardware-specific tasks, e.g. generate random numbers

@@ -1,11 +1,19 @@
+/*
+ * C64 Plasma Example
+ *
+ * - 2001: Originally in C by groepaz; sourced from the CC65 /samples/cbm directory
+ * - 2022: Rust version by Wombat
+ */
+
 #![no_std]
 #![feature(start)]
 #![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
 use itertools::{chain, iproduct, izip};
-use ufmt_stdio::*;
+//use ufmt_stdio::*;
 use mos_hardware::*;
+use ufmt_stdio::*;
 
 /// Generate randomized charset
 unsafe fn make_charset(charset: *mut u8) {
@@ -97,13 +105,13 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     unsafe {
         make_charset(CHARSET);
-        let page1 = ((SCREEN1 as u16 >> 6) & 0xf0 | ((CHARSET as u16 >> 10) & 0x0e)) as u8;
-        let page2 = ((SCREEN2 as u16 >> 6) & 0xf0 | ((CHARSET as u16 >> 10) & 0x0e)) as u8;
+        let page1 = vic2::ScreenBank::from(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
+        let page2 = vic2::ScreenBank::from(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
         loop {
             render_plasma(SCREEN1);
-            (*c64::VIC).screen_char_address.write(page1);
+            (*c64::VIC).screen_and_charset_bank.write(page1);
             render_plasma(SCREEN2);
-            (*c64::VIC).screen_char_address.write(page2);
+            (*c64::VIC).screen_and_charset_bank.write(page2);
         }
     }
 }
@@ -130,6 +138,6 @@ const SINUSTABLE: [u8; 256] = [
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     #[cfg(not(target_vendor = "nes-nrom-128"))]
-    println!("PANIC!!!");
+    print!("!");
     loop {}
 }

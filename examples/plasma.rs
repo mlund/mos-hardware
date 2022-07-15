@@ -1,3 +1,10 @@
+/*
+ * C64 Plasma Example
+ *
+ * - 2001: Originally in C by groepaz; sourced from the CC65 /samples/cbm directory
+ * - 2022: Rust version by Wombat
+ */
+
 #![no_std]
 #![feature(start)]
 #![feature(default_alloc_error_handler)]
@@ -7,7 +14,7 @@ use itertools::{iproduct};
 use ufmt_stdio::*;
 use mos_hardware::*;
 
-/// Generate randomized charset
+/// Generate stochastic character set
 unsafe fn make_charset(charset: *mut u8) {
     const BITS: [u8; 8] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
 
@@ -27,6 +34,7 @@ unsafe fn make_charset(charset: *mut u8) {
         });
 }
 
+/// Render entire 40x25 screen
 unsafe fn render_plasma(screen: *mut u8) {
     static mut C1A: u8 = 0;
     static mut C1B: u8 = 0;
@@ -70,8 +78,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     unsafe {
         make_charset(CHARSET);
-        let page1 = vic2::ScreenBanks::from_addresses(SCREEN1, CHARSET);
-        let page2 = vic2::ScreenBanks::from_addresses(SCREEN2, CHARSET);
+        let page1 = vic2::ScreenBank::from(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
+        let page2 = vic2::ScreenBank::from(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
         loop {
             render_plasma(SCREEN1);
             (*c64::VIC).screen_and_charset_bank.write(page1);
@@ -103,8 +111,7 @@ const SINUSTABLE: [u8; 256] = [
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     #[cfg(not(target_vendor = "nes-nrom-128"))]
-    println!("PANIC!!!");
+    print!("!");
     loop {}
 }
-
 
