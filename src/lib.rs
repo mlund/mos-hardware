@@ -63,8 +63,9 @@ use core::iter::Iterator;
  * Peek into memory (read)
  *
  * Example:
- *
- *     let value = peek!(0xC000 as *mut u8);
+ * ~~~
+ * let value = peek!(0xC000 as *mut u8);
+ * ~~~
  */
 #[macro_export]
 macro_rules! peek {
@@ -80,8 +81,9 @@ macro_rules! peek {
  * Poke into memory (read)
  *
  * Example:
- *
- *     poke!(0xD020 as *mut u8, vic2::LIGHT_GREEN);
+ * ~~~
+ * poke!(0xD020 as *mut u8, vic2::LIGHT_GREEN);
+ * ~~~
  */
 #[macro_export]
 macro_rules! poke {

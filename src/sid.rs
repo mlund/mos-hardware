@@ -65,8 +65,10 @@ impl MOSSoundInterfaceDevice {
      *
      * Example:
      *
-     *    (*c64::SID).start_random_generator();
-     *    let random_byte = rand8!(*c64::SID);
+     * ```
+     * (*c64::SID).start_random_generator();
+     * let random_byte = rand8!(*c64::SID);
+     * ```
      *
      * More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
      */
@@ -81,8 +83,10 @@ impl MOSSoundInterfaceDevice {
  *
  * Example:
  *
- *    (*c64::SID).start_random_generator();
- *    let random_byte = rand8!(*c64::SID);
+ * ```
+ * (*c64::SID).start_random_generator();
+ * let random_byte = rand8!(*c64::SID);
+ * ```
  *
  * More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
  */
