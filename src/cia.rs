@@ -1,5 +1,6 @@
 use core::mem::size_of;
 use volatile_register::RW;
+use static_assertions::const_assert;
 
 #[repr(C, packed)]
 pub struct TimeOfDay {

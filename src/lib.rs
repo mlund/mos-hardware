@@ -10,7 +10,7 @@
 
 #![no_std]
 #![feature(const_ptr_offset_from, const_refs_to_cell)]
-#[macro_use]
+
 extern crate static_assertions;
 
 pub mod cia;

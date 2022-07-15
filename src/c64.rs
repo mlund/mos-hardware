@@ -7,7 +7,7 @@ pub const DEFAULT_SCREEN: *mut u8 = (0x0400) as *mut u8;
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
 pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
 
-pub const VIC_II: *const MOSVideoInterfaceControllerII =
+pub const VIC: *const MOSVideoInterfaceControllerII =
     (0xd000) as *const MOSVideoInterfaceControllerII;
 
 pub const SID: *const MOSSoundInterfaceDevice = (0xd400) as *const MOSSoundInterfaceDevice;

@@ -1,6 +1,7 @@
 use bitflags::bitflags;
 use core::mem::size_of;
 use volatile_register::{RO, WO};
+use static_assertions::const_assert;
 
 bitflags! {
     pub struct VoiceControlFlags: u8 {
@@ -61,7 +62,8 @@ impl MOSSoundInterfaceDevice {
  */
 #[macro_export]
 macro_rules! rand8 {
-    ($sid:expr) => {{
-        (*sid).channel3_oscillator.read()
+    ($sid_pointer:expr) => {{
+        (*$sid_pointer).channel3_oscillator.read()
     }};
 }
+

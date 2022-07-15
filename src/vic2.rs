@@ -1,6 +1,7 @@
 use bitflags::bitflags;
 use memoffset::offset_of;
 use volatile_register::RW;
+use static_assertions::const_assert;
 
 pub const BLACK: u8 = 0;
 pub const WHITE: u8 = 1;
