@@ -13,7 +13,6 @@
 // limitations under the license.
 
 #![no_std]
-#![feature(const_ptr_offset_from, const_refs_to_cell)]
 
 extern crate static_assertions;
 

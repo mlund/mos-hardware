@@ -13,9 +13,7 @@
 // limitations under the license.
 
 use bitflags::bitflags;
-use memoffset::offset_of;
 use volatile_register::RW;
-use static_assertions::const_assert;
 
 pub const BLACK: u8 = 0;
 pub const WHITE: u8 = 1;
@@ -126,5 +124,3 @@ pub struct MOSVideoInterfaceControllerII {
     pub background_color: RW<u8>,            // 0x21
 }
 
-const_assert!(offset_of!(MOSVideoInterfaceControllerII, control1) == 0x16);
-const_assert!(offset_of!(MOSVideoInterfaceControllerII, sprites_expand_y) == 0x17);
