@@ -61,8 +61,14 @@ const_assert!(size_of::<MOSSoundInterfaceDevice>() == 0x1d);
 
 impl MOSSoundInterfaceDevice {
     /**
-     * Start noise generation on channel 3. For more information, see
-     * https://www.atarimagazines.com/compute/issue72/random_numbers.php
+     * Start noise generation on SID channel 3.
+     *
+     * Example:
+     *
+     *    (*c64::SID).start_random_generator();
+     *    let random_byte = rand8!(*c64::SID);
+     *
+     * More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
      */
     pub unsafe fn start_random_generator(&self) {
         self.channel3.frequency.write(0xffff);
@@ -71,8 +77,14 @@ impl MOSSoundInterfaceDevice {
 }
 
 /**
- * Use SID entropy to generate random numbers in the interval [0:255].
- * Requires an initial call to `start_random_generator()`.
+ * Use SID entropy to generate a random byte in the interval.
+ *
+ * Example:
+ *
+ *    (*c64::SID).start_random_generator();
+ *    let random_byte = rand8!(*c64::SID);
+ *
+ * More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
  */
 #[macro_export]
 macro_rules! rand8 {

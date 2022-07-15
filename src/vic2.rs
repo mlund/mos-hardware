@@ -43,7 +43,14 @@ bitflags! {
     }
 }
 bitflags! {
-    /// Controls charset memory location
+    /**
+     * All possible charset memory locations
+     *
+     * Example:
+     *
+     *     let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
+     *     (*c64::VIC).screen_and_charset_bank.write(bank);
+     */
     pub struct CharsetBank: u8 {
         const AT_0000 = 0b0000_0000;
         const AT_0800 = 0b0000_0010;
@@ -58,7 +65,15 @@ bitflags! {
 }
 
 impl CharsetBank {
-    /// Create a bank based on given charset address
+    /**
+     * Generate bank from memory address. Will check if it is valid.
+     *
+     * Example:
+     *
+     *     let screen: 0x2800 as *mut u8;
+     *     let charset: 0x2000 as *mut u8;
+     *     let bank = vic2::ScreenBank::from(screen).bits() | vic2::CharsetBank::from(charset).bits();
+     */
     pub unsafe fn from(charset : *mut u8) -> CharsetBank {
         let bank = ((charset as u16 >> 10) & 0x0e) as u8;
         Self::from_bits(bank).unwrap()
@@ -66,7 +81,14 @@ impl CharsetBank {
 }
 
 bitflags! {
-    /// Controls screen memory location
+    /**
+     * All possible screen memory locations
+     *
+     * Example:
+     *
+     *     let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
+     *     (*c64::VIC).screen_and_charset_bank.write(bank);
+     */
     pub struct ScreenBank: u8 {
         const AT_0000 = 0b0000_0000;
         const AT_0400 = 0b0001_0000;
@@ -89,17 +111,20 @@ bitflags! {
 }
 
 impl ScreenBank {
-    /// Create a bank based in given screen address
+    /**
+     * Generate bank from memory address. Will check if it is valid.
+     *
+     * Example:
+     *
+     *     let screen: 0x2800 as *mut u8;
+     *     let charset: 0x2000 as *mut u8;
+     *     let bank = vic2::ScreenBank::from(screen).bits() | vic2::CharsetBank::from(charset).bits();
+     */
     pub unsafe fn from(screen : *mut u8) -> ScreenBank {
         let bank = (screen as u16 >> 6) as u8;
         Self::from_bits(bank).unwrap()
     }
 }
-
-pub unsafe fn make_screen_and_charset_bank(screen : *mut u8, charset : *mut u8) -> u8 {
-    ScreenBank::from(screen).bits() | CharsetBank::from(charset).bits()
-}
-
 
 #[repr(C, packed)]
 pub struct MOSVideoInterfaceControllerII {

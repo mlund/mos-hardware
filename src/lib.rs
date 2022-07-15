@@ -12,6 +12,41 @@
 // see the license for the specific language governing permissions and
 // limitations under the license.
 
+//! This crate contains hardware register tables and support functions for
+//! 8-bit retro computers like the Commodore 64, MEGA65 and others.
+//! Please check the `examples/` directory to see how Rust can be
+//! used generate demo effects.
+//!
+//! # Examples
+//! 
+//! Read and write to labelled hardware registers:
+//! 
+//! ```
+//! use mos_hardware::{c64,vic2};
+//! 
+//! let old_border_color = (*c64::VIC).border_color.read();
+//! (*c64::VIC).border_color.write(c64::LIGHT_RED);
+//! 
+//! (*c64::SID).potentiometer_x.write(3); // error: read-only register
+//! ```
+//! 
+//! Use bitflags to control hardware behaviour, _e.g._ where the VIC-II chip accesses
+//! screen memory and character sets:
+//! 
+//! ```
+//! let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
+//! (*c64::VIC).screen_and_charset_bank.write(bank);
+//! ```
+//! 
+//! Convenience functions to perform hardware-specific tasks, _e.g._ generate random numbers
+//! using noise from the C64's SID chip:
+//! 
+//! ```
+//! (*c64::SID).start_random_generator();
+//! let random_number : u8 = rand8!(c64::SID);
+//! ```
+//!
+
 #![no_std]
 
 extern crate static_assertions;
@@ -24,7 +59,13 @@ pub mod mega65;
 
 use core::iter::Iterator;
 
-/// Peek into memory (read)
+/**
+ * Peek into memory (read)
+ *
+ * Example:
+ *
+ *     let value = peek!(0xC000 as *mut u8);
+ */
 #[macro_export]
 macro_rules! peek {
     ($address:expr) => {{
@@ -35,7 +76,13 @@ macro_rules! peek {
     }};
 }
 
-/// Poke memory address (write)
+/**
+ * Poke into memory (read)
+ *
+ * Example:
+ *
+ *     poke!(0xD020 as *mut u8, vic2::LIGHT_GREEN);
+ */
 #[macro_export]
 macro_rules! poke {
     ($address:expr, $value:expr) => {{
@@ -62,7 +109,12 @@ macro_rules! sub {
     }};
 }
 
-/** https://stackoverflow.com/questions/66482699/how-to-repeat-each-element-of-iterator-n-times*/
+/**
+ * Repeat each element n times
+ *
+ * See more
+ * [here](https://stackoverflow.com/questions/66482699/how-to-repeat-each-element-of-iterator-n-times).
+ */
 pub fn repeat_element<T: Clone>(
     it: impl Iterator<Item = T>,
     cnt: usize,
