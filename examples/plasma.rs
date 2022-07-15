@@ -64,20 +64,19 @@ unsafe fn render_plasma(screen: *mut u8) {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-
     const CHARSET: *mut u8 = (0x2000) as *mut u8; // Custom charset
     const SCREEN1: *mut u8 = (0x2800) as *mut u8; // Set up two character screens...
     const SCREEN2: *mut u8 = (0x2c00) as *mut u8; // ...for double buffering
 
     unsafe {
         make_charset(CHARSET);
-        let page1 = ((SCREEN1 as u16 >> 6) & 0xf0 | ((CHARSET as u16 >> 10) & 0x0e)) as u8;
-        let page2 = ((SCREEN2 as u16 >> 6) & 0xf0 | ((CHARSET as u16 >> 10) & 0x0e)) as u8;
+        let page1 = vic2::ScreenBanks::from_addresses(SCREEN1, CHARSET);
+        let page2 = vic2::ScreenBanks::from_addresses(SCREEN2, CHARSET);
         loop {
             render_plasma(SCREEN1);
-            (*c64::VIC).screen_char_address.write(page1);
+            (*c64::VIC).screen_and_charset_bank.write(page1);
             render_plasma(SCREEN2);
-            (*c64::VIC).screen_char_address.write(page2);
+            (*c64::VIC).screen_and_charset_bank.write(page2);
         }
     }
 }
