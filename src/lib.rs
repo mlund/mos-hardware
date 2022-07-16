@@ -111,6 +111,37 @@ macro_rules! sub {
     }};
 }
 
+/// Get high byte from a 16-bit integer using bit-shifting
+///
+/// Example:
+/// ```
+/// let high = highbyte(0xABCD);
+/// let low = lowbyte(0xABCD);
+/// assert_eq!(high, 0xAB);
+/// assert_eq!(low, 0xCD);
+/// ```
+#[macro_export]
+macro_rules! highbyte {
+    ($word:expr) => {{
+        ($word >> 8) as u8
+    }};
+}
+
+/// Get low byte from a 16-bit integer using bit-shifting
+///
+/// Example:
+/// ```
+/// let word = 0xABCD;
+/// assert_eq!(highbyte!(word), 0xAB);
+/// assert_eq!(lowbyte!(word), 0xCD);
+/// ```
+#[macro_export]
+macro_rules! lowbyte {
+    ($word:expr) => {{
+        ($word & 0xff) as u8;
+    }};
+}
+
 /**
  * Repeat each element n times
  *
