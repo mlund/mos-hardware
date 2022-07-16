@@ -25,7 +25,7 @@
 //! use mos_hardware::{c64,vic2};
 //! 
 //! let old_border_color = (*c64::VIC).border_color.read();
-//! (*c64::VIC).border_color.write(c64::LIGHT_RED);
+//! (*c64::VIC).border_color.write(vic2::LIGHT_RED);
 //! 
 //! (*c64::SID).potentiometer_x.write(3); // error: read-only register
 //! ```
@@ -48,6 +48,7 @@
 //!
 
 #![no_std]
+#![feature(const_option)]
 
 extern crate static_assertions;
 

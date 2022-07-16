@@ -1,9 +1,8 @@
-/*
- * C64 Plasma Example
- *
- * - 2001: Originally in C by groepaz; sourced from the CC65 /samples/cbm directory
- * - 2022: Rust version by Wombat
- */
+//! C64 Plasma Example
+//!
+//! - (w)2001 by groepaz; sourced from the CC65 /samples/cbm directory
+//! - Cleanup and porting to CC65 by Ullrich von Bassewitz.
+//! - Porting to Rust by Mikael Lund aka Wombat (2022)
 
 #![no_std]
 #![feature(start)]
@@ -11,7 +10,6 @@
 
 use core::panic::PanicInfo;
 use itertools::{chain, iproduct, izip};
-//use ufmt_stdio::*;
 use mos_hardware::*;
 use ufmt_stdio::*;
 
@@ -51,32 +49,32 @@ unsafe fn render_plasma(screen: *mut u8) {
 
     let xsine1 = SINUSTABLE
         .iter()
+        .copied()
         .cycle()
         .skip(C1A as usize)
         .step_by(4)
-        .take(XBUF.len())
-        .copied();
+        .take(XBUF.len());
     let xsine2 = SINUSTABLE
         .iter()
+        .copied()
         .cycle()
         .skip(C1B as usize)
         .step_by(9)
-        .take(XBUF.len())
-        .copied();
+        .take(XBUF.len());
     let ysine1 = SINUSTABLE
         .iter()
+        .copied()
         .cycle()
         .skip(C2A as usize)
         .step_by(3)
-        .take(YBUF.len())
-        .copied();
+        .take(YBUF.len());
     let ysine2 = SINUSTABLE
         .iter()
+        .copied()
         .cycle()
         .skip(C2B as usize)
         .step_by(7)
-        .take(YBUF.len())
-        .copied();
+        .take(YBUF.len());
 
     let zipped_x = izip!(XBUF.iter_mut(), xsine1, xsine2);
     let zipped_y = izip!(YBUF.iter_mut(), ysine1, ysine2);
@@ -98,20 +96,19 @@ unsafe fn render_plasma(screen: *mut u8) {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-
-    const CHARSET: *mut u8 = (0x2000) as *mut u8; // Custom charset
-    const SCREEN1: *mut u8 = (0x2800) as *mut u8; // Set up two character screens...
-    const SCREEN2: *mut u8 = (0x2c00) as *mut u8; // ...for double buffering
+    const CHARSET: u16 = 0x2000; // Custom charset
+    const SCREEN1: u16 = 0x2800; // Set up two character screens...
+    const SCREEN2: u16 = 0x2c00; // ...for double buffering
+    const PAGE1: u8 = vic2::ScreenBank::from(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
+    const PAGE2: u8 = vic2::ScreenBank::from(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
 
     unsafe {
-        make_charset(CHARSET);
-        let page1 = vic2::ScreenBank::from(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
-        let page2 = vic2::ScreenBank::from(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
+        make_charset(CHARSET as *mut u8);
         loop {
-            render_plasma(SCREEN1);
-            (*c64::VIC).screen_and_charset_bank.write(page1);
-            render_plasma(SCREEN2);
-            (*c64::VIC).screen_and_charset_bank.write(page2);
+            render_plasma(SCREEN1 as *mut u8);
+            (*c64::VIC).screen_and_charset_bank.write(PAGE1);
+            render_plasma(SCREEN2 as *mut u8);
+            (*c64::VIC).screen_and_charset_bank.write(PAGE2);
         }
     }
 }

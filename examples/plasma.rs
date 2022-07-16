@@ -1,9 +1,8 @@
-/*
- * C64 Plasma Example
- *
- * - 2001: Originally in C by groepaz; sourced from the CC65 /samples/cbm directory
- * - 2022: Rust version by Wombat
- */
+//! C64 Plasma Example
+//!
+//! - (w)2001 by groepaz; sourced from the CC65 /samples/cbm directory
+//! - Cleanup and porting to CC65 by Ullrich von Bassewitz.
+//! - Porting to Rust by Mikael Lund aka Wombat (2022)
 
 #![no_std]
 #![feature(start)]
@@ -15,19 +14,18 @@ use ufmt_stdio::*;
 use mos_hardware::*;
 
 /// Generate stochastic character set
-unsafe fn make_charset(charset: *mut u8) {
+unsafe fn make_charset(charset_ptr: *mut u8) {
     const BITS: [u8; 8] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
-
     (*c64::SID).start_random_generator();
 
-    repeat_element(SINUSTABLE.iter(), 8)
+    repeat_element(SINUSTABLE.iter().copied(), 8)
         .enumerate()
         .for_each(|(cnt, sine)| {
             let mut char_pattern = 0b00000000u8;
-            BITS.iter().filter(|_| rand8!(c64::SID) > *sine).for_each(|bit| {
+            BITS.iter().filter(|_| rand8!(c64::SID) > sine).for_each(|bit| {
                 char_pattern |= bit;
             });
-            poke!(charset.offset(cnt as isize), char_pattern);
+            poke!(charset_ptr.offset(cnt as isize), char_pattern);
             if cnt % 64 == 0 {
                 print!(".");
             }
@@ -35,7 +33,7 @@ unsafe fn make_charset(charset: *mut u8) {
 }
 
 /// Render entire 40x25 screen
-unsafe fn render_plasma(screen: *mut u8) {
+unsafe fn render_plasma(screen_ptr: *mut u8) {
     static mut C1A: u8 = 0;
     static mut C1B: u8 = 0;
     static mut C2A: u8 = 0;
@@ -66,25 +64,25 @@ unsafe fn render_plasma(screen: *mut u8) {
     iproduct!(YBUF.iter().copied(), XBUF.iter().copied())
         .enumerate()
         .for_each(|(cnt, (y, x))| {
-            poke!(screen.offset(cnt as isize), add!(y, x));
+            poke!(screen_ptr.offset(cnt as isize), add!(y, x));
         })
 }
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-    const CHARSET: *mut u8 = (0x2000) as *mut u8; // Custom charset
-    const SCREEN1: *mut u8 = (0x2800) as *mut u8; // Set up two character screens...
-    const SCREEN2: *mut u8 = (0x2c00) as *mut u8; // ...for double buffering
+    const CHARSET: u16 = 0x2000; // Custom charset
+    const SCREEN1: u16 = 0x2800; // Set up two character screens...
+    const SCREEN2: u16 = 0x2c00; // ...for double buffering
+    const PAGE1: u8 = vic2::ScreenBank::from(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
+    const PAGE2: u8 = vic2::ScreenBank::from(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
 
     unsafe {
-        make_charset(CHARSET);
-        let page1 = vic2::ScreenBank::from(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
-        let page2 = vic2::ScreenBank::from(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
+        make_charset(CHARSET as *mut u8);
         loop {
-            render_plasma(SCREEN1);
-            (*c64::VIC).screen_and_charset_bank.write(page1);
-            render_plasma(SCREEN2);
-            (*c64::VIC).screen_and_charset_bank.write(page2);
+            render_plasma(SCREEN1 as *mut u8);
+            (*c64::VIC).screen_and_charset_bank.write(PAGE1);
+            render_plasma(SCREEN2 as *mut u8);
+            (*c64::VIC).screen_and_charset_bank.write(PAGE2);
         }
     }
 }

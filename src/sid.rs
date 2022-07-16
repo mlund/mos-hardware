@@ -72,9 +72,11 @@ impl MOSSoundInterfaceDevice {
      *
      * More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
      */
-    pub unsafe fn start_random_generator(&self) {
-        self.channel3.frequency.write(0xffff);
-        self.channel3.control.write(VoiceControlFlags::NOISE);
+    pub fn start_random_generator(&self) {
+        unsafe {
+            self.channel3.frequency.write(0xffff);
+            self.channel3.control.write(VoiceControlFlags::NOISE);
+        }
     }
 }
 
