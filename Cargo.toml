@@ -20,7 +20,7 @@ debug = 2
 codegen-units = 1
 
 [profile.release]
-opt-level = 3
+opt-level = "s"
 lto = true
 debug = 2
 
