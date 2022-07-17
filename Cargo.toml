@@ -4,6 +4,7 @@ version = "0.1.1"
 edition = "2021"
 authors = ["Mikael Lund <lyssky@icloud.com>"]
 homepage = "https://github.com/mlund/mos-hardware"
+documentation = "https://https://docs.rs/mos-hardware"
 repository = "https://github.com/mlund/mos-hardware"
 license = "MIT OR Apache-2.0"
 readme = "README.md"

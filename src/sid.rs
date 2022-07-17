@@ -16,6 +16,7 @@ use bitflags::bitflags;
 use core::mem::size_of;
 use volatile_register::{RO, WO};
 use static_assertions::const_assert;
+use crate::*;
 
 bitflags! {
     pub struct VoiceControlFlags: u8 {
@@ -60,22 +61,39 @@ pub struct MOSSoundInterfaceDevice {
 const_assert!(size_of::<MOSSoundInterfaceDevice>() == 0x1d);
 
 impl MOSSoundInterfaceDevice {
-    /**
-     * Start noise generation on SID channel 3.
-     *
-     * Example:
-     *
-     * ```
-     * (*c64::SID).start_random_generator();
-     * let random_byte = rand8!(*c64::SID);
-     * ```
-     *
-     * More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
-     */
+    /// Start noise generation on SID channel 3.
+    ///
+    /// Example:
+    /// ```
+    /// (*c64::SID).start_random_generator();
+    /// let random_byte = rand8!(*c64::SID);
+    /// ```
+    ///
+    /// More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
     pub fn start_random_generator(&self) {
         unsafe {
-            self.channel3.frequency.write(0xffff);
+            self.channel3.frequency.write(u16::MAX);
             self.channel3.control.write(VoiceControlFlags::NOISE);
+        }
+    }
+
+    /// Random byte in the interval [0:max_value]
+    pub fn rand8(&self, max_value : u8) -> u8 {
+        loop {
+            let r = self.channel3_oscillator.read();
+            if r <= max_value {
+                return r;
+            }
+        }
+    }
+
+    /// Random word in the interval [0:max_value]
+    pub fn rand16(&self, max_value : u16) -> u16 {
+        loop {
+            let r = ((self.channel3_oscillator.read() as u16) << 8) | (self.channel3_oscillator.read() as u16);
+            if r <= max_value {
+                return r;
+            }
         }
     }
 }
@@ -98,4 +116,3 @@ macro_rules! rand8 {
         (*$sid_pointer).channel3_oscillator.read()
     }};
 }
-
