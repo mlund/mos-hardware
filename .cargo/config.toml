@@ -1,6 +1,12 @@
 [build]
 target = "mos-c64-none"
 
+[target.mos-c64-none]
+runner = ["x64sc", ""]
+
+[target.mos-mega65-none]
+runner = ["xemu-xmega65", "-prg"]
+
 [target.mos-sim-none]
 runner = ["mos-sim", "--cycles"]
 
