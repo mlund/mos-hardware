@@ -14,6 +14,7 @@
 
 use crate::vic2::*;
 use crate::sid::*;
+use crate::{peek};
 
 pub const DEFAULT_SCREEN: *mut u8 = (0x0800) as *mut u8;
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
@@ -22,10 +23,10 @@ pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
 pub const VIC_II: *const MOSVideoInterfaceControllerII =
     (0xd000) as *const MOSVideoInterfaceControllerII;
 
-pub const SID1: *const MOSSoundInterfaceDevice = (0xd400) as *const MOSSoundInterfaceDevice;
-pub const SID2: *const MOSSoundInterfaceDevice = (0xd440) as *const MOSSoundInterfaceDevice;
-pub const SID3: *const MOSSoundInterfaceDevice = (0xd480) as *const MOSSoundInterfaceDevice;
-pub const SID4: *const MOSSoundInterfaceDevice = (0xd4c0) as *const MOSSoundInterfaceDevice;
+pub const SID0: *const MOSSoundInterfaceDevice = (0xd400) as *const MOSSoundInterfaceDevice;
+pub const SID1: *const MOSSoundInterfaceDevice = (0xd440) as *const MOSSoundInterfaceDevice;
+pub const SID2: *const MOSSoundInterfaceDevice = (0xd480) as *const MOSSoundInterfaceDevice;
+pub const SID3: *const MOSSoundInterfaceDevice = (0xd4c0) as *const MOSSoundInterfaceDevice;
 
 pub const COLOR_RAM: *mut u8 = (0xd800) as *mut u8;
 
@@ -36,3 +37,21 @@ pub enum VicBank {
     RegionC000 = 0x00, // Bank 3
 }
 
+/// Generate random byte from hardware register (from mega65 libc)
+///
+/// @todo Returns constant zero on xemu; check on real hardware.
+pub fn rand8() -> u8 {
+    let mut random_byte : u8 = 0;
+    let mut steps :u8 = 32;
+    while steps > 0 {
+        steps = steps - 1;
+        random_byte = (random_byte << 1) | (random_byte >> 7) ^ (peek!(0xd6de as *mut u8) & 0x01);
+        // We then have to wait 10usec before the next value is ready.
+        // 1 raster line is more than that, so just wait one raster line
+        let raster_position = peek!(0xd052 as *mut u8);
+        while peek!(0xd052 as *mut u8) == raster_position {
+            continue;
+        }
+    }
+    return random_byte;
+}
