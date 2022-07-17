@@ -15,7 +15,7 @@
 use crate::vic2::*;
 use crate::sid::*;
 
-pub const DEFAULT_SCREEN: *mut u8 = (0x0400) as *mut u8;
+pub const DEFAULT_SCREEN: *mut u8 = (0x0800) as *mut u8;
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
 pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
 
