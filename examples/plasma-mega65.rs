@@ -1,4 +1,4 @@
-//! C64 Plasma Example
+//! C64 Plasma Example (80 x 25 mode for mega65)
 //!
 //! - (w)2001 by groepaz; sourced from the CC65 /samples/cbm directory
 //! - Cleanup and porting to CC65 by Ullrich von Bassewitz.
@@ -70,6 +70,7 @@ unsafe fn render_plasma(screen_ptr: *mut u8) {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+    mega65::speed_mode3();       // Set CPU speed to 3.5 Mhz
     const CHARSET: u16 = 0x3000; // Custom charset
     const SCREEN1: u16 = 0x0800; // Set up two character screens...
     const SCREEN2: u16 = 0x2800; // ...for double buffering

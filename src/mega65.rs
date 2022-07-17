@@ -14,7 +14,7 @@
 
 use crate::vic2::*;
 use crate::sid::*;
-use crate::{peek};
+use crate::{peek, poke};
 
 pub const DEFAULT_SCREEN: *mut u8 = (0x0800) as *mut u8;
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
@@ -55,3 +55,27 @@ pub fn rand8() -> u8 {
     }
     return random_byte;
 }
+
+/// Set CPU speed to 1 Mhz
+pub fn speed_mode1() {
+    let mut val : u8 = peek!(0xd031 as *mut u8) & 0b1011_1111; // unset FAST bit 
+    poke!(0xd031 as *mut u8, val);
+    val = peek!(0xd054 as *mut u8) & 0b1011_1111; // unset VFAST bit
+    poke!(0xd054 as *mut u8, val);
+} 
+
+/// Set CPU speed to 3.5 Mhz
+pub fn speed_mode3() {
+    let mut val : u8 = peek!(0xd031 as *mut u8) | 0b0100_0000; // set FAST bit
+    poke!(0xd031 as *mut u8, val);
+    val = peek!(0xd054 as *mut u8) & 0b1011_1111; // unset VFAST
+    poke!(0xd054 as *mut u8, val);
+} 
+
+/// Set CPU speed to 40 Mhz
+pub fn speed_mode40() {
+    let mut val : u8 = peek!(0xd031 as *mut u8) | 0b0100_0000; // set FAST bit
+    poke!(0xd031 as *mut u8, val);
+    val = peek!(0xd054 as *mut u8) | 0b0100_0000; // set VFAST bit
+    poke!(0xd054 as *mut u8, val);
+} 
