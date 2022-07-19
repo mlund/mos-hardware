@@ -8,7 +8,7 @@ documentation = "https://docs.rs/mos-hardware"
 repository = "https://github.com/mlund/mos-hardware"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-keywords = ["commodore", "c64", "mega65", "8-bit"]
+keywords = ["commodore", "c64", "mega65", "8-bit", "rust-mos"]
 categories = ["embedded", "no-std"]
 description = "Hardware register tables and support functions for 8-bit retro computers like the Commodore 64, MEGA65 and others."
 

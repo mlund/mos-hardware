@@ -1,3 +1,5 @@
+[![Crates.io](https://img.shields.io/crates/v/mos-hardware)](https://crates.io/crates/mos-hardware)
+
 # MOS-Hardware
 
 This crate contains hardware register tables and support functions for
