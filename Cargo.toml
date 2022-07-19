@@ -1,6 +1,6 @@
 [package]
 name = "mos-hardware"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Mikael Lund <lyssky@icloud.com>"]
 homepage = "https://github.com/mlund/mos-hardware"
