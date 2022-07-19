@@ -47,4 +47,5 @@ itertools = {version = "0.10.3", default-features = false}
 
 [package.metadata.docs.rs]
 default-target = "mos-c64-none"
+targets = ["mos-c64-none"]
 
