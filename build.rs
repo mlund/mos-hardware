@@ -1,10 +1,12 @@
 // build.rs
 
+#[cfg(feature = "docs-rs")]
+fn main() {} // Skip the script when the doc is building
+
+#[cfg(not(feature = "docs-rs"))]
 fn main() {
-    if std::env::var("DOCS_RS").is_ok() {
-        return
-    }
     cc::Build::new()
+        .compiler("mos-c64-clang")
         .file("src/irq.c")
         .compile("irq");
 }
