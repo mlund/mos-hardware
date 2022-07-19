@@ -51,3 +51,35 @@ pub enum VicBank {
     RegionC000 = 0x00, // Bank 3
 }
 
+extern {
+    // defined in c to allow assembly and interrupt attribute
+    fn hardware_raster_irq_c(triggering_raster_line: u8);
+}
+
+/// Setup hardware raster interrupt (0xfffe)
+///
+/// This registers a Rust function, `called_every_frame()` to be triggered
+/// at a specific raster line. The BASIC and KERNAL roms are disabled so
+/// suffix your main program with and endless loop.
+/// The function `fn called_every_frame()` must be defined and *exported*
+/// on the Rust side and will be called from C via a wrapper. This is because
+/// the llvm-mos `__interrupt__` attribute is currently not available from Rust.
+///
+/// Example:
+/// ```
+/// #[no_mangle]
+/// pub unsafe extern fn called_every_frame() {
+///    ...
+/// }
+///
+/// #[start]
+/// fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+///    c64::hardware_raster_irq(100); // trigger at raster line 100
+///    loop {}                        // let's not return to dead BASIC
+/// }
+/// ```
+pub fn hardware_raster_irq(triggering_raster_line: u8) {
+    unsafe {
+        hardware_raster_irq_c(triggering_raster_line);
+    }
+}
