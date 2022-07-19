@@ -60,8 +60,8 @@ extern {
 ///
 /// This registers a Rust function, `called_every_frame()` to be triggered
 /// at a specific raster line. The BASIC and KERNAL roms are disabled so
-/// suffix your main program with and endless loop.
-/// The function `fn called_every_frame()` must be defined and *exported*
+/// suffix your main program with an endless loop.
+/// `fn called_every_frame()` must be defined and *exported*
 /// on the Rust side and will be called from C via a wrapper. This is because
 /// the llvm-mos `__interrupt__` attribute is currently not available from Rust.
 ///
