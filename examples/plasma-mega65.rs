@@ -22,7 +22,7 @@ unsafe fn make_charset(charset_ptr: *mut u8) {
         .enumerate()
         .for_each(|(cnt, sine)| {
             let mut char_pattern = 0b00000000u8;
-            BITS.iter().filter(|_| rand8!(c64::SID) > sine).for_each(|bit| {
+            BITS.iter().filter(|_| rand8!(mega65::SID0) > sine).for_each(|bit| {
                 char_pattern |= bit;
             });
             poke!(charset_ptr.offset(cnt as isize), char_pattern);
