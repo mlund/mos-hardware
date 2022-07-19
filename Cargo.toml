@@ -25,6 +25,9 @@ opt-level = "s"
 lto = true
 debug = 2
 
+[lib]
+doctest = false
+
 [patch.crates-io]
 ufmt = {git="https://github.com/mrk-its/ufmt", branch="ptr_width_16_fix"}
 ufmt-write = {git="https://github.com/mrk-its/ufmt", branch="ptr_width_16_fix"}
@@ -41,4 +44,7 @@ cc = "1.0"
 [dev-dependencies]
 ufmt-stdio = "0"
 itertools = {version = "0.10.3", default-features = false}
+
+[package.metadata.docs.rs]
+default-target = "mos-c64-none"
 
