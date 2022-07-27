@@ -1,0 +1,4 @@
+{
+    "image": "mrkits/rust-mos:latest",
+    "extensions": ["matklad.rust-analyzer", "serayuzgur.crates"]
+}
