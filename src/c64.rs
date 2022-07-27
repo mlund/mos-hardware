@@ -12,6 +12,11 @@
 // see the license for the specific language governing permissions and
 // limitations under the license.
 
+//! Commodore 64 support.
+//!
+//! Future information may be incorporated using the
+//! [Ultimate Commodore 64 Reference](https://github.com/mist64/c64ref)
+
 use bitflags::bitflags;
 use crate::vic2::*;
 use crate::sid::*;
