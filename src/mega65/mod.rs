@@ -26,9 +26,9 @@ pub const VIC_II: *const MOSVideoInterfaceControllerII =
     (0xd000) as *const MOSVideoInterfaceControllerII;
 
 pub const SID0: *const MOSSoundInterfaceDevice = (0xd400) as *const MOSSoundInterfaceDevice;
-pub const SID1: *const MOSSoundInterfaceDevice = (0xd440) as *const MOSSoundInterfaceDevice;
-pub const SID2: *const MOSSoundInterfaceDevice = (0xd480) as *const MOSSoundInterfaceDevice;
-pub const SID3: *const MOSSoundInterfaceDevice = (0xd4c0) as *const MOSSoundInterfaceDevice;
+pub const SID1: *const MOSSoundInterfaceDevice = (0xd420) as *const MOSSoundInterfaceDevice;
+pub const SID2: *const MOSSoundInterfaceDevice = (0xd440) as *const MOSSoundInterfaceDevice;
+pub const SID3: *const MOSSoundInterfaceDevice = (0xd460) as *const MOSSoundInterfaceDevice;
 
 pub const COLOR_RAM: *mut u8 = (0xd800) as *mut u8;
 
