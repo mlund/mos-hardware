@@ -112,7 +112,7 @@ macro_rules! sub {
     }};
 }
 
-/// Get high byte from a 16-bit integer using bit-shifting
+/// Get high byte from a 16-bit integer using pointer arithmetic
 ///
 /// Example:
 /// ```
@@ -124,11 +124,12 @@ macro_rules! sub {
 #[macro_export]
 macro_rules! highbyte {
     ($word:expr) => {{
-        ($word >> 8) as u8
+        *((&$word as *const u16) as *const u8).offset(1)
+        // Can also be done using bit-shifting: ($word >> 8) as u8
     }};
 }
 
-/// Get low byte from a 16-bit integer using bit-shifting
+/// Get low byte from a 16-bit integer using pointer arithmetic
 ///
 /// Example:
 /// ```
@@ -139,7 +140,8 @@ macro_rules! highbyte {
 #[macro_export]
 macro_rules! lowbyte {
     ($word:expr) => {{
-        ($word & 0xff) as u8;
+        *((&$word as *const u16) as *const u8).offset(0)
+        // Can also be done using bit-shifting: ($word & 0xff) as u8
     }};
 }
 
