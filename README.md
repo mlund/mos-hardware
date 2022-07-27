@@ -14,13 +14,6 @@ used to generate demo effects.
 - Intuitive bitflags with type checks where possible
 - Minimum resource impact
 
-## Getting started
-
-The project requires [rust-mos](https://github.com/mrk-its/rust-mos) and
-is setup to build for C64 by default.
-A docker image of rust-mos is [available](https://hub.docker.com/r/mrkits/rust-mos) if you
-do not fancy compiling LLVM.
-
 ## Examples
 
 ### Read and write to labelled hardware registers
@@ -51,6 +44,25 @@ let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
 let random_number : u8 = rand8!(c64::SID);
 ~~~
 
+## Getting started
+
+The project requires [rust-mos](https://github.com/mrk-its/rust-mos) and
+is setup to build for C64 by default.
+A docker image of rust-mos is [available](https://hub.docker.com/r/mrkits/rust-mos) if you
+do not fancy compiling LLVM.
+
+### Docker and Visual Studio Code
+
+The easiest way is to use provided `devcontainer.json` configuration for vscode:
+
+1. Configure Visual Studio Code with `Remote - Containers` extension
+2. Open this project inside devcontainer
+3. In vscode terminal do:
+    ```
+      # build for mos-atari8-none target
+      cargo build --target mos-mega65-none
+    ```
+
 ## Status
 
 The hardware registers are currently incomplete and the library may
@@ -60,7 +72,7 @@ be subject to significant changes.
 - [x] `vic2` (partially)
 - [x] `cia` (partially)
 - [x] `c64` (particlly)
-- [ ] `mega65` (scaffold only)
+- [x] `mega65` (partially)
 - [x] Plasma-effect example
 - [x] Raster IRQ example
 
