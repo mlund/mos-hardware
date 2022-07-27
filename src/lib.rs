@@ -71,10 +71,7 @@ use core::iter::Iterator;
 #[macro_export]
 macro_rules! peek {
     ($address:expr) => {{
-        #[allow(unused_unsafe)]
-        unsafe {
-            core::ptr::read_volatile($address)
-        }
+        core::ptr::read_volatile($address)
     }};
 }
 
@@ -89,10 +86,7 @@ macro_rules! peek {
 #[macro_export]
 macro_rules! poke {
     ($address:expr, $value:expr) => {{
-        #[allow(unused_unsafe)]
-        unsafe {
-            core::ptr::write_volatile($address, $value);
-        }
+        core::ptr::write_volatile($address, $value)
     }};
 }
 
@@ -124,7 +118,7 @@ macro_rules! sub {
 #[macro_export]
 macro_rules! highbyte {
     ($word:expr) => {{
-        *((&$word as *const u16) as *const u8).offset(1)
+        ((&$word as *const u16) as *const u8).offset(1).read_volatile()
         // Can also be done using bit-shifting: ($word >> 8) as u8
     }};
 }
@@ -140,7 +134,7 @@ macro_rules! highbyte {
 #[macro_export]
 macro_rules! lowbyte {
     ($word:expr) => {{
-        *((&$word as *const u16) as *const u8).offset(0)
+        ((&$word as *const u16) as *const u8).offset(0).read_volatile()
         // Can also be done using bit-shifting: ($word & 0xff) as u8
     }};
 }
