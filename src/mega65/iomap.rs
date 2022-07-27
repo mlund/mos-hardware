@@ -1150,79 +1150,79 @@ pub mod qspi {
 pub mod rtc {
 
     /// Real-time Clock seconds value (binary coded decimal) [0xFFD7110: RTCSEC]
-    pub const REAL_TIME_CLOCK_SECONDS_VALUE: *mut u8 = (0xFFD7110) as *mut u8;
+    pub const REAL_TIME_CLOCK_SECONDS_VALUE: *mut u8 = (0xFFD7110u32) as *mut u8;
 
     /// Real-time Clock minutes value (binary coded decimal) [0xFFD7111: RTCMIN]
-    pub const REAL_TIME_CLOCK_MINUTES_VALUE: *mut u8 = (0xFFD7111) as *mut u8;
+    pub const REAL_TIME_CLOCK_MINUTES_VALUE: *mut u8 = (0xFFD7111u32) as *mut u8;
 
     /// Real-time Clock hours value (binary coded decimal) [0xFFD7112: RTCHOUR]
-    pub const REAL_TIME_CLOCK_HOURS_VALUE: *mut u8 = (0xFFD7112) as *mut u8;
+    pub const REAL_TIME_CLOCK_HOURS_VALUE: *mut u8 = (0xFFD7112u32) as *mut u8;
 
     /// Real-time Clock day of month value (binary coded decimal) [0xFFD7113: RTCDAY]
-    pub const REAL_TIME_CLOCK_DAY_OF_MONTH_VALUE: *mut u8 = (0xFFD7113) as *mut u8;
+    pub const REAL_TIME_CLOCK_DAY_OF_MONTH_VALUE: *mut u8 = (0xFFD7113u32) as *mut u8;
 
     /// Real-time Clock month value (binary coded decimal) [0xFFD7114: RTCMONTH]
-    pub const REAL_TIME_CLOCK_MONTH_VALUE: *mut u8 = (0xFFD7114) as *mut u8;
+    pub const REAL_TIME_CLOCK_MONTH_VALUE: *mut u8 = (0xFFD7114u32) as *mut u8;
 
     /// Real-time Clock year value (binary coded decimal) [0xFFD7115: RTCYEAR]
-    pub const REAL_TIME_CLOCK_YEAR_VALUE: *mut u8 = (0xFFD7115) as *mut u8;
+    pub const REAL_TIME_CLOCK_YEAR_VALUE: *mut u8 = (0xFFD7115u32) as *mut u8;
 
     /// External Real-time Clock seconds value (binary coded decimal) [0xFFD7400: EXTRTCSEC]
-    pub const EXTERNAL_REAL_TIME_CLOCK_SECONDS_VALUE: *mut u8 = (0xFFD7400) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_SECONDS_VALUE: *mut u8 = (0xFFD7400u32) as *mut u8;
 
     /// External Real-time Clock minutes value (binary coded decimal) [0xFFD7401: EXTRTCMIN]
-    pub const EXTERNAL_REAL_TIME_CLOCK_MINUTES_VALUE: *mut u8 = (0xFFD7401) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_MINUTES_VALUE: *mut u8 = (0xFFD7401u32) as *mut u8;
 
     /// External Real-time Clock hours value (binary coded decimal) [0xFFD7402: EXTRTCHOUR]
-    pub const EXTERNAL_REAL_TIME_CLOCK_HOURS_VALUE: *mut u8 = (0xFFD7402) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_HOURS_VALUE: *mut u8 = (0xFFD7402u32) as *mut u8;
 
     /// External Real-time Clock day of week value (binary coded decimal) [0xFFD7403: EXTRTCDOW]
-    pub const EXTERNAL_REAL_TIME_CLOCK_DAY_OF_WEEK_VALUE: *mut u8 = (0xFFD7403) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_DAY_OF_WEEK_VALUE: *mut u8 = (0xFFD7403u32) as *mut u8;
 
     /// External Real-time Clock day of month value (binary coded decimal) [0xFFD7404: EXTRTCDAY]
-    pub const EXTERNAL_REAL_TIME_CLOCK_DAY_OF_MONTH_VALUE: *mut u8 = (0xFFD7404) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_DAY_OF_MONTH_VALUE: *mut u8 = (0xFFD7404u32) as *mut u8;
 
     /// External Real-time Clock month value (binary coded decimal) [0xFFD7405: EXTRTCMONTH]
-    pub const EXTERNAL_REAL_TIME_CLOCK_MONTH_VALUE: *mut u8 = (0xFFD7405) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_MONTH_VALUE: *mut u8 = (0xFFD7405u32) as *mut u8;
 
     /// External Real-time Clock year value (binary coded decimal) [0xFFD7406: EXTRTCYEAR]
-    pub const EXTERNAL_REAL_TIME_CLOCK_YEAR_VALUE: *mut u8 = (0xFFD7406) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_YEAR_VALUE: *mut u8 = (0xFFD7406u32) as *mut u8;
 
     /// External Real-time Clock alarm 1 seconds value (binary coded decimal) [0xFFD7407: EXTRTCA1SEC]
-    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_1_SECONDS_VALUE: *mut u8 = (0xFFD7407) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_1_SECONDS_VALUE: *mut u8 = (0xFFD7407u32) as *mut u8;
 
     /// External Real-time Clock alarm 1 minutes value (binary coded decimal) [0xFFD7408: EXTRTCA1MIN]
-    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_1_MINUTES_VALUE: *mut u8 = (0xFFD7408) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_1_MINUTES_VALUE: *mut u8 = (0xFFD7408u32) as *mut u8;
 
     /// External Real-time Clock alarm 1 hours value (binary coded decimal) [0xFFD7409: EXTRTCA1HOUR]
-    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_1_HOURS_VALUE: *mut u8 = (0xFFD7409) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_1_HOURS_VALUE: *mut u8 = (0xFFD7409u32) as *mut u8;
 
     /// External Real-time Clock alarm 1 day of week / day of month value (binary coded decimal) [0xFFD740A: EXTRTCA1DAYDATE]
     pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_1_DAY_OF_WEEK__SLASH__DAY_OF_MONTH_VALUE: *mut u8 =
-        (0xFFD740A) as *mut u8;
+        (0xFFD740Au32) as *mut u8;
 
     /// External Real-time Clock alarm 2 minutes value (binary coded decimal) [0xFFD740B: EXTRTCA2MIN]
-    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_2_MINUTES_VALUE: *mut u8 = (0xFFD740B) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_2_MINUTES_VALUE: *mut u8 = (0xFFD740Bu32) as *mut u8;
 
     /// External Real-time Clock alarm 2 hours value (binary coded decimal) [0xFFD740C: EXTRTCA2HOUR]
-    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_2_HOURS_VALUE: *mut u8 = (0xFFD740C) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_2_HOURS_VALUE: *mut u8 = (0xFFD740Cu32) as *mut u8;
 
     /// External Real-time Clock alarm 2 day of week / day of month value (binary coded decimal) [0xFFD740D: EXTRTCA2DAYDATE]
     pub const EXTERNAL_REAL_TIME_CLOCK_ALARM_2_DAY_OF_WEEK__SLASH__DAY_OF_MONTH_VALUE: *mut u8 =
-        (0xFFD740D) as *mut u8;
+        (0xFFD740Du32) as *mut u8;
 
     /// External Real-time Clock control [0xFFD740E: EXTRTCCTRL]
-    pub const EXTERNAL_REAL_TIME_CLOCK_CONTROL: *mut u8 = (0xFFD740E) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_CONTROL: *mut u8 = (0xFFD740Eu32) as *mut u8;
 
     /// External Real-time Clock control/status register [0xFFD740F: EXTRTCST]
     pub const EXTERNAL_REAL_TIME_CLOCK_CONTROL_SLASH_STATUS_REGISTER: *mut u8 =
-        (0xFFD740F) as *mut u8;
+        (0xFFD740Fu32) as *mut u8;
 
     /// External Real-time Clock aging offset (do not modify) [0xFFD7410: EXTRTCAGINGOFS]
-    pub const EXTERNAL_REAL_TIME_CLOCK_AGING_OFFSET: *mut u8 = (0xFFD7410) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_AGING_OFFSET: *mut u8 = (0xFFD7410u32) as *mut u8;
 
     /// External Real-time Clock temperature (MSB) [0xFFD7411: EXTRTCTEMPMSB]
-    pub const EXTERNAL_REAL_TIME_CLOCK_TEMPERATURE: *mut u8 = (0xFFD7411) as *mut u8;
+    pub const EXTERNAL_REAL_TIME_CLOCK_TEMPERATURE: *mut u8 = (0xFFD7411u32) as *mut u8;
 }
 
 pub mod sd {
