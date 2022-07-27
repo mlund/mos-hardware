@@ -42,7 +42,7 @@ pub enum VicBank {
 /// Generate random byte from hardware register (from mega65 libc)
 ///
 /// @todo Returns constant zero on xemu; check on real hardware.
-pub fn rand8() -> u8 {
+pub unsafe fn rand8() -> u8 {
     let mut random_byte : u8 = 0;
     let mut steps :u8 = 32;
     while steps > 0 {
@@ -59,7 +59,7 @@ pub fn rand8() -> u8 {
 }
 
 /// Set CPU speed to 1 Mhz
-pub fn speed_mode1() {
+pub unsafe fn speed_mode1() {
     let mut val : u8 = peek!(0xd031 as *mut u8) & 0b1011_1111; // unset FAST bit 
     poke!(0xd031 as *mut u8, val);
     val = peek!(0xd054 as *mut u8) & 0b1011_1111; // unset VFAST bit
@@ -67,7 +67,7 @@ pub fn speed_mode1() {
 } 
 
 /// Set CPU speed to 3.5 Mhz
-pub fn speed_mode3() {
+pub unsafe fn speed_mode3() {
     let mut val : u8 = peek!(0xd031 as *mut u8) | 0b0100_0000; // set FAST bit
     poke!(0xd031 as *mut u8, val);
     val = peek!(0xd054 as *mut u8) & 0b1011_1111; // unset VFAST
@@ -75,7 +75,7 @@ pub fn speed_mode3() {
 } 
 
 /// Set CPU speed to 40 Mhz
-pub fn speed_mode40() {
+pub unsafe fn speed_mode40() {
     let mut val : u8 = peek!(0xd031 as *mut u8) | 0b0100_0000; // set FAST bit
     poke!(0xd031 as *mut u8, val);
     val = peek!(0xd054 as *mut u8) | 0b0100_0000; // set VFAST bit

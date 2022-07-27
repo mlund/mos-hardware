@@ -25,13 +25,13 @@ use mos_hardware::*;
 // This function is called at every triggering event.
 #[no_mangle]
 pub unsafe extern fn called_every_frame() {
-    (*c64::VIC).border_color.write(7);
+    (*c64::VIC).border_color.write(vic2::LIGHT_GREEN);
     loop {
         if (*c64::VIC).raster_counter.read() > 120 {
             break;
         }
     }
-    (*c64::VIC).border_color.write(0);
+    (*c64::VIC).border_color.write(vic2::BLACK);
 }
 
 #[start]
