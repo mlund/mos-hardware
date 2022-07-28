@@ -36,10 +36,9 @@ use ufmt_stdio::*;
 /// import numpy as np
 /// from PIL import Image
 /// image = Image.open('sprite.png')
-/// bits = ~np.asarray(image).reshape(3*21, 8).astype('int')
-/// for bits_in_byte in bits:
-///     byte = int(''.join('01'[i] for i in bits_in_byte), 2)
-///     print(f'{byte},', end='')
+/// bits = (~np.asarray(image).reshape(int(24*21/8), 8))
+/// for bits_in_byte in bits.astype(int):
+///     print(int(''.join('01'[i] for i in bits_in_byte), 2), end=',')
 /// ```
 const RUST_LOGO: [u8; 63] = [
     0, 90, 0, 1, 255, 128, 7, 239, 224, 15, 24, 240, 28, 0, 56, 63, 255, 28, 127, 255, 158, 127,
