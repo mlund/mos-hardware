@@ -75,4 +75,5 @@ be subject to significant changes.
 - [x] `mega65` (partially)
 - [x] Plasma-effect example
 - [x] Raster IRQ example
+- [x] Sprite example
 
