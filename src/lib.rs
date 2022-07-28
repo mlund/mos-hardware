@@ -45,7 +45,6 @@
 //! (*c64::SID).start_random_generator();
 //! let random_number : u8 = rand8!(c64::SID);
 //! ```
-//!
 
 #![no_std]
 #![feature(const_option)]
