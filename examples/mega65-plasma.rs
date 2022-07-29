@@ -80,9 +80,9 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         make_charset(CHARSET as *mut u8);
         loop {
             render_plasma(SCREEN1 as *mut u8);
-            (*mega65::VIC_II).screen_and_charset_bank.write(PAGE1);
+            (*mega65::VICII).screen_and_charset_bank.write(PAGE1);
             render_plasma(SCREEN2 as *mut u8);
-            (*mega65::VIC_II).screen_and_charset_bank.write(PAGE2);
+            (*mega65::VICII).screen_and_charset_bank.write(PAGE2);
         }
     }
 }

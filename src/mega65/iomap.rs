@@ -12,6 +12,12 @@
 // see the license for the specific language governing permissions and
 // limitations under the license.
 
+//! This submodule contains automatically generated constants
+//! from the `iomap.txt` file found in the
+//! [`mega65-core`](https://github.com/MEGA65/mega65-core/blob/development/iomap.txt) repository.
+//! The core is still under development so expect the contained values and
+//! names to change over time.
+
 pub mod audio {
 
     /// Audio Mixer register select [0xD6F4: MIXREGSEL]
@@ -1042,9 +1048,6 @@ pub mod misc {
 
     /// Keyboard scan code reader (lower byte) [0xD6F6: PS2KEYSCANLSB]
     pub const KEYBOARD_SCAN_CODE_READER: *mut u8 = (0xD6F6) as *mut u8;
-}
-
-pub mod miscio {
 
     /// Select audio channel volume to be set by thumb wheel #3 [0xD6AC: WHEEL3TARGET]
     pub const SELECT_AUDIO_CHANNEL_VOLUME_TO_BE_SET_BY_THUMB_WHEEL_3_MASK: u8 = 0b00001111;
@@ -1118,12 +1121,6 @@ pub mod miscio {
 
     /// Accelerometer bit-bashing port (debug only) [0xD6F3: ACCELBASH]
     pub const ACCELEROMETER_BIT_BASHING_PORT: *mut u8 = (0xD6F3) as *mut u8;
-}
-
-pub mod none {
-
-    /// palette bank selection [0xD070: VIC_IV]
-    pub const PALETTE_BANK_SELECTION: *mut u8 = (0xD070) as *mut u8;
 }
 
 pub mod qspi {
@@ -1634,9 +1631,6 @@ pub mod uart {
 
     /// C65 keyboard extra lines Data Direction Register (DDR) [0xD608: PORTEDDR]
     pub const C65_KEYBOARD_EXTRA_LINES_DATA_DIRECTION_REGISTER_MASK: u8 = 0b00000011;
-}
-
-pub mod uartmisc {
 
     /// C65 UART BAUD clock source: 1 = 7.09375MHz, 0 = 80MHz (VIC-IV pixel clock) [0xD609: UFAST]
     pub const C65_UART_BAUD_CLOCK_SOURCE_MASK: u8 = 0b00000001;
@@ -2228,4 +2222,8 @@ pub mod vic4 {
 
     /// VIC-IV debug pixel select red(01), green(10) or blue(11) channel visible in $D07D [0xD07C: DEBUGC]
     pub const VIC_IV_DEBUG_PIXEL_SELECT_RED_MASK: u8 = 0b00000011;
+
+    /// palette bank selection [0xD070: VIC_IV]
+    pub const PALETTE_BANK_SELECTION: *mut u8 = (0xD070) as *mut u8;
+
 }
