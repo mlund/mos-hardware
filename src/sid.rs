@@ -68,7 +68,6 @@ impl MOSSoundInterfaceDevice {
     /// (*c64::SID).start_random_generator();
     /// let random_byte = rand8!(*c64::SID);
     /// ```
-    ///
     /// More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
     pub fn start_random_generator(&self) {
         unsafe {
@@ -98,18 +97,16 @@ impl MOSSoundInterfaceDevice {
     }
 }
 
-/**
- * Use SID entropy to generate a random byte in the interval.
- *
- * Example:
- *
- * ```
- * (*c64::SID).start_random_generator();
- * let random_byte = rand8!(*c64::SID);
- * ```
- *
- * More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
- */
+
+/// Use SID entropy to generate a random byte in the interval.
+///
+/// Example:
+/// ```
+/// (*c64::SID).start_random_generator();
+/// let random_byte = rand8!(*c64::SID);
+/// ```
+///
+/// More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
 #[macro_export]
 macro_rules! rand8 {
     ($sid_pointer:expr) => {{

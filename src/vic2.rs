@@ -84,12 +84,7 @@ bitflags! {
 
 bitflags! {
     /// Interrupt Register Flags (0xD019).
-    /// Bits are set to 1 when an IRQ is detected
-    ///
-    /// Example:
-    /// ```
-    /// 
-    /// ```
+    /// Bits are set to 1 when an IRQ is detected.
     pub struct InterruptFlags: u8 {
         /// Set when raster counter equals stored raster count
         const RASTER_COMPARE_IRQ = 0b00000001;
@@ -103,15 +98,13 @@ bitflags! {
 }
 
 bitflags! {
-    /**
-     * All possible charset memory locations
-     *
-     * Example:
-     * ```
-     * let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
-     * (*c64::VIC).screen_and_charset_bank.write(bank);
-     * ```
-     */
+    /// All possible charset memory locations
+    ///
+    /// Example:
+    /// ~~~
+    /// let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
+    /// (*c64::VIC).screen_and_charset_bank.write(bank);
+    /// ~~~
     pub struct CharsetBank: u8 {
         const AT_0000 = 0b0000_0000;
         const AT_0800 = 0b0000_0010;
@@ -126,16 +119,14 @@ bitflags! {
 }
 
 impl CharsetBank {
-    /**
-     * Generate bank from charset memory address. Will check if it is valid.
-     *
-     * Example:
-     * ```
-     * const SCREEN: u16 = 0x2800;
-     * const CHARSET: u16 = 0x2000;
-     * const BANK: u8 = vic2::ScreenBank::from(SCREEN).bits() | vic2::CharsetBank::from(CHARSET).bits();
-     * ```
-     */
+    /// Generate bank from charset memory address. Will check if it is valid.
+    ///
+    /// Example:
+    /// ~~~
+    /// const SCREEN: u16 = 0x2800;
+    /// const CHARSET: u16 = 0x2000;
+    /// const BANK: u8 = vic2::ScreenBank::from(SCREEN).bits() | vic2::CharsetBank::from(CHARSET).bits();
+    /// ~~~
     pub const fn from(charset: u16) -> CharsetBank {
         let bank = ((charset >> 10) & 0x0e) as u8;
         Self::from_bits(bank).unwrap()
@@ -143,9 +134,7 @@ impl CharsetBank {
 }
 
 bitflags! {
-    /**
-     * All possible screen memory locations
-     */
+    /// All possible screen memory locations
     pub struct ScreenBank: u8 {
         const AT_0000 = 0b0000_0000;
         const AT_0400 = 0b0001_0000;
@@ -168,17 +157,15 @@ bitflags! {
 }
 
 impl ScreenBank {
-    /**
-     * Generate bank from screen memory address. Will check if it is valid.
-     *
-     * Example:
-     * ```
-     * const SCREEN: u16 = 0x2800;
-     * const CHARSET: u16 = 0x2000;
-     * const BANK: u8 = vic2::ScreenBank::from(SCREEN).bits() | vic2::CharsetBank::from(CHARSET).bits();
-     * ```
-     */
-    pub const fn from(screen: u16) -> ScreenBank {
+    /// Generate bank from screen memory address. Will check if it is valid.
+    ///
+    /// Example:
+    /// ~~~
+    /// const SCREEN: u16 = 0x2800;
+    /// const CHARSET: u16 = 0x2000;
+    /// const BANK: u8 = ScreenBank::from_address(SCREEN).bits() | ScreenBank::from_address(CHARSET).bits();
+    /// ~~~
+    pub const fn from_address(screen: u16) -> ScreenBank {
         let bank = (screen >> 6) as u8;
         Self::from_bits(bank).unwrap()
     }
@@ -259,6 +246,23 @@ pub struct MOSVideoInterfaceControllerII {
 /// (which must be divisible with 64), set the contents of the corresponding
 /// sprite pointer address to `address` divided by 64. For instance, if the sprite pattern
 /// begins at address 704, the pointer value will be 704 / 64 = 11.
+///
+/// Image files can be converted using ImageMagick:
+///
+/// ~~~bash
+/// convert image.png -alpha off -resize 24x21! -monochrome sprite.png
+/// ~~~
+///
+/// and then converted into a byte array using Python:
+///
+/// ~~~python
+/// import numpy as np
+/// from PIL import Image
+/// image = Image.open('sprite.png')
+/// bits = (~np.asarray(image).reshape(int(24*21/8), 8))
+/// for bits_in_byte in bits.astype(int):
+///     print(int(''.join('01'[i] for i in bits_in_byte), 2), end=',')
+/// ~~~
 pub fn to_sprite_pointer(address : u16) -> u8 {
     debug_assert!(address % 64 == 0);
     debug_assert!(address / 64 < 256);

@@ -70,14 +70,13 @@ unsafe fn render_plasma(screen_ptr: *mut u8) {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+    mega65::speed_mode3();       // Set CPU speed to 3.5 Mhz
+    const CHARSET: u16 = 0x3000; // Custom charset
+    const SCREEN1: u16 = 0x0800; // Set up two character screens...
+    const SCREEN2: u16 = 0x2800; // ...for double buffering
+    const PAGE1: u8 = vic2::ScreenBank::from_address(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
+    const PAGE2: u8 = vic2::ScreenBank::from_address(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
     unsafe {
-        mega65::speed_mode3();       // Set CPU speed to 3.5 Mhz
-        const CHARSET: u16 = 0x3000; // Custom charset
-        const SCREEN1: u16 = 0x0800; // Set up two character screens...
-        const SCREEN2: u16 = 0x2800; // ...for double buffering
-        const PAGE1: u8 = vic2::ScreenBank::from(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
-        const PAGE2: u8 = vic2::ScreenBank::from(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
-
         make_charset(CHARSET as *mut u8);
         loop {
             render_plasma(SCREEN1 as *mut u8);

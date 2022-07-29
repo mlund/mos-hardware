@@ -78,8 +78,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         vic.sprite_background_priority.write(vic2::Sprites::SPRITE2);
 
         // Show sprite 0 and 2
-        vic.sprite_enable
-            .write(vic2::Sprites::SPRITE0 | vic2::Sprites::SPRITE2);
+        vic.sprite_enable.write(vic2::Sprites::SPRITE0 | vic2::Sprites::SPRITE2);
     }
     0
 }

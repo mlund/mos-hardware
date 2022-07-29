@@ -4,8 +4,8 @@
 
 This crate contains hardware register tables and support functions for
 8-bit retro computers like the Commodore 64, MEGA65 and others.
-Please check the `examples/` directory to see how Rust can be
-used to generate demo effects.
+Please check the [`examples`](https://github.com/mlund/mos-hardware/tree/main/examples)
+directory to see how Rust can be used to generate demo effects.
 
 ## Aims
 
@@ -20,7 +20,6 @@ used to generate demo effects.
 
 ~~~ rust
 use mos_hardware::{c64,vic2};
-
 let old_border_color = (*c64::VIC).border_color.read();
 (*c64::VIC).border_color.write(vic2::LIGHT_RED);
 (*c64::SID).potentiometer_x.write(3); // error: read-only register
@@ -58,10 +57,10 @@ The easiest way is to use provided `devcontainer.json` configuration for vscode:
 1. Configure Visual Studio Code with `Remote - Containers` extension
 2. Open this project inside devcontainer
 3. In vscode terminal do:
-    ```
-      # build for mos-atari8-none target
-      cargo build --target mos-mega65-none
-    ```
+   ~~~ bash
+   # build for mos-atari8-none target
+   cargo build --target mos-mega65-none
+   ~~~
 
 ## Status
 
@@ -73,7 +72,7 @@ be subject to significant changes.
 - [x] `cia` (partially)
 - [x] `c64` (particlly)
 - [x] `mega65` (partially)
-- [x] Plasma-effect example
-- [x] Raster IRQ example
-- [x] Sprite example
-
+- [Examples](https://github.com/mlund/mos-hardware/tree/main/examples):
+  - [x] Plasma effect (c64, mega65)
+  - [x] Raster IRQ (c64)
+  - [x] Sprites (c64)
