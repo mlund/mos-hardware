@@ -25,7 +25,7 @@ let old_border_color = (*c64::VIC).border_color.read();
 (*c64::SID).potentiometer_x.write(3); // error: read-only register
 ~~~
 
-### Use bitflags to safely control hardware behaviour
+### Use bitflags to safely control hardware
 
 ...for example where the VIC-II chip accesses screen memory and character sets:
 
@@ -52,13 +52,13 @@ do not fancy compiling LLVM.
 
 ### Docker and Visual Studio Code
 
-The easiest way is to use provided `devcontainer.json` configuration for vscode:
+The easiest way is to use provided `.devcontainer.json` configuration for vscode:
 
 1. Configure Visual Studio Code with `Remote - Containers` extension
 2. Open this project inside devcontainer
 3. In vscode terminal do:
    ~~~ bash
-   # build for mos-atari8-none target
+   # build for the MEGA65:
    cargo build --target mos-mega65-none
    ~~~
 
