@@ -4,10 +4,10 @@
   The RTC varies between revisions of the MEGA65, though, so we have to take that into account.
 */
 
-#include <memory.h>
-#include <time.h>
-#include <targets.h>
-#include <hal.h>
+#include "memory.h"
+#include "time.h"
+#include "targets.h"
+#include "hal.h"
 
 #define I2CDELAY 5000L
 

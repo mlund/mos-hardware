@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <memory.h>
-#include <targets.h>
+#include "memory.h"
+#include "targets.h"
 
 unsigned char detect_target(void)
 {

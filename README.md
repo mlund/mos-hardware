@@ -67,11 +67,14 @@ The easiest way is to use provided `.devcontainer.json` configuration for vscode
 The hardware registers are currently incomplete and the library may
 be subject to significant changes.
 
-- [x] `sid`
-- [x] `vic2` (partially)
-- [x] `cia` (partially)
-- [x] `c64` (particlly)
-- [x] `mega65` (partially)
+- c64:
+  - [x] `sid`
+  - [x] `vic2`
+  - [x] `cia` (partially)
+  - [x] `c64` memory map (particlly)
+- mega65:
+  - [x] partial support for vic3, vic4 and other hardware registers.
+  - [x] [mega65-libc](https://github.com/MEGA65/mega65-libc) bindings
 - [Examples](https://github.com/mlund/mos-hardware/tree/main/examples):
   - [x] Plasma effect (c64, mega65)
   - [x] Raster IRQ (c64)

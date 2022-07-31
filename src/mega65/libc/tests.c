@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <memory.h>
+#include "memory.h"
 
 volatile unsigned char __tests_out;
 volatile unsigned short __ut_issueNum;

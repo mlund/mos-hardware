@@ -1,12 +1,11 @@
-#[cfg(feature = "docs-rs")]
-fn main() {} // Skip the script when the doc is building
-
-#[cfg(not(feature = "docs-rs"))]
-fn main() {
+fn make_mega65_libc_bindings() {
     let _bindings = bindgen::Builder::default()
         .header("src/mega65/libc/conio.h")
         .header("src/mega65/libc/debug.h")
         .header("src/mega65/libc/dirent.h")
+        // Include when rust-mos docker is updated to newer llvm-mos
+        // which has better support for 65c02
+        // .header("src/mega65/libc/fileio.h")
         .header("src/mega65/libc/hal.h")
         .header("src/mega65/libc/memory.h")
         .header("src/mega65/libc/random.h")
@@ -16,11 +15,21 @@ fn main() {
         .header("src/mega65/libc/time.h")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .ctypes_prefix("::core::ffi")
+        .use_core()
         .generate()
         .unwrap()
         .write_to_file("src/mega65/libc/bindings.rs")
         .expect("Couldn't write bindings!");
+}
 
+#[cfg(feature = "docs-rs")]
+fn main() {
+    make_mega65_libc_bindings();
+} // Skip the script when the doc is building
+
+#[cfg(not(feature = "docs-rs"))]
+fn main() {
+    make_mega65_libc_bindings();
     cc::Build::new()
         .compiler("mos-c64-clang")
         .file("src/irq.c")

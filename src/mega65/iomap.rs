@@ -2225,5 +2225,4 @@ pub mod vic4 {
 
     /// palette bank selection [0xD070: VIC_IV]
     pub const PALETTE_BANK_SELECTION: *mut u8 = (0xD070) as *mut u8;
-
 }
