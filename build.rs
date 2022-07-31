@@ -1,4 +1,5 @@
-fn make_mega65_libc_bindings() {
+/// Call to update mega65/libc/bindings.rs
+fn _make_mega65_libc_bindings() {
     let _bindings = bindgen::Builder::default()
         .header("src/mega65/libc/conio.h")
         .header("src/mega65/libc/debug.h")
@@ -24,12 +25,11 @@ fn make_mega65_libc_bindings() {
 
 #[cfg(feature = "docs-rs")]
 fn main() {
-    make_mega65_libc_bindings();
 } // Skip the script when the doc is building
 
 #[cfg(not(feature = "docs-rs"))]
 fn main() {
-    make_mega65_libc_bindings();
+    //_make_mega65_libc_bindings();
     cc::Build::new()
         .compiler("mos-c64-clang")
         .file("src/irq.c")
