@@ -4,7 +4,7 @@
 
 //! Bindings for the MEGA65-libc library
 //!
-//! This exposes the full [mega65-libc](https://github.com/MEGA65/mega65-libc) library
+//! This exposes the [mega65-libc](https://github.com/MEGA65/mega65-libc) library
 //! to Rust via automatically generated bindings.
 //!
 //! Example:
