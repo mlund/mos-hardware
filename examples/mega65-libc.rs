@@ -28,7 +28,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         libc::conioinit();
         libc::clrscr();
         libc::gohome();
-        libc::gotoxy(1,1);
+        libc::gotoxy(1, 1);
         let mut width: u8 = 0;
         let mut height: u8 = 0;
         libc::getscreensize(&mut width, &mut height);
