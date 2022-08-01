@@ -1,44 +1,51 @@
 // copyright 2022 mikael lund aka wombat
-// 
+//
 // licensed under the apache license, version 2.0 (the "license");
 // you may not use this file except in compliance with the license.
 // you may obtain a copy of the license at
-// 
+//
 //     http://www.apache.org/licenses/license-2.0
-// 
+//
 // unless required by applicable law or agreed to in writing, software
 // distributed under the license is distributed on an "as is" basis,
 // without warranties or conditions of any kind, either express or implied.
 // see the license for the specific language governing permissions and
 // limitations under the license.
 
+//! Registers for the MOS Technology 6581/8580 SID (Sound Interface Device)
+//!
+//! SID is the built-in programmable sound generator chip of Commodore's CBM-II,
+//! Commodore 64,[1] Commodore 128 and Commodore MAX Machine home computers.
+//! It was one of the first sound chips of its kind to be included in a home computer
+//! prior to the digital sound revolution.
+
+use crate::*;
 use bitflags::bitflags;
 use core::mem::size_of;
-use volatile_register::{RO, WO};
 use static_assertions::const_assert;
-use crate::*;
+use volatile_register::{RO, WO};
 
 bitflags! {
-    pub struct VoiceControlFlags: u8 {
-        const GATE     = 0b0000_0001;
-        const SYNC     = 0b0000_0010;
-        const RING_MODULATION = 0b0000_0100;
-        const TEST     = 0b0000_1000;
-        const TRIANGLE = 0b0001_0000;
-        const SAWTOOTH = 0b0010_0000;
-        const PULSE    = 0b0100_0000;
-        const NOISE    = 0b1000_0000;
+    pub struct VoiceControl: u8 {
+        const GATE     = 0b00000001;
+        const SYNC     = 0b00000010;
+        const RING_MODULATION = 0b00000100;
+        const TEST     = 0b00001000;
+        const TRIANGLE = 0b00010000;
+        const SAWTOOTH = 0b00100000;
+        const PULSE    = 0b01000000;
+        const NOISE    = 0b10000000;
     }
 }
 
 #[repr(C, packed)]
 /// Registers for a single SID voice/channel
 pub struct Voice {
-    pub frequency: WO<u16>,             // 0x00
-    pub pulse_width: WO<u16>,           // 0x02
-    pub control: WO<VoiceControlFlags>, // 0x04
-    pub attack_decay: WO<u8>,           // 0x05
-    pub sustain_release: WO<u8>,        // 0x06
+    pub frequency: WO<u16>,        // 0x00
+    pub pulse_width: WO<u16>,      // 0x02
+    pub control: WO<VoiceControl>, // 0x04
+    pub attack_decay: WO<u8>,      // 0x05
+    pub sustain_release: WO<u8>,   // 0x06
 }
 
 const_assert!(size_of::<Voice>() == 7);
@@ -72,12 +79,12 @@ impl MOSSoundInterfaceDevice {
     pub fn start_random_generator(&self) {
         unsafe {
             self.channel3.frequency.write(u16::MAX);
-            self.channel3.control.write(VoiceControlFlags::NOISE);
+            self.channel3.control.write(VoiceControl::NOISE);
         }
     }
 
     /// Random byte in the interval [0:max_value]
-    pub fn rand8(&self, max_value : u8) -> u8 {
+    pub fn rand8(&self, max_value: u8) -> u8 {
         loop {
             let r = self.channel3_oscillator.read();
             if r <= max_value {
@@ -87,16 +94,16 @@ impl MOSSoundInterfaceDevice {
     }
 
     /// Random word in the interval [0:max_value]
-    pub fn rand16(&self, max_value : u16) -> u16 {
+    pub fn rand16(&self, max_value: u16) -> u16 {
         loop {
-            let r = ((self.channel3_oscillator.read() as u16) << 8) | (self.channel3_oscillator.read() as u16);
+            let r = ((self.channel3_oscillator.read() as u16) << 8)
+                | (self.channel3_oscillator.read() as u16);
             if r <= max_value {
                 return r;
             }
         }
     }
 }
-
 
 /// Use SID entropy to generate a random byte in the interval.
 ///

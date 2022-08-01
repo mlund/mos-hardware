@@ -26,6 +26,9 @@ pub const DEFAULT_SCREEN: *mut u8 = (0x0400) as *mut u8;
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
 pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
 
+/// This is the default location for sprite pointers, i.e.
+/// relative to the default screen memory location 0x0400. The
+/// sprite pointers can be calculated with `vic2::to_sprite_pointer()`.
 pub const DEFAULT_SPRITE_PTR : [*mut u8; 8] = [
     (0x0400 + 0x3F8 + 0) as *mut u8,
     (0x0400 + 0x3F8 + 1) as *mut u8,

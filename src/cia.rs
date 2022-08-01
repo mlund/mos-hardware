@@ -1,21 +1,30 @@
 // copyright 2022 mikael lund aka wombat
-// 
+//
 // licensed under the apache license, version 2.0 (the "license");
 // you may not use this file except in compliance with the license.
 // you may obtain a copy of the license at
-// 
+//
 //     http://www.apache.org/licenses/license-2.0
-// 
+//
 // unless required by applicable law or agreed to in writing, software
 // distributed under the license is distributed on an "as is" basis,
 // without warranties or conditions of any kind, either express or implied.
 // see the license for the specific language governing permissions and
 // limitations under the license.
 
-use core::mem::size_of;
-use volatile_register::RW;
-use static_assertions::const_assert;
+//! Registers for the MOS Technology 6526/8520 Complex Interface Adapter (CIA)
 
+use core::mem::size_of;
+use static_assertions::const_assert;
+use volatile_register::RW;
+
+/// A real-time clock is incorporated in the CIA, providing a timekeeping device more
+/// conducive to human needs than the microsecond precision of the interval timers.
+/// Time is kept in the American 12-hour AM/PM format.
+/// The TOD clock consists of four read/write registers: hours (with bit 7 acting as
+/// the AM/PM flag), minutes, seconds and tenths of a second. All registers read out in
+/// [BCD format](https://en.wikipedia.org/wiki/Binary-coded_decimal), thus simplifying
+/// the encoding/decoding process.
 #[repr(C, packed)]
 pub struct TimeOfDay {
     pub deci_seconds: RW<u8>, // 0x08
