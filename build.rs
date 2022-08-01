@@ -17,6 +17,7 @@ fn _make_mega65_libc_bindings() {
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .ctypes_prefix("::core::ffi")
         .use_core()
+        .derive_default(true)
         .generate()
         .unwrap()
         .write_to_file("src/mega65/libc/bindings.rs")

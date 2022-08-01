@@ -6,6 +6,9 @@
 //!
 //! This exposes the [mega65-libc](https://github.com/MEGA65/mega65-libc) library
 //! to Rust via automatically generated bindings.
+//! While all required 65c02 opcodes are present in llvm-mos, they have not yet
+//! made it into rust-mos. For this reason, routines in `fileio.h` are currently
+//! unavailable.
 //!
 //! Example:
 //! ~~~
