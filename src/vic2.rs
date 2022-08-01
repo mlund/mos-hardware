@@ -171,24 +171,18 @@ impl ScreenBank {
     }
 }
 
+/// X and Y positions for e.g. sprites
+pub struct XYcoordinate {
+    /// X position
+    pub x: RW<u8>,
+    /// Y position
+    pub y: RW<u8>,
+}
+
 #[repr(C, packed)]
 pub struct MOSVideoInterfaceControllerII {
-    pub sprite0_xpos: RW<u8>,
-    pub sprite0_ypos: RW<u8>,
-    pub sprite1_xpos: RW<u8>,
-    pub sprite1_ypos: RW<u8>,
-    pub sprite2_xpos: RW<u8>,
-    pub sprite2_ypos: RW<u8>,
-    pub sprite3_xpos: RW<u8>,
-    pub sprite3_ypos: RW<u8>,
-    pub sprite4_xpos: RW<u8>,
-    pub sprite4_ypos: RW<u8>,
-    pub sprite5_xpos: RW<u8>,
-    pub sprite5_ypos: RW<u8>,
-    pub sprite6_xpos: RW<u8>,
-    pub sprite6_ypos: RW<u8>,
-    pub sprite7_xpos: RW<u8>,
-    pub sprite7_ypos: RW<u8>,
+    /// Sprite positions (x0, y0, x1, ...)
+    pub sprite_positions : [XYcoordinate; 8],
     /// [0x10]
     pub sprite_positions_most_significant_bit_of_x: RW<Sprites>,
     /// [0x11]

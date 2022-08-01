@@ -26,14 +26,16 @@ pub const DEFAULT_SCREEN: *mut u8 = (0x0400) as *mut u8;
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
 pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
 
-pub const DEFAULT_SPRITE0_PTR: *mut u8 = (0x0400 + 0x3F8 + 0) as *mut u8;
-pub const DEFAULT_SPRITE1_PTR: *mut u8 = (0x0400 + 0x3F8 + 1) as *mut u8;
-pub const DEFAULT_SPRITE2_PTR: *mut u8 = (0x0400 + 0x3F8 + 2) as *mut u8;
-pub const DEFAULT_SPRITE3_PTR: *mut u8 = (0x0400 + 0x3F8 + 3) as *mut u8;
-pub const DEFAULT_SPRITE4_PTR: *mut u8 = (0x0400 + 0x3F8 + 4) as *mut u8;
-pub const DEFAULT_SPRITE5_PTR: *mut u8 = (0x0400 + 0x3F8 + 5) as *mut u8;
-pub const DEFAULT_SPRITE6_PTR: *mut u8 = (0x0400 + 0x3F8 + 6) as *mut u8;
-pub const DEFAULT_SPRITE7_PTR: *mut u8 = (0x0400 + 0x3F8 + 7) as *mut u8;
+pub const DEFAULT_SPRITE_PTR : [*mut u8; 8] = [
+    (0x0400 + 0x3F8 + 0) as *mut u8,
+    (0x0400 + 0x3F8 + 1) as *mut u8,
+    (0x0400 + 0x3F8 + 2) as *mut u8,
+    (0x0400 + 0x3F8 + 3) as *mut u8,
+    (0x0400 + 0x3F8 + 4) as *mut u8,
+    (0x0400 + 0x3F8 + 5) as *mut u8,
+    (0x0400 + 0x3F8 + 6) as *mut u8,
+    (0x0400 + 0x3F8 + 7) as *mut u8,
+];
 
 pub const VIC: *const MOSVideoInterfaceControllerII =
     (0xd000) as *const MOSVideoInterfaceControllerII;
