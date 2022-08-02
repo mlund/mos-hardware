@@ -13,9 +13,15 @@
 // limitations under the license.
 
 //! Registers for the MOS 6566/6567 (VIC-II) Chip
-//! found in e.g. the Commodore 64.
+//!
+//! The VIC-II (Video Interface Chip II), specifically known as the MOS Technology
+//! 6567/8562/8564 (NTSC versions), 6569/8565/8566 (PAL), is the microchip tasked
+//! with generating Y/C video signals (combined to composite video in the RF modulator)
+//! and DRAM refresh signals in the Commodore 64 and C128 home computers.
 
 use bitflags::bitflags;
+use core::mem::size_of;
+use static_assertions::const_assert;
 use volatile_register::{RO, RW};
 
 pub const BLACK: u8 = 0;
@@ -182,7 +188,7 @@ pub struct XYcoordinate {
 #[repr(C, packed)]
 pub struct MOSVideoInterfaceControllerII {
     /// Sprite positions (x0, y0, x1, ...)
-    pub sprite_positions : [XYcoordinate; 8],
+    pub sprite_positions: [XYcoordinate; 8],
     /// [0x10]
     pub sprite_positions_most_significant_bit_of_x: RW<Sprites>,
     /// [0x11]
@@ -234,6 +240,8 @@ pub struct MOSVideoInterfaceControllerII {
     pub sprite_colors: [RW<u8>; 8],
 }
 
+const_assert!(size_of::<MOSVideoInterfaceControllerII>() == 0x2f);
+
 /// Calculate sprite pointer from pattern address
 ///
 /// To make a given sprite show the pattern that's stored in RAM at `address`
@@ -257,7 +265,7 @@ pub struct MOSVideoInterfaceControllerII {
 /// for bits_in_byte in bits.astype(int):
 ///     print(int(''.join('01'[i] for i in bits_in_byte), 2), end=',')
 /// ~~~
-pub fn to_sprite_pointer(address : u16) -> u8 {
+pub fn to_sprite_pointer(address: u16) -> u8 {
     debug_assert!(address % 64 == 0);
     debug_assert!(address / 64 < 256);
     return (address / 64) as u8;

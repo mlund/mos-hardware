@@ -19,8 +19,8 @@
 #define POKE(address, value) *(uint8_t *)(address) = (value)
 
 /**
- * This function must be defined on the Rust side and is
- * called for every IRQ trigger.
+ * This function *must* be defined on the Rust side and is
+ * called for every IRQ event.
  */
 void called_every_frame();
 

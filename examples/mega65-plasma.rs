@@ -9,22 +9,23 @@
 #![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
-use itertools::{iproduct};
-use ufmt_stdio::*;
+use itertools::iproduct;
 use mos_hardware::*;
+use ufmt_stdio::*;
 
 /// Generate stochastic character set
 unsafe fn make_charset(charset_ptr: *mut u8) {
     const BITS: [u8; 8] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
-    (*mega65::SID0).start_random_generator();
 
     repeat_element(SINUSTABLE.iter().copied(), 8)
         .enumerate()
         .for_each(|(cnt, sine)| {
             let mut char_pattern = 0b00000000u8;
-            BITS.iter().filter(|_| rand8!(mega65::SID0) > sine).for_each(|bit| {
-                char_pattern |= bit;
-            });
+            BITS.iter()
+                .filter(|_| mega65::libc::rand8(u8::MAX) > sine)
+                .for_each(|bit| {
+                    char_pattern |= bit;
+                });
             poke!(charset_ptr.offset(cnt as isize), char_pattern);
             if cnt % 64 == 0 {
                 print!(".");
@@ -70,12 +71,14 @@ unsafe fn render_plasma(screen_ptr: *mut u8) {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-    mega65::speed_mode3();       // Set CPU speed to 3.5 Mhz
+    mega65::speed_mode3(); // Set CPU speed to 3.5 Mhz
     const CHARSET: u16 = 0x3000; // Custom charset
     const SCREEN1: u16 = 0x0800; // Set up two character screens...
     const SCREEN2: u16 = 0x2800; // ...for double buffering
-    const PAGE1: u8 = vic2::ScreenBank::from_address(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
-    const PAGE2: u8 = vic2::ScreenBank::from_address(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
+    const PAGE1: u8 =
+        vic2::ScreenBank::from_address(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
+    const PAGE2: u8 =
+        vic2::ScreenBank::from_address(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
     unsafe {
         make_charset(CHARSET as *mut u8);
         loop {
@@ -112,4 +115,3 @@ fn panic(_info: &PanicInfo) -> ! {
     print!("!");
     loop {}
 }
-

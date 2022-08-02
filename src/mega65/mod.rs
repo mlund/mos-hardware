@@ -13,6 +13,16 @@
 // limitations under the license.
 
 //! Support for the MEG65 Computer
+//!
+//! The MEGA65 is a 100% open-source implementation of the official (but never-released)
+//! Commodore 65 computer. It is in development by associates of the Museum of Electronic
+//! Games and Art e. V., a not-for-profit institution "dedicated to the preservation of
+//! our digital heritage." As well as the original C65 design, the MEGA65 provides
+//! additional hardware and software enhancements, including a choice of using BASIC 10 or
+//! BASIC 65 (containing improvements that go beyond BASIC 10).
+//! The MEGA65 has an 8-bit CPU with additional 32-bit instructions implemented in FPGA.
+//! Like the original C65, it also has a Commodore 64 mode with a level of compatibility
+//! similar to that of the Commodore 128 running in C64 mode
 
 use crate::sid::*;
 use crate::vic2::*;

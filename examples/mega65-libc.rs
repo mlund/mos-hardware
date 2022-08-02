@@ -34,6 +34,17 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         libc::getscreensize(&mut width, &mut height);
         println!("SCREEN SIZE = {} x {}", width, height);
 
+        // random numbers
+        println!("RANDUM BYTES FROM SID:");
+        (*SID0).start_random_generator();
+        for _i in 0..3 {
+            println!("{}", (*SID0).rand8(u8::MAX));
+        }
+        println!("RANDUM BYTES FROM LIBC:");
+        for _i in 0..3 {
+            println!("{}", libc::rand8(u8::MAX));
+        }
+
         // play with colors
         libc::bordercolor(libc::COLOUR_BROWN as u8);
 

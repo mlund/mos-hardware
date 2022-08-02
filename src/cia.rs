@@ -13,6 +13,11 @@
 // limitations under the license.
 
 //! Registers for the MOS Technology 6526/8520 Complex Interface Adapter (CIA)
+//!
+//! The CIA served as an I/O port controller for the 6502 family of microprocessors,
+//! providing for parallel and serial I/O capabilities as well as timers and a
+//! Time-of-Day (TOD) clock. The device's most prominent use was in the Commodore 64
+//! and Commodore 128(D), each of which included two CIA chips.
 
 use core::mem::size_of;
 use static_assertions::const_assert;
@@ -32,6 +37,8 @@ pub struct TimeOfDay {
     pub minutes: RW<u8>,      // 0x0a
     pub hours: RW<u8>,        // 0x0b
 }
+
+const_assert!(size_of::<TimeOfDay>() == 4);
 
 #[repr(C, packed)]
 pub struct MOSComplexInterfaceAdapter6526 {
