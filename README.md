@@ -5,7 +5,7 @@
 This crate contains hardware register tables and support functions for
 8-bit retro computers like the Commodore 64, MEGA65 and others.
 Please check the [`examples`](https://github.com/mlund/mos-hardware/tree/main/examples)
-directory to see how Rust can be used to generate demo effects.
+directory to see how Rust can be used to generate simple demo effects.
 
 ## Aims
 
@@ -52,11 +52,11 @@ do not fancy compiling LLVM.
 
 ### Docker and Visual Studio Code
 
-The easiest way is to use provided `.devcontainer.json` configuration for vscode:
+The easiest way is to use the provided `.devcontainer.json` configuration for vscode:
 
-1. Configure Visual Studio Code with `Remote - Containers` extension
-2. Open this project inside devcontainer
-3. In vscode terminal do:
+1. Configure Visual Studio Code with the _Remote - Containers_ extension
+2. Open the project inside devcontainer
+3. In the vscode terminal do:
    ~~~ bash
    # build for the MEGA65:
    cargo build --target mos-mega65-none
