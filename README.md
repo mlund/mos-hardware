@@ -1,4 +1,5 @@
 [![Crates.io](https://img.shields.io/crates/v/mos-hardware)](https://crates.io/crates/mos-hardware)
+![docs.rs](https://img.shields.io/docsrs/mos-hardware)
 
 # MOS-Hardware
 
