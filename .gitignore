@@ -1,6 +1,7 @@
 *~
 *.prg
 *.swp
+*.o
 .DS_Store
 .vscode
 

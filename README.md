@@ -3,7 +3,7 @@
 # MOS-Hardware
 
 This crate contains hardware register tables and support functions for
-8-bit retro computers like the Commodore 64, MEGA65 and others.
+8-bit retro computers like the Commodore 64, Commander X16, MEGA65 and others.
 Please check the [`examples`](https://github.com/mlund/mos-hardware/tree/main/examples)
 directory to see how Rust can be used to generate simple demo effects.
 
@@ -55,7 +55,7 @@ do not fancy compiling LLVM.
 The easiest way is to use the provided `.devcontainer.json` configuration for vscode:
 
 1. Configure Visual Studio Code with the _Remote - Containers_ extension
-2. Open the project inside devcontainer
+2. Open the project inside devcontainer when asked
 3. In the vscode terminal do:
    ~~~ bash
    # build for the MEGA65:
@@ -67,12 +67,17 @@ The easiest way is to use the provided `.devcontainer.json` configuration for vs
 The hardware registers are currently incomplete and the library may
 be subject to significant changes.
 
-- c64:
+- Commodore 64:
   - [x] `sid`
   - [x] `vic2`
   - [x] `cia` (partially)
   - [x] `c64` memory map (particlly)
-- mega65:
+- Commander X16
+  - [x] `vera`
+  - [x] `via` (partially)
+  - [x] `cx16` Memory map (partially)
+  - [ ] Support functions
+- MEAG65:
   - [x] partial support for vic3, vic4 and other hardware registers.
   - [x] [mega65-libc](https://github.com/MEGA65/mega65-libc) bindings
 - [Examples](https://github.com/mlund/mos-hardware/tree/main/examples):

@@ -13,7 +13,7 @@
 // limitations under the license.
 
 //! This crate contains hardware register tables and support functions for
-//! 8-bit retro computers like the Commodore 64, MEGA65 and others.
+//! 8-bit retro computers like the Commodore 64, Commander X16, MEGA65 and others.
 //! Please check the `examples/` directory to see how Rust can be
 //! used generate basic graphics effects and interact with hardware.
 //!
@@ -45,14 +45,17 @@
 #![no_std]
 #![feature(const_option)]
 #![feature(core_ffi_c)]
+#![feature(untagged_unions)]
 
 extern crate static_assertions;
 
 pub mod c64;
 pub mod cia;
+pub mod cx16;
 pub mod mega65;
 pub mod sid;
 pub mod vic2;
+pub mod vera;
 
 use core::iter::Iterator;
 
