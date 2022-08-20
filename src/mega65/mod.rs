@@ -12,7 +12,7 @@
 // see the license for the specific language governing permissions and
 // limitations under the license.
 
-//! Support for the MEG65 Computer
+//! MEGA65 support.
 //!
 //! The MEGA65 is a 100% open-source implementation of the official (but never-released)
 //! Commodore 65 computer. It is in development by associates of the Museum of Electronic

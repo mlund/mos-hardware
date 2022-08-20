@@ -37,7 +37,7 @@
 // 3. This notice may not be removed or altered from any source
 //    distribution.
 
-//! Versatile Embedded Retro Adapter (VERA) graphics chip.
+//! Registers for the Versatile Embedded Retro Adapter (VERA) graphics chip.
 //!
 //! VERA consists of:
 //! - Video generator featuring:
@@ -105,6 +105,7 @@ pub const DEC_320: u8 = convert_stride(-320);
 pub const DEC_640: u8 = convert_stride(-640);
 
 /// Convert stride to register value.
+/// 
 /// By setting the 'Address Increment' field in `ADDRx_H`, the address will be incremented after each access to the data register.
 /// Setting the `DECR` bit, will decrement instead of increment.
 /// More [information](https://github.com/commanderx16/x16-docs/blob/master/VERA%20Programmer's%20Reference.md#video-ram-access)
@@ -140,6 +141,7 @@ pub const fn convert_stride(stride: i16) -> u8 {
     ((value << 1) | decrement as u8) << 3
 }
 
+/// Versatile Embedded Retro Adapter (VERA) graphics chip
 #[repr(C)]
 pub struct VersatileEmbeddedRetroAdapter {
     /// VRAM Address 0-16 (offset 0x00)
@@ -158,6 +160,7 @@ pub struct VersatileEmbeddedRetroAdapter {
     pub irq_flags: RW<u8>,
 
     /// `IRQLINE_L` - Interrupt raster, offset 0x08.
+    /// 
     /// `IRQLINE` specifies at which line the `LINE` interrupt will be generated.
     /// Note that bit 8 of this value is present in the `IEN` register.
     /// For interlaced modes the interrupt will be generated each field and the bit 0 of `IRQ_LINE` is ignored.
@@ -200,6 +203,8 @@ bitflags! {
         /// RGB interlaced, composite sync (via VGA connector)
         const RGB = 0b0000_0011;
 
+        /// Disable chroma.
+        /// 
         /// Setting `CHROMA_DISABLE` disables output of chroma in NTSC composite mode and will give a
         /// better picture on a monochrome display.
         /// (Setting this bit will also disable the chroma output on the S-video output.)
@@ -219,21 +224,25 @@ pub struct Display0 {
     /// Flags to enable video layers
     pub video: RW<VideoFlags>,
     /// `HSCALE` - Active Display H-Scale, offset 0x0a
+    /// 
     /// `HSCALE` and `VSCALE` will set the fractional scaling factor of the active part of the display.
     /// Setting this value to 128 will output 1 output pixel for every input pixel.
     /// Setting this to 64 will output 2 output pixels for every input pixel.
     pub hscale: RW<u8>,
     /// `VSCALE` - Active Display V-Scale, offset 0x0b
+    /// 
     /// `HSCALE` and `VSCALE` will set the fractional scaling factor of the active part of the display.
     /// Setting this value to 128 will output 1 output pixel for every input pixel.
     /// Setting this to 64 will output 2 output pixels for every input pixel.
     pub vscale: RW<u8>,
     /// `DC_BORDER` - Border Color, offset 0x0c.
+    /// 
     /// Determines the palette index which is used for the non-active area of the screen.
     pub border: RW<u8>,
 }
 
 /// Active when Display Composer (DC) `SEL=1`.
+/// 
 /// `HSTART`/`HSTOP` and `VSTART`/`VSTOP` determines the active part of the screen.
 /// The values here are specified in the native 640x480 display space.
 /// `HSTART=0`, `HSTOP=640`, `VSTART=0`, `VSTOP=480` will set the active area to the full resolution.
@@ -252,7 +261,9 @@ pub struct Display1 {
     pub vstop: RW<u8>,
 }
 
-/// The features of the 2 layers are the same.
+/// Video layer registers.
+/// 
+/// The features of the two VERA layers are the same.
 /// Each layer supports a few different modes which are specified using T256C / 'Bitmap Mode' / 'Color Depth' in `Lx_CONFIG`.
 /// The layer can either operate in tile mode or bitmap mode.
 /// This is selected using the 'Bitmap Mode' bit; 0 selects tile mode, 1 selects bitmap mode.
@@ -262,17 +273,19 @@ pub struct Display1 {
 #[repr(C)]
 pub struct Layer {
     /// `Lx_CONFIG`
-    pub config: u8,
+    pub config: RW<u8>,
     /// `Lx_MAPBASE` - Map Base Address (16:9)
-    pub mapbase: u8,
+    pub mapbase: RW<u8>,
     /// `Lx_TILEBASE`
-    pub tilebase: u8,
+    pub tilebase: RW<u8>,
     /// `H-SCROLL` - Horizontal scroll
-    pub hscroll: u16,
+    pub hscroll: RW<u16>,
     /// `V-SCROLL` - Vertical scroll
-    pub vscroll: u16,
+    pub vscroll: RW<u16>,
 }
 
+/// VERA audio.
+/// 
 /// The audio functionality contains of two independent systems:
 /// 1. The PSG or Programmable Sound Generator.
 /// 2. The PCM (or Pulse-Code Modulation) playback system.
@@ -286,7 +299,8 @@ pub struct Audio {
     pub data: WO<u8>,
 }
 
-/// The SPI controller is connected to the SD card connector.
+/// SPI controller connected to the SD card connector.
+/// 
 /// The speed of the clock output of the SPI controller can be controlled by the 'Slow Clock' bit.
 /// When this bit is 0 the clock is 12.5MHz, when 1 the clock is about 390kHz.
 /// The slow clock speed is to be used during the initialization phase of the SD card.
@@ -298,8 +312,8 @@ pub struct Audio {
 /// Writing 1 will assert the chip-select (logic-0) and writing 0 will release the chip-select (logic-1).
 #[repr(C)]
 pub struct SPIController {
-    pub data: u8,
-    pub control: u8,
+    pub data: RW<u8>,
+    pub control: RW<u8>,
 }
 
 /// VRAM, 0x00000 - 0x1F9BF
