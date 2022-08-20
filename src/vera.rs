@@ -39,20 +39,21 @@
 
 //! Registers for the Versatile Embedded Retro Adapter (VERA) chip.
 //!
-//! The VERA consists of:
+//! VERA consists of:
 //! - Video generator featuring:
-//!   - Multiple output formats (VGA, NTSC Composite, NTSC S-Video, RGB video) at a fixed resolution of 640x480@60Hz
-//!   - Support for 2 layers, both supporting either tile or bitmap mode.
+//!   - Multiple output formats (VGA, NTSC Composite, NTSC S-Video, RGB video) at a fixed resolution of 640x480 at 60Hz
+//!   - Support for two layers, both supporting either tile or bitmap mode.
 //!   - Support for up to 128 sprites.
 //!   - Embedded video RAM of 128kB.
 //!   - Palette with 256 colors selected from a total range of 4096 colors.
 //! - 16-channel Programmable Sound Generator with multiple waveforms (Pulse, Sawtooth, Triangle, Noise)
-//! - High quality PCM audio playback from an 4kB FIFO buffer featuring up to 48kHz 16-bit stereo sound.
+//! - High quality PCM audio playback from 4kB FIFO buffer with up to 48kHz 16-bit stereo sound.
 //! - SPI controller for SecureDigital storage.
 //! - [VERA Reference Guide](https://github.com/commanderx16/x16-docs/blob/master/VERA%20Programmer's%20Reference.md)
 
 use bitflags::bitflags;
 use volatile_register::{RW, WO};
+use core::mem::ManuallyDrop;
 
 pub const VIDEOMODE_80X60: u8 = 0;
 pub const VIDEOMODE_80X30: u8 = 1;
@@ -103,6 +104,7 @@ pub const DEC_160: u8 = convert_stride(-160);
 pub const DEC_320: u8 = convert_stride(-320);
 pub const DEC_640: u8 = convert_stride(-640);
 
+/// Convert stride to register value.
 /// By setting the 'Address Increment' field in `ADDRx_H`, the address will be incremented after each access to the data register.
 /// Setting the `DECR` bit, will decrement instead of increment.
 /// More [information](https://github.com/commanderx16/x16-docs/blob/master/VERA%20Programmer's%20Reference.md#video-ram-access)
@@ -183,9 +185,9 @@ bitflags! {
 #[repr(C)]
 pub union DisplayComposer {
     /// Visible when Display Composer (DC) `SEL` flag = 0
-    pub display0: Display0,
+    pub display0: ManuallyDrop<Display0>,
     /// Visible when Display Composer (DC) `SEL` flag = 1
-    pub display1: Display1,
+    pub display1: ManuallyDrop<Display1>,
 }
 
 bitflags! {

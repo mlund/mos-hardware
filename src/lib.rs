@@ -45,7 +45,6 @@
 #![no_std]
 #![feature(const_option)]
 #![feature(core_ffi_c)]
-#![feature(untagged_unions)]
 
 extern crate static_assertions;
 

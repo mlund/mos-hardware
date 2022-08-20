@@ -189,54 +189,54 @@ pub struct XYcoordinate {
 pub struct MOSVideoInterfaceControllerII {
     /// Sprite positions (x0, y0, x1, ...)
     pub sprite_positions: [XYcoordinate; 8],
-    /// [0x10]
+    /// Offset 0x10
     pub sprite_positions_most_significant_bit_of_x: RW<Sprites>,
-    /// [0x11]
+    /// Offset 0x11
     pub control_y: RW<ControlYFlags>,
-    /// [0x12]
+    /// Offset 0x12
     pub raster_counter: RW<u8>,
-    /// [0x13]
+    /// Offset 0x13
     pub lightpen_x: RW<u8>,
-    /// [0x14]
+    /// Offset 0x14
     pub lightpen_y: RW<u8>,
-    /// [0x15]
+    /// Offset 0x15
     pub sprite_enable: RW<Sprites>,
-    /// [0x16]
+    /// Offset 0x16
     pub control_x: RW<ControlXFlags>,
-    /// [0x17]
+    /// Offset 0x17
     pub sprite_expand_y: RW<Sprites>,
-    /// [0x18]
+    /// Offset 0x18
     pub screen_and_charset_bank: RW<u8>,
-    /// [0x19]
+    /// Offset 0x19
     pub irq_status: RW<u8>,
-    /// Enable interrupt requests (enable = 1) [0x1a]
+    /// Enable interrupt requests (enable = 1). Offset 0x1a.
     pub irq_enable: RW<u8>,
     /// Place non-transparent sprite data behind (0)
-    /// character/bitmap data, or in front (1) [0x1b]
+    /// character/bitmap data, or in front (1). Offset 0x1b.
     pub sprite_background_priority: RW<Sprites>,
-    /// [0x1c]
+    /// Offset 0x1c
     pub sprite_multicolor_mode: RW<Sprites>,
-    /// [0x1d]
+    /// Offset 0x1d
     pub sprite_expand_x: RW<Sprites>,
-    /// [0x1e]
+    /// Offset 0x1e
     pub sprite_sprite_collision: RO<Sprites>,
-    /// [0x1f]
+    /// Offset 0x1f
     pub sprite_background_collision: RO<Sprites>,
-    /// [0x20]
+    /// Offset 0x20
     pub border_color: RW<u8>,
-    /// [0x21]
+    /// Offset 0x21
     pub background_color0: RW<u8>,
-    /// [0x22]
+    /// Offset 0x22
     pub background_color1: RW<u8>,
-    /// [0x23]
+    /// Offset 0x23
     pub background_color2: RW<u8>,
-    /// [0x24]
+    /// Offset 0x24
     pub background_color3: RW<u8>,
-    /// [0x25]
+    /// Offset 0x25
     pub sprite_multicolor0: RW<u8>,
-    /// [0x26]
+    /// Offset 0x26
     pub sprite_multicolor1: RW<u8>,
-    /// [0x27, 0x2e]
+    /// Offsets 0x27, 0x2e
     pub sprite_colors: [RW<u8>; 8],
 }
 

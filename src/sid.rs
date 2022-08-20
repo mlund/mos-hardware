@@ -15,7 +15,7 @@
 //! Registers for the MOS Technology 6581/8580 SID (Sound Interface Device)
 //!
 //! SID is the built-in programmable sound generator chip of Commodore's CBM-II,
-//! Commodore 64,[1] Commodore 128 and Commodore MAX Machine home computers.
+//! Commodore 64, Commodore 128 and Commodore MAX Machine home computers.
 //! It was one of the first sound chips of its kind to be included in a home computer
 //! prior to the digital sound revolution.
 
@@ -83,7 +83,7 @@ impl MOSSoundInterfaceDevice {
         }
     }
 
-    /// Random byte in the interval [0:max_value]
+    /// Random byte in the interval (0, max_value)
     pub fn rand8(&self, max_value: u8) -> u8 {
         loop {
             let r = self.channel3_oscillator.read();
@@ -93,7 +93,7 @@ impl MOSSoundInterfaceDevice {
         }
     }
 
-    /// Random word in the interval [0:max_value]
+    /// Random word in the interval (0, max_value)
     pub fn rand16(&self, max_value: u16) -> u16 {
         loop {
             let r = ((self.channel3_oscillator.read() as u16) << 8)
@@ -105,7 +105,7 @@ impl MOSSoundInterfaceDevice {
     }
 }
 
-/// Use SID entropy to generate a random byte in the interval.
+/// Use SID entropy to generate a random byte.
 ///
 /// Example:
 /// ```
