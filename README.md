@@ -1,4 +1,5 @@
 [![Crates.io](https://img.shields.io/crates/v/mos-hardware)](https://crates.io/crates/mos-hardware)
+[![docs.rs](https://img.shields.io/docsrs/mos-hardware)](https://docs.rs/mos-hardware/latest/mos_hardware)
 
 # MOS-Hardware
 
@@ -67,17 +68,17 @@ The easiest way is to use the provided `.devcontainer.json` configuration for vs
 The hardware registers are currently incomplete and the library may
 be subject to significant changes.
 
-- Commodore 64:
+- [Commodore 64](https://www.c64-wiki.com/wiki/C64):
   - [x] `sid`
   - [x] `vic2`
   - [x] `cia` (partially)
   - [x] `c64` memory map (particlly)
-- Commander X16
+- [Commander X16](https://www.commanderx16.com)
   - [x] `vera`
   - [x] `via` (partially)
   - [x] `cx16` Memory map (partially)
   - [ ] Support functions
-- MEAG65:
+- [MEGA65](https://mega65.org):
   - [x] partial support for vic3, vic4 and other hardware registers.
   - [x] [mega65-libc](https://github.com/MEGA65/mega65-libc) bindings
 - [Examples](https://github.com/mlund/mos-hardware/tree/main/examples):

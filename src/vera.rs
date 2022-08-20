@@ -37,7 +37,7 @@
 // 3. This notice may not be removed or altered from any source
 //    distribution.
 
-//! Registers for the Versatile Embedded Retro Adapter (VERA) chip.
+//! Versatile Embedded Retro Adapter (VERA) graphics chip.
 //!
 //! VERA consists of:
 //! - Video generator featuring:
