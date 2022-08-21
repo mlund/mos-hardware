@@ -39,11 +39,6 @@ bitflags = "1.3.2"
 volatile-register = "0.2.1"
 itertools = {version = "0.10.3", default-features = false}
 
-[dependencies.tock-registers]
-version = "0.7.0"
-default-features = false
-features = ["register_types"]
-
 [build-dependencies]
 cc = "1"
 bindgen = "0.60"

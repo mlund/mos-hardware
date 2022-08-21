@@ -21,43 +21,7 @@ use crate::cia::*;
 use crate::sid::*;
 use crate::vic2::*;
 use bitflags::bitflags;
-use tock_registers::registers::ReadWrite;
-use tock_registers::{register_bitfields, register_structs};
 use volatile_register::RW;
-
-register_structs! {
-    /// Experimental memory map of the C64
-    ///
-    /// More information [here](https://sta.c64.org/cbm64mem.html).
-    /// Currently not in use.
-    MemoryMap {
-        /// `D6510` - Data direction, 0x0000
-        (0x0000 => pub cpu_port_data_direction: ReadWrite<u8>),
-        /// `R6510` - Input/output, 0x0001
-        (0x0001 => pub cpu_port_data: ReadWrite<u8, CpuPortControl::Register>),
-        (0x0002 => _reserved_after_cpu_port_data),
-        (0x0400 => pub screen_memory: [ReadWrite<u8>; 1000]),
-        (0x07e8 => _reserved_after_screen_memory),
-        (0x07f8 => pub sprite_ptr: [ReadWrite<u8>; 8]),
-        (0x0800 => _reserved_must_be_zero_for_basic),
-        (0x0801 => default_basic_ram: [ReadWrite<u8>; 38911]),
-        (0xa000 => pub basic_rom: [ReadWrite<u8>; 8192]),
-        (0xc000 => pub upper_ram: [ReadWrite<u8>; 4096]),
-        /// Video interface device, 0xd000
-        (0xd000 => pub vic2: MOSVideoInterfaceControllerII),
-        /// Sound interface device, 0xd400
-        (0xd400 => pub sid: MOSSoundInterfaceDevice),
-        (0xd41d => _reserved_after_sid),
-        (0xd420 => sid_images),
-        (0xd800 => pub color_ram: [ReadWrite<u8>; 1000]),
-        (0xdbe8 => _reserved_after_color_ram),
-        (0xdc00 => pub cia1: MOSComplexInterfaceAdapter6526),
-        (0xdc10 => cia1_image),
-        (0xdd00 => pub cia2: MOSComplexInterfaceAdapter6526),
-        (0xdd10 => cia2_image),
-        (0xffff => @END),
-    }
-}
 
 bitflags! {
     /// Control flags for the CPU port `R6510` at 0x0001
@@ -92,56 +56,6 @@ bitflags! {
     }
 }
 
-register_bitfields! [
-    u8,
-    /// Experimental bitfield for the `cpu_port_data` / `R6510` register at 0x0001
-    CpuPortControl [
-        /// LORAM signal (0 = switch BASIC ROM out)
-        ///
-        /// Selects BASIC ROM or RAM at 0xa000-0xbfff.
-        /// If KERNAL isn't mapped in, then BASIC won't map in either and
-        /// this region stays mapped to RAM.
-        LORAM OFFSET(0) NUMBITS(1) [
-            /// Switch in BASIC ROM at 0xa000 (default)
-            BASIC = 1,
-            /// Use 0xa000-0xbfff as RAM
-            RAM = 0,
-        ],
-        /// HIRAM signal (0 = switch KERNAL ROM out)
-        ///
-        /// Selects ROM or RAM at 0xe000-0xffff.
-        HIRAM OFFSET(1) NUMBITS(1) [
-            /// Switch in Kernal ROM at 0xe000-0xffff (default)
-            Kernal = 1,
-            RAM = 0,
-        ],
-        /// CHAREN signal for controlling 0xd000-0xdfff visibility.
-        ///
-        /// Selects character ROM or I/O devices.
-        /// This bit is by default set to 1, so that while the VIC
-        /// can access the character generator ROM, you cannot PEEK into it.
-        /// If `HIRAM` and `LORAM` are both set to 0, then this bit is ignored
-        /// and the area also maps to RAM
-        CHAREN OFFSET(2) NUMBITS(1) [
-            /// Switch in character generator ROM at 0xd000-0xdfff
-            CharacterROM = 0,
-            /// Switch in I/O devices (SID, VIC-II, and CIA's). This is the default.
-            IO = 1,
-        ],
-        DATASETTE_OUTPUT_SIGNAL OFFSET(3) NUMBITS(1) [
-            Default = 0,
-        ],
-        DATASETTE_BUTTON OFFSET(4) NUMBITS(1) [
-            Pressed = 0,
-            NotPressed = 1
-        ],
-        DATASETTE_MOTOR OFFSET(5) NUMBITS(1) [
-            On = 0,
-            Off = 1
-        ],
-    ],
-];
-
 /// Pointer to the `R6510` register for 6510 I/O (0x0001)
 pub const CPU_PORT: *mut RW<CpuPortFlags> = (0x0001) as *mut RW<CpuPortFlags>;
 
@@ -171,11 +85,11 @@ pub const DEFAULT_SPRITE_PTR: [*mut u8; 8] = [
     (0x0400 + 0x3F8 + 7) as *mut u8,
 ];
 
+/// Default upper case font in the CHARROM (0x1000)
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
-pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
 
-// /// Experimental memory map of the c64
-// pub const MAP: *const MemoryMap = (0x0000) as *const MemoryMap;
+/// Default mixed case font in the CHARROM (0x1800)
+pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
 
 /// Pointer to BASIC ROM start (0xa000)
 pub const BASIC_ROM: *mut u8 = (0xa000) as *mut u8;
@@ -190,7 +104,7 @@ pub const VIC: *const MOSVideoInterfaceControllerII =
 /// Pointer to the sound interface device (0xd400)
 pub const SID: *const MOSSoundInterfaceDevice = (0xd400) as *const MOSSoundInterfaceDevice;
 
-/// Pointer to default color RAM
+/// Pointer to default color RAM (0xd800)
 pub const COLOR_RAM: *mut u8 = (0xd800) as *mut u8;
 
 /// Pointer to first complex interface adapter (0xdc00)
