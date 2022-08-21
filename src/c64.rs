@@ -42,7 +42,7 @@ bitflags! {
     /// assert_eq!(CpuPortFlags::RAM_IO_KERNAL.bitw(), 0x36);
     /// ~~~
     pub struct CpuPortFlags: u8 {
-        const DEFAULT              = 0b00110111;
+        const DEFAULT              = Self::BASIC_IO_KERNAL.bits;
         const BASIC_IO_KERNAL      = 0b00110111;
         const RAM_RAM_RAM          = 0b00110000;
         const RAM_CHAR_RAM         = 0b00110001;
@@ -152,7 +152,7 @@ extern "C" {
 /// suffix your main program with an endless loop.
 /// `fn called_every_frame()` must be defined and *exported*
 /// on the Rust side and will be called from C via a wrapper. This is because
-/// the llvm-mos `__interrupt__` attribute is currently not available from Rust.
+/// the LLVM `__interrupt__` attribute is currently not available from Rust.
 ///
 /// Example:
 /// ```
