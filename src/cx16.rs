@@ -188,9 +188,14 @@ pub const VIA1: *const VersatileInterfaceAdapter65C22 =
     (0x9f00) as *const VersatileInterfaceAdapter65C22;
 pub const VIA2: *const VersatileInterfaceAdapter65C22 =
     (0x9f10) as *const VersatileInterfaceAdapter65C22;
+
+/// Pointer to the Versatile Embedded Retro Adapter chip
 pub const VERA: *const VersatileEmbeddedRetroAdapter =
     (0x9f20) as *const VersatileEmbeddedRetroAdapter;
+
+/// Pointer to Yamaha 2151 sound chip
 pub const YM2151: *mut u8 = (0x9f40) as *mut u8;
+
 /// Access to emulator specific features
 pub const EMULATOR: *const Emulator = (0x9fb0) as *const Emulator;
 

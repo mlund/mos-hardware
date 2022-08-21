@@ -38,9 +38,13 @@ pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
 pub const VICII: *const MOSVideoInterfaceControllerII =
     (0xd000) as *const MOSVideoInterfaceControllerII;
 
+/// Pointer to first sound interface device
 pub const SID0: *const MOSSoundInterfaceDevice = (0xd400) as *const MOSSoundInterfaceDevice;
+/// Pointer to second sound interface device
 pub const SID1: *const MOSSoundInterfaceDevice = (0xd420) as *const MOSSoundInterfaceDevice;
+/// Pointer to third sound interface device
 pub const SID2: *const MOSSoundInterfaceDevice = (0xd440) as *const MOSSoundInterfaceDevice;
+/// Pointer to fourth sound interface device
 pub const SID3: *const MOSSoundInterfaceDevice = (0xd460) as *const MOSSoundInterfaceDevice;
 
 pub const COLOR_RAM: *mut u8 = (0xd800) as *mut u8;

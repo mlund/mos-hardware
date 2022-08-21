@@ -12,8 +12,9 @@
 // see the license for the specific language governing permissions and
 // limitations under the license.
 
-//! This submodule contains automatically generated constants
-//! from the `iomap.txt` file found in the
+//! Automatically generated constants from `iomap.txt`
+//!
+//! The `iomap.txt` file is found in the
 //! [`mega65-core`](https://github.com/MEGA65/mega65-core/blob/development/iomap.txt) repository.
 //! The core is still under development so expect the contained values and
 //! names to change over time.

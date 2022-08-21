@@ -52,8 +52,8 @@
 //! - [VERA Reference Guide](https://github.com/commanderx16/x16-docs/blob/master/VERA%20Programmer's%20Reference.md)
 
 use bitflags::bitflags;
-use volatile_register::{RW, WO};
 use core::mem::ManuallyDrop;
+use volatile_register::{RW, WO};
 
 pub const VIDEOMODE_80X60: u8 = 0;
 pub const VIDEOMODE_80X30: u8 = 1;
@@ -105,7 +105,7 @@ pub const DEC_320: u8 = convert_stride(-320);
 pub const DEC_640: u8 = convert_stride(-640);
 
 /// Convert stride to register value.
-/// 
+///
 /// By setting the 'Address Increment' field in `ADDRx_H`, the address will be incremented after each access to the data register.
 /// Setting the `DECR` bit, will decrement instead of increment.
 /// More [information](https://github.com/commanderx16/x16-docs/blob/master/VERA%20Programmer's%20Reference.md#video-ram-access)
@@ -160,7 +160,7 @@ pub struct VersatileEmbeddedRetroAdapter {
     pub irq_flags: RW<u8>,
 
     /// `IRQLINE_L` - Interrupt raster, offset 0x08.
-    /// 
+    ///
     /// `IRQLINE` specifies at which line the `LINE` interrupt will be generated.
     /// Note that bit 8 of this value is present in the `IEN` register.
     /// For interlaced modes the interrupt will be generated each field and the bit 0 of `IRQ_LINE` is ignored.
@@ -204,7 +204,7 @@ bitflags! {
         const RGB = 0b0000_0011;
 
         /// Disable chroma.
-        /// 
+        ///
         /// Setting `CHROMA_DISABLE` disables output of chroma in NTSC composite mode and will give a
         /// better picture on a monochrome display.
         /// (Setting this bit will also disable the chroma output on the S-video output.)
@@ -224,25 +224,25 @@ pub struct Display0 {
     /// Flags to enable video layers
     pub video: RW<VideoFlags>,
     /// `HSCALE` - Active Display H-Scale, offset 0x0a
-    /// 
+    ///
     /// `HSCALE` and `VSCALE` will set the fractional scaling factor of the active part of the display.
     /// Setting this value to 128 will output 1 output pixel for every input pixel.
     /// Setting this to 64 will output 2 output pixels for every input pixel.
     pub hscale: RW<u8>,
     /// `VSCALE` - Active Display V-Scale, offset 0x0b
-    /// 
+    ///
     /// `HSCALE` and `VSCALE` will set the fractional scaling factor of the active part of the display.
     /// Setting this value to 128 will output 1 output pixel for every input pixel.
     /// Setting this to 64 will output 2 output pixels for every input pixel.
     pub vscale: RW<u8>,
     /// `DC_BORDER` - Border Color, offset 0x0c.
-    /// 
+    ///
     /// Determines the palette index which is used for the non-active area of the screen.
     pub border: RW<u8>,
 }
 
 /// Active when Display Composer (DC) `SEL=1`.
-/// 
+///
 /// `HSTART`/`HSTOP` and `VSTART`/`VSTOP` determines the active part of the screen.
 /// The values here are specified in the native 640x480 display space.
 /// `HSTART=0`, `HSTOP=640`, `VSTART=0`, `VSTOP=480` will set the active area to the full resolution.
@@ -262,7 +262,7 @@ pub struct Display1 {
 }
 
 /// Video layer registers.
-/// 
+///
 /// The features of the two VERA layers are the same.
 /// Each layer supports a few different modes which are specified using T256C / 'Bitmap Mode' / 'Color Depth' in `Lx_CONFIG`.
 /// The layer can either operate in tile mode or bitmap mode.
@@ -285,7 +285,7 @@ pub struct Layer {
 }
 
 /// VERA audio.
-/// 
+///
 /// The audio functionality contains of two independent systems:
 /// 1. The PSG or Programmable Sound Generator.
 /// 2. The PCM (or Pulse-Code Modulation) playback system.
@@ -300,7 +300,7 @@ pub struct Audio {
 }
 
 /// SPI controller connected to the SD card connector.
-/// 
+///
 /// The speed of the clock output of the SPI controller can be controlled by the 'Slow Clock' bit.
 /// When this bit is 0 the clock is 12.5MHz, when 1 the clock is about 390kHz.
 /// The slow clock speed is to be used during the initialization phase of the SD card.
