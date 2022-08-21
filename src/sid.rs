@@ -16,8 +16,7 @@
 //!
 //! SID is the built-in programmable sound generator chip of Commodore's CBM-II,
 //! Commodore 64, Commodore 128 and Commodore MAX Machine home computers.
-//! It was one of the first sound chips of its kind to be included in a home computer
-//! prior to the digital sound revolution.
+//! It was one of the first sound chips of its kind to be included in a home computer.
 
 use crate::*;
 use bitflags::bitflags;
@@ -93,6 +92,18 @@ impl MOSSoundInterfaceDevice {
         }
     }
 
+    /// Random byte in the interval (0, 255)
+    /// 
+    /// /// Example:
+    /// ~~~
+    /// (*c64::SID).start_random_generator();
+    /// let value = (*c64::SID).random_byte();
+    /// ~~~
+    /// More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
+    pub fn random_byte(&self) -> u8 {
+        self.channel3_oscillator.read()
+    }
+
     /// Random word in the interval (0, max_value)
     pub fn rand16(&self, max_value: u16) -> u16 {
         loop {
@@ -103,20 +114,4 @@ impl MOSSoundInterfaceDevice {
             }
         }
     }
-}
-
-/// Use SID entropy to generate a random byte.
-///
-/// Example:
-/// ```
-/// (*c64::SID).start_random_generator();
-/// let random_byte = rand8!(*c64::SID);
-/// ```
-///
-/// More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
-#[macro_export]
-macro_rules! rand8 {
-    ($sid_pointer:expr) => {{
-        (*$sid_pointer).channel3_oscillator.read()
-    }};
 }

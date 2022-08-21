@@ -22,8 +22,8 @@ unsafe fn make_charset(charset: *mut u8) {
     repeat_element(SINUSTABLE.iter(), 8)
         .enumerate()
         .for_each(|(cnt, sine)| {
-            let mut char_pattern = 0b00000000u8;
-            BITS.iter().filter(|_| rand8!(c64::SID) > *sine).for_each(|bit| {
+            let mut char_pattern = 0;
+            BITS.iter().filter(|_| (*c64::SID).random_byte() > *sine).for_each(|bit| {
                 char_pattern |= bit;
             });
             poke!(charset.offset(cnt as isize), char_pattern);

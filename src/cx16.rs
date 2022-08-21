@@ -114,6 +114,7 @@ pub const JOY_UP_MASK: u8 = 8;
 pub const JOY_DOWN_MASK: u8 = 4;
 pub const JOY_LEFT_MASK: u8 = 2;
 pub const JOY_RIGHT_MASK: u8 = 1;
+
 pub const JOY_BTN_A_MASK: u8 = 128;
 pub const JOY_BTN_B_MASK: u8 = 64;
 pub const JOY_SELECT_MASK: u8 = 32;
@@ -125,36 +126,37 @@ pub const MOUSE_BTN_MIDDLE: u8 = 2;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct VersatileInterfaceAdapter65C22 {
-    /// Port B
-    pub prb: u8,
-    /// Port A
-    pub pra: u8,
-    /// Data direction B
-    pub ddrb: u8,
-    /// Data direction A
-    pub ddra: u8,
-    /// Timer 1
-    pub t1: u16,
-    /// Timer 1 latch
-    pub t1l: u16,
-    /// Timer 2
-    pub t2: u16,
-    /// Shift
-    pub sr: u8,
-    /// Auxiliary control
-    pub acr: u8,
-    /// Peripheral control
-    pub pcr: u8,
-    /// Interrupt flag
-    pub ifr: u8,
-    /// Interrupt enable
-    pub ier: u8,
-    /// Port A w/o handshake
-    pub pra2: u8,
+    /// Port B `prb`
+    pub port_b: u8,
+    /// Port A `pra`
+    pub port_a: u8,
+    /// Data direction B `ddrb`
+    pub data_direction_b: u8,
+    /// Data direction A `ddra`
+    pub data_direction_a: u8,
+    /// Timer 1 `t1`
+    pub timer1: u16,
+    /// Timer 1 latch `t1l`
+    pub timer1_latch: u16,
+    /// Timer 2 `t2`
+    pub timer2: u16,
+    /// Shift `sr`
+    pub shift: u8,
+    /// Auxiliary control `acr`
+    pub auxiliary_control: u8,
+    /// Peripheral control `pcr`
+    pub peripheral_control: u8,
+    /// Interrupt flag `ifr`
+    pub irq_flag: u8,
+    /// Interrupt enable `ier`
+    pub irq_enable: u8,
+    /// Port A w/o handshake `pra2`
+    pub port_a_no_handshape: u8,
 }
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+/// Access to emulator specific features
 pub struct Emulator {
     /// Boolean: debugging enabled
     pub debug: u8,
@@ -184,8 +186,11 @@ pub struct Emulator {
 pub const RAM_BANK: *mut u8 = (0x00) as *mut u8;
 pub const ROM_BANK: *mut u8 = (0x01) as *mut u8;
 
+/// Pointer to first Versatile Interface Adapter (VIA1)
 pub const VIA1: *const VersatileInterfaceAdapter65C22 =
     (0x9f00) as *const VersatileInterfaceAdapter65C22;
+
+/// Pointer to second Versatile Interface Adapter (VIA2)
 pub const VIA2: *const VersatileInterfaceAdapter65C22 =
     (0x9f10) as *const VersatileInterfaceAdapter65C22;
 

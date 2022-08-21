@@ -42,7 +42,7 @@ pub const LIGHT_BLUE: u8 = 14;
 pub const GRAY3: u8 = 15;
 
 bitflags! {
-    /// Bitmask for sprites 0-7
+    /// Bitmask for sprites 0 to 7.
     pub struct Sprites: u8 {
         const SPRITE0 = 0b00000001;
         const SPRITE1 = 0b00000010;
@@ -56,7 +56,7 @@ bitflags! {
 }
 
 bitflags! {
-    /// Y-Scroll Register Mask (0xD011)
+    /// Y-Scroll Register Mask (0xd011)
     pub struct ControlYFlags: u8 {
         /// Control smooth y scrolling
         const YSCROLL = 0b0000_0111;

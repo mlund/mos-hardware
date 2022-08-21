@@ -30,7 +30,7 @@ register_structs! {
     ///
     /// More information [here](https://sta.c64.org/cbm64mem.html).
     /// Currently not in use.
-    pub MemoryMap {
+    MemoryMap {
         /// `D6510` - Data direction, 0x0000
         (0x0000 => pub cpu_port_data_direction: ReadWrite<u8>),
         /// `R6510` - Input/output, 0x0001
@@ -61,14 +61,14 @@ register_structs! {
 
 bitflags! {
     /// Control flags for the CPU port `R6510` at 0x0001
-    /// 
+    ///
     /// Three-word combination constants like `RAM_IO_KERNAL` refer to banking configurations
     /// of what is visible at addresses `$A000-BFFF`, `$D000-DFFF`, and `$E000-FFFF`.
     /// Regardless of `0x0001`, the VIC-II chip *always* sees the `CHARROM` at `$1000-1FFF` and `$9000-9FFF`,
     /// and RAM everywhere else.
-    /// 
+    ///
     /// [More information](https://codebase64.org/doku.php?id=base:memory_management).
-    /// 
+    ///
     /// Here's an example that makes the RAM available "under" both the BASIC and KERNAL
     /// ROMs located at 0xA000-0xBFFF and 0xE000-0xFFFF.
     /// The VIC, SID, and CIA I/O devices are left accessible at 0xD000-0xDFFF:
@@ -142,21 +142,24 @@ register_bitfields! [
     ],
 ];
 
-/// `R6510` register for 6510 I/O at 0x0001
+/// Pointer to the `R6510` register for 6510 I/O (0x0001)
 pub const CPU_PORT: *mut RW<CpuPortFlags> = (0x0001) as *mut RW<CpuPortFlags>;
 
-/// Pointer to default screen memory (0x0400)
-pub const DEFAULT_SCREEN: *mut u8 = (0x0400) as *mut u8;
-pub const DEFAULT_SCREEN_AREA: *mut [u8; 1000] = (0x0400) as *mut [u8; 1000];
-//pub const DEFAULT_BASIC_AREA : *mut [u8; 38911] = (0x0801) as *mut [u8; 38911];
-pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
-pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
+/// Pointer to beginning of default video memory (0x0400)
+pub const DEFAULT_VIDEO_MEMORY: *mut u8 = (0x0400) as *mut u8;
 
-/// Default sprite pointers
+/// Pointer to the default video matrix area (0x0400)
+/// 
+/// The video matrix is where text screen characters are stored in RAM.
+/// By default this corresponds to 25 lines, each with 40 columns.
+pub const DEFAULT_VIDEO_MATRIX: *mut [u8; 25 * 40] = (0x0400) as *mut [u8; 25 * 40];
+
+/// Default sprite shape pointers (0x0400)
 ///
-/// This is the default location for sprite pointers, i.e.
-/// relative to the default screen memory location 0x0400. The
-/// sprite pointers can be calculated with `vic2::to_sprite_pointer()`.
+/// This is the default location for sprite shape pointers, i.e.
+/// relative to the default screen memory location 0x0400.
+/// Individual sprite shape pointers can be calculated with
+/// `vic2::to_sprite_pointer()`.
 pub const DEFAULT_SPRITE_PTR: [*mut u8; 8] = [
     (0x0400 + 0x3F8 + 0) as *mut u8,
     (0x0400 + 0x3F8 + 1) as *mut u8,
@@ -168,31 +171,44 @@ pub const DEFAULT_SPRITE_PTR: [*mut u8; 8] = [
     (0x0400 + 0x3F8 + 7) as *mut u8,
 ];
 
+pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
+pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
+
 // /// Experimental memory map of the c64
 // pub const MAP: *const MemoryMap = (0x0000) as *const MemoryMap;
 
-/// Pointer to the video interface controller (VIC II)
+/// Pointer to BASIC ROM start (0xa000)
+pub const BASIC_ROM: *mut u8 = (0xa000) as *mut u8;
+
+/// Pointer to BASIC ROM area (0xa000 - 0xbfff)
+pub const BASIC_ROM_AREA: *mut [u8; 0x1fff] = (0xa000) as *mut [u8; 0x1fff];
+
+/// Pointer to the video interface controller (0xd000)
 pub const VIC: *const MOSVideoInterfaceControllerII =
     (0xd000) as *const MOSVideoInterfaceControllerII;
 
-/// Pointer to the sound interface device (SID)
+/// Pointer to the sound interface device (0xd400)
 pub const SID: *const MOSSoundInterfaceDevice = (0xd400) as *const MOSSoundInterfaceDevice;
 
 /// Pointer to default color RAM
 pub const COLOR_RAM: *mut u8 = (0xd800) as *mut u8;
 
-/// Pointer to first complex interface adapter (CIA)
+/// Pointer to first complex interface adapter (0xdc00)
 pub const CIA1: *const MOSComplexInterfaceAdapter6526 =
     (0xdc00) as *const MOSComplexInterfaceAdapter6526;
-/// Pointer to second complex interface adapter (CIA)
+
+/// Pointer to second complex interface adapter (0xdd00)
 pub const CIA2: *const MOSComplexInterfaceAdapter6526 =
     (0xdd00) as *const MOSComplexInterfaceAdapter6526;
 
+/// Pointer to the KERNAL ROM memory area (0xe000 - 0xffff)
 pub const KERNAL_ROM: *mut [u8; 8192] = (0xe000) as *mut [u8; 8192];
 
 bitflags! {
-    pub struct CIA1ControlFlags: u8 {
-        const START         = 0b00000001;
+    /// Flags for the `CIA1::control_a` register (0xdc0e)
+    pub struct CIA1ControlAFlags: u8 {
+        /// Start (1) or stop (0) timer A
+        const START         = 0b00000001; // bit 0
         const PBON          = 0b00000010;
         const OUTMODE       = 0b00000100;
         const RUNMODE       = 0b00001000;

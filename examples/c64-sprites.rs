@@ -21,6 +21,7 @@
 use core::panic::PanicInfo;
 use mos_hardware::{c64, poke, vic2};
 use ufmt_stdio::*;
+use vic2::*;
 
 /// Sprite pattern
 ///
@@ -49,10 +50,10 @@ const RUST_LOGO: [u8; 63] = [
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     unsafe {
-        // Copy Rust logo to sprite address and set sprite pointers
+        // Copy Rust logo to sprite address and set sprite shape pointers
         const SPRITE_ADDRESS: u16 = 0x2000;
         *(SPRITE_ADDRESS as *mut [u8; 63]) = RUST_LOGO;
-        let sprite_ptr = vic2::to_sprite_pointer(SPRITE_ADDRESS);
+        let sprite_ptr = to_sprite_pointer(SPRITE_ADDRESS);
         poke!(c64::DEFAULT_SPRITE_PTR[0], sprite_ptr);
         poke!(c64::DEFAULT_SPRITE_PTR[2], sprite_ptr);
 
@@ -62,23 +63,23 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         // Sprite 0 properties
         vic.sprite_positions[0].x.write(180);
         vic.sprite_positions[0].y.write(128);
-        vic.sprite_colors[0].write(vic2::GREEN);
-        vic.sprite_expand_x.write(vic2::Sprites::SPRITE0);
-        vic.sprite_expand_y.write(vic2::Sprites::SPRITE0);
+        vic.sprite_colors[0].write(GREEN);
+        vic.sprite_expand_x.write(Sprites::SPRITE0);
+        vic.sprite_expand_y.write(Sprites::SPRITE0);
 
         // Sprite 2 properties
         vic.sprite_positions[2].x.write(180);
         vic.sprite_positions[2].y.write(60);
-        vic.sprite_colors[2].write(vic2::RED);
-        vic.sprite_background_priority.write(vic2::Sprites::SPRITE2);
+        vic.sprite_colors[2].write(RED);
+        vic.sprite_background_priority.write(Sprites::SPRITE2);
 
         // Show sprite 0, 2, and 7
         vic.sprite_enable
-            .write(vic2::Sprites::SPRITE0 | vic2::Sprites::SPRITE2 | vic2::Sprites::SPRITE7);
+            .write(Sprites::SPRITE0 | Sprites::SPRITE2 | Sprites::SPRITE7);
 
         // Ups, we didn't mean to show sprite 7, so let's disable it again:
         let mut enabled_sprites = vic.sprite_enable.read();
-        enabled_sprites.remove(vic2::Sprites::SPRITE7);
+        enabled_sprites.remove(Sprites::SPRITE7);
         vic.sprite_enable.write(enabled_sprites);
     }
     0
