@@ -39,7 +39,7 @@
 //! using noise from the C64's SID chip:
 //! ~~~
 //! (*c64::SID).start_random_generator();
-//! let random_number : u8 = rand8!(c64::SID);
+//! let value = (*c64::SID).random_byte();
 //! ~~~
 
 #![no_std]

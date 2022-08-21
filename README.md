@@ -41,7 +41,7 @@ let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
 
 ~~~ rust
 (*c64::SID).start_random_generator();
-let random_number : u8 = rand8!(c64::SID);
+let value = (*c64::SID).random_byte();
 ~~~
 
 ## Getting started
