@@ -113,7 +113,7 @@ impl Voice {
     /// 
     /// ## Example:
     /// ~~~
-    /// (*c64::SID).set_attack_decay(AttackTime::Ms38, DecayTime::Ms240);
+    /// (*c64::SID).channel1.set_attack_decay(AttackTime::Ms38, DecayTime::Ms240);
     /// ~~~
     pub fn set_attack_decay(&self, attack_time: AttackTime, decay_time: DecayTime) {
         let value = combine_attack_decay(attack_time, decay_time);
