@@ -104,6 +104,17 @@ bitflags! {
 }
 
 bitflags! {
+    /// Flags to trigger IRQ request when VIC-II interrupt
+    /// conditions are met (0xD01A)
+    pub struct IRQEnableFlags: u8 {
+        const RASTER_COMPARE              = 0b0000_0001; // bit 0
+        const SPRITE_BACKGROUND_COLLISION = 0b0000_0010; // bit 1
+        const ENSPRITE_SPRITE_COLLISION   = 0b0000_0100; // bit 2
+        const LIGHT_PEN                   = 0b0000_1000; // bit 3
+    }
+}
+
+bitflags! {
     /// All possible charset memory locations
     ///
     /// Example:
@@ -186,35 +197,47 @@ pub struct XYcoordinate {
 }
 
 #[repr(C, packed)]
+/// Hardware registers for the MOS Technologies Video Interface Controller II
 pub struct MOSVideoInterfaceControllerII {
     /// Sprite positions (x0, y0, x1, ...)
     pub sprite_positions: [XYcoordinate; 8],
-    /// Offset 0x10
+    /// `MSIGX` Most Significant Bits of Sprites 0-7 Horizontal Positions (0x10)
+    ///
+    /// Setting one of these bits to 1 adds 256 to the horizontal
+    /// position of the corresponding sprite.
+    /// Resetting one to 0 restricts the horizontal position of the
+    /// corresponding sprite to a value of 255 or less.
     pub sprite_positions_most_significant_bit_of_x: RW<Sprites>,
-    /// Offset 0x11
+    /// `SCROLY` Vertical Fine Scrolling and Control Register, 0x11
     pub control_y: RW<ControlYFlags>,
-    /// Offset 0x12
+    /// `RASTER` Raster counter (0x12)
+    ///
+    /// This has two different functions, depending on whether reading or writing:
+    /// 1. When _read_, it tells which screen line the electron beam is currently scanning.
+    /// 2. _Writing_ to this register designates the comparison value for the Raster IRQ.
     pub raster_counter: RW<u8>,
-    /// Offset 0x13
+    /// `LPENX` (0x13)
     pub lightpen_x: RW<u8>,
-    /// Offset 0x14
+    /// `LPENY` (0x14)
     pub lightpen_y: RW<u8>,
-    /// Offset 0x15
+    /// `SPENA` (0x15)
     pub sprite_enable: RW<Sprites>,
     /// Offset 0x16
     pub control_x: RW<ControlXFlags>,
-    /// Offset 0x17
+    /// `YXPAND` (0x17)
     pub sprite_expand_y: RW<Sprites>,
-    /// Offset 0x18
+    /// `VMCSB` Memory Control Register (0x18)
     pub screen_and_charset_bank: RW<u8>,
-    /// Offset 0x19
-    pub irq_status: RW<u8>,
-    /// Enable interrupt requests (enable = 1). Offset 0x1a.
-    pub irq_enable: RW<u8>,
-    /// Place non-transparent sprite data behind (0)
-    /// character/bitmap data, or in front (1). Offset 0x1b.
+    /// `VICIRQ` Interrupt flag (0x19)
+    ///
+    /// The VIC-II chip is capable of generating a maskable request (IRQ)
+    /// when certain conditions relating to the video display are fulfilled.
+    pub irq_status: RW<InterruptFlags>,
+    /// `IRQMSK` IRQ Mask Register (0x1a)
+    pub irq_enable: RW<IRQEnableFlags>,
+    /// `SPBGPR` Place sprites behind (0) in infront of bitmaps (0x1b)
     pub sprite_background_priority: RW<Sprites>,
-    /// Offset 0x1c
+    /// `SPMC` (0x1c)
     pub sprite_multicolor_mode: RW<Sprites>,
     /// Offset 0x1d
     pub sprite_expand_x: RW<Sprites>,
@@ -236,7 +259,7 @@ pub struct MOSVideoInterfaceControllerII {
     pub sprite_multicolor0: RW<u8>,
     /// Offset 0x26
     pub sprite_multicolor1: RW<u8>,
-    /// Offsets 0x27, 0x2e
+    /// `SPxCOL` Sprite Colors (0x2e)
     pub sprite_colors: [RW<u8>; 8],
 }
 

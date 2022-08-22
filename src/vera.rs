@@ -47,7 +47,7 @@
 //!   - Embedded video RAM of 128kB.
 //!   - Palette with 256 colors selected from a total range of 4096 colors.
 //! - 16-channel Programmable Sound Generator with multiple waveforms (Pulse, Sawtooth, Triangle, Noise)
-//! - High quality PCM audio playback from 4kB FIFO buffer with up to 48kHz 16-bit stereo sound.
+//! - High quality PCM audio playback from 4 kB FIFO buffer with up to 48kHz 16-bit stereo sound.
 //! - SPI controller for SecureDigital storage.
 //! - [VERA Reference Guide](https://github.com/commanderx16/x16-docs/blob/master/VERA%20Programmer's%20Reference.md)
 
@@ -152,14 +152,14 @@ pub struct VersatileEmbeddedRetroAdapter {
     pub data0: RW<u8>,
     /// `DATA1` - VRAM Data port 1 (offset 0x04)
     pub data1: RW<u8>,
-    /// `CTRL` - Control, offset 0x05.
-    pub control: RW<CTRLFlags>,
-    /// `IEN` - Interrupt enable, offset 0x06.
+    /// `CTRL` - Control, offset 0x05
+    pub control: RW<ControlFlags>,
+    /// `IEN` - Interrupt enable, offset 0x06
     pub irq_enable: RW<u8>,
-    /// `ISR` - Interrupt flags, offset 0x07.
+    /// `ISR` - Interrupt flags, offset 0x07
     pub irq_flags: RW<u8>,
 
-    /// `IRQLINE_L` - Interrupt raster, offset 0x08.
+    /// `IRQLINE_L` - Interrupt raster, offset 0x08
     ///
     /// `IRQLINE` specifies at which line the `LINE` interrupt will be generated.
     /// Note that bit 8 of this value is present in the `IEN` register.
@@ -175,12 +175,13 @@ pub struct VersatileEmbeddedRetroAdapter {
 }
 
 bitflags! {
-    /// Flags for the `CTRL` register at offset 0x05.
-    pub struct CTRLFlags: u8 {
+    /// Flags for the `VersatileEmbeddedRetroAdapter::control` (`CTRL`) register at offset 0x05
+    pub struct ControlFlags: u8 {
         const ADDRSEL = 0b0000_0001;
         const DCSEL = 0b0000_0010;
-        /// When `RESET` in `CTRL` is set, the FPGA will reconfigure itself.
-        /// All registers will be reset; the palette RAM will be set to default values.
+        /// RESET flag
+        /// When set, the FPGA will reconfigure itself:
+        /// all registers will be reset; the palette RAM will be set to default values.
         const RESET = 0b1000_0000;
     }
 }
@@ -194,7 +195,8 @@ pub union DisplayComposer {
 }
 
 bitflags! {
-    /// Flags for Display Composer (DC) VIDEO at offset 0x09 enabled when SEL=0.
+    /// Flags for Display Composer (DC) VIDEO at offset 0x09
+    /// 
     /// Bits 0-1 define the OUTPUT modes.
     pub struct VideoFlags: u8 {
         const DISABLED = 0b0000_0000;
@@ -203,7 +205,7 @@ bitflags! {
         /// RGB interlaced, composite sync (via VGA connector)
         const RGB = 0b0000_0011;
 
-        /// Disable chroma.
+        /// Disable chroma
         ///
         /// Setting `CHROMA_DISABLE` disables output of chroma in NTSC composite mode and will give a
         /// better picture on a monochrome display.
@@ -213,12 +215,14 @@ bitflags! {
         const LAYER1_ENABLE = 0b0010_0000; // bit 5
         const SPRITES_ENABLE = 0b0100_0000; // bit 6
 
-        /// Read-only bit which reflects the active interlaced field in composite and RGB modes. (0: even, 1: odd)
+        /// Read-only bit which reflects the active interlaced field in composite and RGB modes
+        /// 
+        /// 0: even, 1: odd
         const CURRENT_FIELD = 0b1000_0000; // bit 7
     }
 }
 
-/// Active when Display Composer (DC) SEL=0.
+/// Active when Display Composer (DC) SEL=0
 #[repr(C)]
 pub struct Display0 {
     /// Flags to enable video layers
@@ -235,13 +239,13 @@ pub struct Display0 {
     /// Setting this value to 128 will output 1 output pixel for every input pixel.
     /// Setting this to 64 will output 2 output pixels for every input pixel.
     pub vscale: RW<u8>,
-    /// `DC_BORDER` - Border Color, offset 0x0c.
+    /// `DC_BORDER` - Border Color, offset 0x0c
     ///
     /// Determines the palette index which is used for the non-active area of the screen.
     pub border: RW<u8>,
 }
 
-/// Active when Display Composer (DC) `SEL=1`.
+/// Active when Display Composer (DC) `SEL=1`
 ///
 /// `HSTART`/`HSTOP` and `VSTART`/`VSTOP` determines the active part of the screen.
 /// The values here are specified in the native 640x480 display space.
@@ -261,7 +265,7 @@ pub struct Display1 {
     pub vstop: RW<u8>,
 }
 
-/// Video layer registers.
+/// Video layer registers
 ///
 /// The features of the two VERA layers are the same.
 /// Each layer supports a few different modes which are specified using T256C / 'Bitmap Mode' / 'Color Depth' in `Lx_CONFIG`.
@@ -284,9 +288,9 @@ pub struct Layer {
     pub vscroll: RW<u16>,
 }
 
-/// VERA audio.
+/// VERA audio
 ///
-/// The audio functionality contains of two independent systems:
+/// The audio functionality consists of two independent systems:
 /// 1. The PSG or Programmable Sound Generator.
 /// 2. The PCM (or Pulse-Code Modulation) playback system.
 #[repr(C)]
@@ -299,7 +303,7 @@ pub struct Audio {
     pub data: WO<u8>,
 }
 
-/// SPI controller connected to the SD card connector.
+/// SPI controller connected to the SD card connector
 ///
 /// The speed of the clock output of the SPI controller can be controlled by the 'Slow Clock' bit.
 /// When this bit is 0 the clock is 12.5MHz, when 1 the clock is about 390kHz.
@@ -318,9 +322,12 @@ pub struct SPIController {
 
 /// VRAM, 0x00000 - 0x1F9BF
 pub const VIDEO_RAM: *mut u8 = (0x00000) as *mut u8;
+
 /// PSG registers, 0x1F9C0 - 0x1F9FF
 pub const PSG_REGISTERS: *mut u8 = (0x1f9c0u32) as *mut u8;
+
 /// Palette, 0x1FA00 - 0x1FBFF
 pub const PALETTE: *mut u8 = (0x1fa00u32) as *mut u8;
+
 /// Sprite attributes, 0x1FC00 - 0x1FFFF
 pub const SPRITE_ATTRIBUTES: *mut u8 = (0x1fc00u32) as *mut u8;
