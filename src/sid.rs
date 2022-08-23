@@ -27,17 +27,17 @@ use volatile_register::{RO, WO};
 bitflags! {
     /// Control flags for the `Voice::control` register
     pub struct VoiceControlFlags: u8 {
-        const GATE     = 0b00000001; // bit 0
+        const GATE     = 0b0000_0001; // bit 0
         /// Synch fundamental frequency of oscillator with fundamental frequency of neighboring voice
-        const SYNC     = 0b00000010; // bit 1
+        const SYNC     = 0b0000_0010; // bit 1
         /// Set to replace triangle waveform w. ring modulation from neighbor voices
-        const RING_MODULATION = 0b00000100; // bit 2
+        const RING_MODULATION = 0b0000_0100; // bit 2
         /// Set to disable oscillations
-        const TEST     = 0b00001000; // bit 3
-        const TRIANGLE = 0b00010000;
-        const SAWTOOTH = 0b00100000;
-        const PULSE    = 0b01000000;
-        const NOISE    = 0b10000000;
+        const TEST     = 0b0000_1000; // bit 3
+        const TRIANGLE = 0b0001_0000; // bit 4
+        const SAWTOOTH = 0b0010_0000; // bit 5
+        const PULSE    = 0b0100_0000; // bit 6
+        const NOISE    = 0b1000_0000; // bit 7
     }
 }
 
@@ -132,8 +132,10 @@ pub struct MOSSoundInterfaceDevice {
     pub channel2: Voice,
     pub channel3: Voice,
     pub filter_cutoff: WO<u16>,             // 0x15
-    pub resonance_and_filter_setup: WO<u8>, // 0x17
-    pub volume_filter_mode: WO<u8>,         // 0x18
+    /// `RESON` Filter resonance control (0x17)
+    pub resonance_and_filter_setup: WO<u8>,
+    /// `SIGVOL` Volume and filter select (0x18)
+    pub volume_filter_mode: WO<u8>,
     pub potentiometer_x: RO<u8>,            // 0x19
     pub potentiometer_y: RO<u8>,            // 0x1a
     pub channel3_oscillator: RO<u8>,        // 0x1b
