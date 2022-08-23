@@ -33,6 +33,7 @@ unsafe fn make_charset(charset_ptr: *mut u8) {
 }
 
 /// Render entire 40x25 screen
+/// @todo Rename to meaningful variable names (reminiscence from C)
 unsafe fn render_plasma(screen_ptr: *mut u8) {
     static mut C1A: u8 = 0;
     static mut C1B: u8 = 0;

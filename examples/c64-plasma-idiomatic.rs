@@ -38,6 +38,8 @@ unsafe fn make_charset(charset: *mut u8) {
  * The performance is inferior to indexed access to SINUSTABLE which by
  * design is already cyclic by taking up exactly 256 bytes (relying on
  * u8 index overflow).
+ *
+ * @todo Rename to meaningful variable names
  */
 unsafe fn render_plasma(screen: *mut u8) {
     static mut C1A: u8 = 0;
