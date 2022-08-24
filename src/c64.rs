@@ -63,7 +63,7 @@ pub const CPU_PORT: *mut RW<CpuPortFlags> = (0x0001) as *mut RW<CpuPortFlags>;
 pub const DEFAULT_VIDEO_MEMORY: *mut u8 = (0x0400) as *mut u8;
 
 /// Pointer to the default video matrix area (0x0400)
-/// 
+///
 /// The video matrix is where text screen characters are stored in RAM.
 /// By default this corresponds to 25 lines, each with 40 columns.
 pub const DEFAULT_VIDEO_MATRIX: *mut [u8; 25 * 40] = (0x0400) as *mut [u8; 25 * 40];
@@ -171,4 +171,30 @@ pub fn hardware_raster_irq(triggering_raster_line: u8) {
     unsafe {
         hardware_raster_irq_c(triggering_raster_line);
     }
+}
+
+/// Special keyboard and PETSCII codes
+pub enum Keyboard {
+    Delete = 0x14,
+    Stop = 0x03,
+    Return = 0x0d,
+    Home = 0x13,
+    CursorDown = 0x11,
+    CursorRight = 0x1d,
+    Space = 0x20,
+    ArrowLeft = 0x5f,
+    Run = 0x83,
+    F1 = 0x85,
+    F2 = 0x86,
+    F3 = 0x87,
+    F4 = 0x88,
+    F5 = 0x89,
+    F6 = 0x8a,
+    F7 = 0x8b,
+    F8 = 0x8c,
+    ShiftReturn = 0x8d,
+    CursorUp = 0x91,
+    Clear = 0x93,
+    Insert = 0x94,
+    CursorLeft = 0x9d,
 }
