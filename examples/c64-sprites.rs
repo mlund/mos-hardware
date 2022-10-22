@@ -62,7 +62,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
         // Sprite 0 properties
         vic.sprite_positions[0].x.write(180);
-        vic.sprite_positions[0].y.write(128);
+        vic.sprite_positions[0].y.write(100);
         vic.sprite_colors[0].write(GREEN);
         vic.sprite_expand_x.write(Sprites::SPRITE0);
         vic.sprite_expand_y.write(Sprites::SPRITE0);
