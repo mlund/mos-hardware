@@ -41,7 +41,7 @@ itertools = {version = "0.10.3", default-features = false}
 
 [build-dependencies]
 cc = "1"
-bindgen = "0.60"
+bindgen = "0.61"
 
 [dev-dependencies]
 ufmt-stdio = "0"
