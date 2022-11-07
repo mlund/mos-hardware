@@ -24,66 +24,85 @@ use ufmt_stdio::*;
 use vic2::*;
 
 /// Classic, smooth x-scroll using VIC2's 0xD016 register
-unsafe fn smooth_scroll() {
+fn smooth_scroll() {
     static mut TEXT_INDEX: usize = 0;
     const YPOSITION: u8 = 8;
     const LINE: *mut u8 = (0x0400 + (40 * YPOSITION as u16)) as *mut u8;
     static mut DISPLACEMENT: u8 = 7;
 
-    let mut flags = (&*c64::VIC).control_x.read();
-    flags.set(ControlXFlags::XSCROLL, false);
-    (&*c64::VIC)
-        .control_x
-        .write(ControlXFlags::from_bits(flags.bits() + DISPLACEMENT).unwrap());
+    unsafe {
+        let mut flags = (&*c64::VIC).control_x.read();
+        flags.set(ControlXFlags::XSCROLL, false);
+        (&*c64::VIC)
+            .control_x
+            .write(ControlXFlags::from_bits(flags.bits() + DISPLACEMENT).unwrap());
 
-    if DISPLACEMENT == 7 {
-        //let a = SCROLL_TEXT.iter().cycle();
-        poke!(LINE.offset(39), SCROLL_TEXT[TEXT_INDEX]);
-        TEXT_INDEX += 1;
-        if TEXT_INDEX == SCROLL_TEXT.len() {
-            TEXT_INDEX = 0;
+        if DISPLACEMENT == 7 {
+            //let a = SCROLL_TEXT.iter().cycle();
+            poke!(LINE.offset(39), SCROLL_TEXT[TEXT_INDEX]);
+            TEXT_INDEX += 1;
+            if TEXT_INDEX == SCROLL_TEXT.len() {
+                TEXT_INDEX = 0;
+            }
+            // Code below is 2x faster than core::ptr::copy(LINE.offset(1), LINE, 39)...
+            for i in 1..40 {
+                let val = peek!(LINE.offset(i));
+                poke!(LINE.offset(i - 1), val);
+            }
         }
-        // Code below is 2x faster than core::ptr::copy(LINE.offset(1), LINE, 39)...
-        for i in 1..40 {
-            let val = peek!(LINE.offset(i));
-            poke!(LINE.offset(i - 1), val);
-        }
+
+        DISPLACEMENT = match DISPLACEMENT.checked_sub(1) {
+            Some(x) => x,
+            None => 7,
+        };
     }
-
-    DISPLACEMENT = match DISPLACEMENT.checked_sub(1) {
-        Some(x) => x,
-        None => 7,
-    };
 }
 
-unsafe fn move_sprite(counter: u8) {
+fn move_sprite(counter: u8) {
     const OFFSET: u8 = 30;
     const MSB_THRESHOLD: u8 = 255 - OFFSET;
     static mut COUNTER_Y: u8 = 0;
-
-    let vic = &*c64::VIC;
     let xpos = SINUSTABLE[counter as usize];
-    if xpos > MSB_THRESHOLD {
-        vic.sprite_positions_most_significant_bit_of_x
-            .write(Sprites::SPRITE0);
-        vic.sprite_positions[0].x.write(xpos + OFFSET - 255);
-    } else {
-        vic.sprite_positions_most_significant_bit_of_x
-            .write(Sprites::empty());
-        vic.sprite_positions[0].x.write(xpos + OFFSET);
+
+    unsafe {
+        let vic = &*c64::VIC;
+        if xpos > MSB_THRESHOLD {
+            vic.sprite_positions_most_significant_bit_of_x
+                .write(Sprites::SPRITE0);
+            vic.sprite_positions[0].x.write(xpos + OFFSET - 255);
+        } else {
+            vic.sprite_positions_most_significant_bit_of_x
+                .write(Sprites::empty());
+            vic.sprite_positions[0].x.write(xpos + OFFSET);
+        }
+        let i = add!(COUNTER_Y, 20);
+        vic.sprite_positions[0]
+            .y
+            .write(SINUSTABLE[i as usize] / 4 + 70);
+        COUNTER_Y += 1;
     }
-    let i = add!(COUNTER_Y, 20);
-    vic.sprite_positions[0]
-        .y
-        .write(SINUSTABLE[i as usize] / 4 + 70);
-    COUNTER_Y += 1;
+}
+
+struct SmoothScroll {
+    counter: u8,
+    displacement: u8,
+}
+
+impl SmoothScroll {
+    const fn new() -> SmoothScroll {
+        SmoothScroll {
+            counter: 0,
+            displacement: 7,
+        }
+    }
 }
 
 // This function is called at every triggering event.
 #[no_mangle]
 pub extern "C" fn called_every_frame() {
+    static mut SCROLL: SmoothScroll = SmoothScroll::new();
+    static mut COUNTER: u8 = 0;
     unsafe {
-        static mut COUNTER: u8 = 0;
         (&*c64::VIC).border_color.write(vic2::LIGHT_GREEN);
         move_sprite(COUNTER);
         COUNTER += 2;
@@ -96,34 +115,38 @@ pub extern "C" fn called_every_frame() {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+    // set 48 column mode for smooth x-scrolling
     unsafe {
-        let vic = &*c64::VIC;
-
-        // set 48 column mode for smooth x-scrolling
-        let mut flags = vic.control_x.read();
+        let mut flags = (*c64::VIC).control_x.read();
         flags.set(ControlXFlags::COLUMN_SELECT, false);
-        vic.control_x.write(flags);
+        (*c64::VIC).control_x.write(flags);
+    }
 
-        // Clear screen, functional style
+    // Clear screen, functional style
+    unsafe {
         (*c64::DEFAULT_VIDEO_MATRIX)
             .iter_mut()
             .for_each(|i| *i = 0x20);
+    }
 
-        // Copy Rust logo to sprite address and set sprite shape pointers
-        const SPRITE_ADDRESS: u16 = 0x2000;
+    // Copy Rust logo to sprite address and set sprite shape pointers
+    const SPRITE_ADDRESS: u16 = 0x2000;
+    unsafe {
         *(SPRITE_ADDRESS as *mut [u8; 63]) = RUST_LOGO;
         let sprite_ptr = to_sprite_pointer(SPRITE_ADDRESS);
         poke!(c64::DEFAULT_SPRITE_PTR[0], sprite_ptr);
+    }
 
-        // Copy SID file to right location (TODO!)
+    // Copy SID file to right location (TODO!)
 
-        // Sprite 0 properties
-        vic.sprite_positions[0].x.write(180);
-        vic.sprite_positions[0].y.write(100);
-        vic.sprite_colors[0].write(GREEN);
-        vic.sprite_expand_x.write(Sprites::SPRITE0);
-        vic.sprite_expand_y.write(Sprites::SPRITE0);
-        vic.sprite_enable.write(Sprites::SPRITE0);
+    // Sprite 0 properties
+    unsafe {
+        (*c64::VIC).sprite_positions[0].x.write(180);
+        (*c64::VIC).sprite_positions[0].y.write(100);
+        (*c64::VIC).sprite_colors[0].write(GREEN);
+        (*c64::VIC).sprite_expand_x.write(Sprites::SPRITE0);
+        (*c64::VIC).sprite_expand_y.write(Sprites::SPRITE0);
+        (*c64::VIC).sprite_enable.write(Sprites::SPRITE0);
     }
     c64::hardware_raster_irq(20); // trigger at raster line 20
     loop {} // let's not return to dead BASIC
