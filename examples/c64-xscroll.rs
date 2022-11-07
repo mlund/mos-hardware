@@ -25,13 +25,21 @@ use vic2::*;
 
 /// Classic, smooth x-scroll using VIC2's 0xD016 register
 struct SmoothScroll {
+    /// Current position in scroll text
     text_index: usize,
+    /// horizontal x position [0..7]
     displacement: u8,
 }
 
 impl SmoothScroll {
+    /// Vertical position of scroll
     const YPOSITION: u8 = 8;
+    /// Pointer to screen area of the scroll line (beginning of character row)
     const LINE: *mut u8 = (0x0400 + (40 * SmoothScroll::YPOSITION as u16)) as *mut u8;
+    /// PETSCII encoded scroll text
+    const SCROLL_TEXT: [u8; 17] = [
+        8, 5, 12, 12, 15, 0x20, 6, 18, 15, 13, 0x20, 18, 21, 19, 20, 0x21, 0x20,
+    ];
 
     const fn new() -> SmoothScroll {
         SmoothScroll {
@@ -50,12 +58,15 @@ impl SmoothScroll {
         }
 
         if self.displacement == 7 {
-            //let a = SCROLL_TEXT.iter().cycle();
+            //let a = SmoothScroll::SCROLL_TEXT.iter().cycle();
             unsafe {
-                poke!(SmoothScroll::LINE.offset(39), SCROLL_TEXT[self.text_index]);
+                poke!(
+                    SmoothScroll::LINE.offset(39),
+                    SmoothScroll::SCROLL_TEXT[self.text_index]
+                );
             }
             self.text_index += 1;
-            if self.text_index == SCROLL_TEXT.len() {
+            if self.text_index == SmoothScroll::SCROLL_TEXT.len() {
                 self.text_index = 0;
             }
             // Code below is 2x faster than core::ptr::copy(LINE.offset(1), LINE, 39)...
@@ -159,11 +170,6 @@ const RUST_LOGO: [u8; 63] = [
     0, 90, 0, 1, 255, 128, 7, 239, 224, 15, 24, 240, 28, 0, 56, 63, 255, 28, 127, 255, 158, 127,
     255, 222, 235, 195, 215, 115, 255, 142, 227, 255, 135, 99, 199, 142, 247, 195, 223, 127, 243,
     254, 127, 241, 254, 62, 0, 60, 29, 0, 184, 15, 129, 240, 7, 255, 224, 1, 255, 128, 0, 90, 0,
-];
-
-/// PETSCII encoded scroll text
-const SCROLL_TEXT: [u8; 17] = [
-    8, 5, 12, 12, 15, 0x20, 6, 18, 15, 13, 0x20, 18, 21, 19, 20, 0x21, 0x20,
 ];
 
 /// Tabulated sine function
