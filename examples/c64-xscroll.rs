@@ -24,34 +24,50 @@ use ufmt_stdio::*;
 use vic2::*;
 
 /// Classic, smooth x-scroll using VIC2's 0xD016 register
-fn smooth_scroll() {
-    static mut TEXT_INDEX: usize = 0;
+struct SmoothScroll {
+    text_index: usize,
+    displacement: u8,
+}
+
+impl SmoothScroll {
     const YPOSITION: u8 = 8;
-    const LINE: *mut u8 = (0x0400 + (40 * YPOSITION as u16)) as *mut u8;
-    static mut DISPLACEMENT: u8 = 7;
+    const LINE: *mut u8 = (0x0400 + (40 * SmoothScroll::YPOSITION as u16)) as *mut u8;
 
-    unsafe {
-        let mut flags = (&*c64::VIC).control_x.read();
-        flags.set(ControlXFlags::XSCROLL, false);
-        (&*c64::VIC)
-            .control_x
-            .write(ControlXFlags::from_bits(flags.bits() + DISPLACEMENT).unwrap());
+    const fn new() -> SmoothScroll {
+        SmoothScroll {
+            text_index: 0,
+            displacement: 7,
+        }
+    }
 
-        if DISPLACEMENT == 7 {
+    fn update(&mut self) {
+        unsafe {
+            let mut flags = (&*c64::VIC).control_x.read();
+            flags.set(ControlXFlags::XSCROLL, false);
+            (&*c64::VIC)
+                .control_x
+                .write(ControlXFlags::from_bits(flags.bits() + self.displacement).unwrap());
+        }
+
+        if self.displacement == 7 {
             //let a = SCROLL_TEXT.iter().cycle();
-            poke!(LINE.offset(39), SCROLL_TEXT[TEXT_INDEX]);
-            TEXT_INDEX += 1;
-            if TEXT_INDEX == SCROLL_TEXT.len() {
-                TEXT_INDEX = 0;
+            unsafe {
+                poke!(SmoothScroll::LINE.offset(39), SCROLL_TEXT[self.text_index]);
+            }
+            self.text_index += 1;
+            if self.text_index == SCROLL_TEXT.len() {
+                self.text_index = 0;
             }
             // Code below is 2x faster than core::ptr::copy(LINE.offset(1), LINE, 39)...
             for i in 1..40 {
-                let val = peek!(LINE.offset(i));
-                poke!(LINE.offset(i - 1), val);
+                unsafe {
+                    let val = peek!(SmoothScroll::LINE.offset(i));
+                    poke!(SmoothScroll::LINE.offset(i - 1), val);
+                }
             }
         }
 
-        DISPLACEMENT = match DISPLACEMENT.checked_sub(1) {
+        self.displacement = match self.displacement.checked_sub(1) {
             Some(x) => x,
             None => 7,
         };
@@ -83,20 +99,6 @@ fn move_sprite(counter: u8) {
     }
 }
 
-struct SmoothScroll {
-    counter: u8,
-    displacement: u8,
-}
-
-impl SmoothScroll {
-    const fn new() -> SmoothScroll {
-        SmoothScroll {
-            counter: 0,
-            displacement: 7,
-        }
-    }
-}
-
 // This function is called at every triggering event.
 #[no_mangle]
 pub extern "C" fn called_every_frame() {
@@ -107,7 +109,7 @@ pub extern "C" fn called_every_frame() {
         move_sprite(COUNTER);
         COUNTER += 2;
         if COUNTER % 2 == 0 {
-            smooth_scroll();
+            SCROLL.update();
         }
         (&*c64::VIC).border_color.write(vic2::BLACK);
     }
