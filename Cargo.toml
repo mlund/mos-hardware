@@ -33,7 +33,7 @@ ufmt = {git="https://github.com/mrk-its/ufmt", branch="ptr_width_16_fix"}
 ufmt-write = {git="https://github.com/mrk-its/ufmt", branch="ptr_width_16_fix"}
 
 [dependencies]
-memoffset = {version = "0.6", features = ["unstable_const"]}
+memoffset = {version = "0.7.1", features = ["unstable_const"]}
 static_assertions = "1.1.0"
 bitflags = "1.3.2"
 volatile-register = "0.2.1"
