@@ -49,28 +49,27 @@ const RUST_LOGO: [u8; 63] = [
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+    const SPRITE_ADDRESS: u16 = 0x2000;
+    const SPRITE_PTR: u8 = to_sprite_pointer(SPRITE_ADDRESS);
+
+    // VIC-II chip on C64 (0xD000)
+    let vic = c64::vic2();
+
     unsafe {
         // Copy Rust logo to sprite address and set sprite shape pointers
-        const SPRITE_ADDRESS: u16 = 0x2000;
         *(SPRITE_ADDRESS as *mut [u8; 63]) = RUST_LOGO;
-        let sprite_ptr = to_sprite_pointer(SPRITE_ADDRESS);
-        poke!(c64::DEFAULT_SPRITE_PTR[0], sprite_ptr);
-        poke!(c64::DEFAULT_SPRITE_PTR[2], sprite_ptr);
-
-        // Borrow VIC-II chip on C64 (0xD000)
-        let vic = &*c64::VIC;
+        poke!(c64::DEFAULT_SPRITE_PTR[0], SPRITE_PTR);
+        poke!(c64::DEFAULT_SPRITE_PTR[2], SPRITE_PTR);
 
         // Sprite 0 properties
-        vic.sprite_positions[0].x.write(180);
-        vic.sprite_positions[0].y.write(100);
-        vic.sprite_colors[0].write(GREEN);
+        vic.set_sprite_pos(0, 180, 100);
+        vic.set_sprite_color(0, GREEN);
         vic.sprite_expand_x.write(Sprites::SPRITE0);
         vic.sprite_expand_y.write(Sprites::SPRITE0);
 
         // Sprite 2 properties
-        vic.sprite_positions[2].x.write(180);
-        vic.sprite_positions[2].y.write(60);
-        vic.sprite_colors[2].write(RED);
+        vic.set_sprite_pos(2, 180, 60);
+        vic.set_sprite_color(2, RED);
         vic.sprite_background_priority.write(Sprites::SPRITE2);
 
         // Show sprite 0, 2, and 7

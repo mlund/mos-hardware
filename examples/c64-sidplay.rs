@@ -13,15 +13,17 @@
 // limitations under the license.
 
 //! Incomplete C64 SID play example
+//! This is currently just for playing around with the SID
+//! format and the idea is to eventually split this into a separate
+//! module or crate
 
 #![no_std]
 #![feature(start)]
 #![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
-use mos_hardware::{c64, poke, vic2};
+use mos_hardware::{vic2};
 use ufmt_stdio::*;
-use vic2::*;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
