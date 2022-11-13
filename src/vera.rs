@@ -196,7 +196,7 @@ pub union DisplayComposer {
 
 bitflags! {
     /// Flags for Display Composer (DC) VIDEO at offset 0x09
-    /// 
+    ///
     /// Bits 0-1 define the OUTPUT modes.
     pub struct VideoFlags: u8 {
         const DISABLED = 0b0000_0000;
@@ -216,7 +216,7 @@ bitflags! {
         const SPRITES_ENABLE = 0b0100_0000; // bit 6
 
         /// Read-only bit which reflects the active interlaced field in composite and RGB modes
-        /// 
+        ///
         /// 0: even, 1: odd
         const CURRENT_FIELD = 0b1000_0000; // bit 7
     }

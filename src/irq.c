@@ -87,3 +87,24 @@ __attribute__((interrupt)) void irq_wrapper(void) {
 void hardware_raster_irq_c(uint8_t triggering_raster_line) {
   init_raster_irq(&irq_wrapper, triggering_raster_line, HARDWARE_IRQ, true);
 }
+
+/*
+ * Unused function that illustrates GNU assembler usage. See links below
+ * for further information.
+ * - https://blog.alex.balgavy.eu/a-practical-guide-to-gcc-inline-assembly/
+ * - https://www.lemon64.com/forum/viewtopic.php?t=69663
+ */
+inline void _indexed_memcopy() {
+  const uint16_t _src = 0x0541; // known at compile time..
+  const uint16_t _dst = 0x0540; // ... -> "i" operand below
+  const uint8_t _size = 39;
+  asm volatile(
+      "ldx #$00\n"
+      "loop: lda %[src],x\n"
+      "sta %[dst],x\n"
+      "inx\n"
+      "cpx #%[size]\n"
+      "bne loop\n"
+      :: [src] "i" (_src), [dst] "i" (_dst), [size] "i" (_size)
+          : "a", "x");
+}

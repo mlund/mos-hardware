@@ -33,6 +33,8 @@ bitflags! {
     ///
     /// [More information](https://codebase64.org/doku.php?id=base:memory_management).
     ///
+    /// # Examples
+    ///
     /// Here's an example that makes the RAM available "under" both the BASIC and KERNAL
     /// ROMs located at 0xA000-0xBFFF and 0xE000-0xFFFF.
     /// The VIC, SID, and CIA I/O devices are left accessible at 0xD000-0xDFFF:
@@ -154,7 +156,7 @@ extern "C" {
 /// on the Rust side and will be called from C via a wrapper. This is because
 /// the LLVM `__interrupt__` attribute is currently not available from Rust.
 ///
-/// Example:
+/// # Examples
 /// ```
 /// #[no_mangle]
 /// pub unsafe extern fn called_every_frame() {
@@ -197,4 +199,18 @@ pub enum Keyboard {
     Clear = 0x93,
     Insert = 0x94,
     CursorLeft = 0x9d,
+}
+
+/// Get reference to VIC2 chip
+pub const fn vic2() -> &'static MOSVideoInterfaceControllerII {
+    unsafe { &*VIC }
+}
+
+/// Clears screen, functional style (fill with SPACE character)
+pub fn clear_screen() {
+    unsafe {
+        (*DEFAULT_VIDEO_MATRIX)
+            .iter_mut()
+            .for_each(|i| *i = Keyboard::Space as u8);
+    }
 }

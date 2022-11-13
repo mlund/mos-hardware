@@ -42,7 +42,7 @@ const_assert!(size_of::<TimeOfDay>() == 4);
 
 #[repr(C, packed)]
 /// Registers for the MOS Tehnology Complex Interface Adapter 6526
-/// 
+///
 /// The CIA served as an I/O port controller for the 6502 family of microprocessors,
 /// providing for parallel and serial I/O capabilities as well as timers and a
 /// Time-of-Day (TOD) clock. The device's most prominent use was in the Commodore 64

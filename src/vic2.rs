@@ -55,6 +55,29 @@ bitflags! {
     }
 }
 
+impl Sprites {
+    /// Construct from sprite index of bits
+    ///
+    /// # Examples
+    /// ~~~
+    /// const SPRITE2: Sprite = Sprites::new(2);
+    /// ~~~
+    pub const fn new(index: u8) -> Sprites {
+        assert!(index < 8);
+        match index {
+            0 => Sprites::SPRITE0,
+            1 => Sprites::SPRITE1,
+            2 => Sprites::SPRITE2,
+            3 => Sprites::SPRITE3,
+            4 => Sprites::SPRITE4,
+            5 => Sprites::SPRITE5,
+            6 => Sprites::SPRITE6,
+            7 => Sprites::SPRITE7,
+            _ => panic!(),
+        }
+    }
+}
+
 bitflags! {
     /// Y-Scroll Register Mask (0xd011)
     pub struct ControlYFlags: u8 {
@@ -117,7 +140,7 @@ bitflags! {
 bitflags! {
     /// All possible charset memory locations
     ///
-    /// Example:
+    /// # Examples
     /// ~~~
     /// let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
     /// (*c64::VIC).screen_and_charset_bank.write(bank);
@@ -138,7 +161,7 @@ bitflags! {
 impl CharsetBank {
     /// Generate bank from charset memory address. Will check if it is valid.
     ///
-    /// Example:
+    /// # Examples
     /// ~~~
     /// const SCREEN: u16 = 0x2800;
     /// const CHARSET: u16 = 0x2000;
@@ -176,7 +199,7 @@ bitflags! {
 impl ScreenBank {
     /// Generate bank from screen memory address. Will check if it is valid.
     ///
-    /// Example:
+    /// # Examples
     /// ~~~
     /// const SCREEN: u16 = 0x2800;
     /// const CHARSET: u16 = 0x2000;
@@ -265,12 +288,44 @@ pub struct MOSVideoInterfaceControllerII {
 
 const_assert!(size_of::<MOSVideoInterfaceControllerII>() == 0x2f);
 
+impl MOSVideoInterfaceControllerII {
+    /// Sets position of sprite identified by it's index
+    pub fn set_sprite_pos(&self, index: u8, xpos: u8, ypos: u8) {
+        unsafe {
+            self.sprite_positions[index as usize].x.write(xpos);
+            self.sprite_positions[index as usize].y.write(ypos);
+        }
+    }
+
+    /// Sets color of sprite identified by it's index
+    pub fn set_sprite_color(&self, index: u8, color: u8) {
+        unsafe {
+            self.sprite_colors[index as usize].write(color);
+        }
+    }
+}
+
 /// Calculate sprite pointer from pattern address
 ///
 /// To make a given sprite show the pattern that's stored in RAM at `address`
 /// (which must be divisible with 64), set the contents of the corresponding
 /// sprite pointer address to `address` divided by 64. For instance, if the sprite pattern
 /// begins at address 704, the pointer value will be 704 / 64 = 11.
+///
+/// # Examples
+///
+/// ~~~
+/// const SPRITE_ADDRESS: u16 = 0x2000;
+/// const SPRITE_PTR: u8 = to_sprite_pointer(SPRITE_ADDRESS);
+/// ~~~
+///
+/// When called as `const`, assertions are done at compile time:
+///
+/// ~~~should_panic
+/// const INVALID_SPRITE_ADDRESS: u16 = 0x2001; // compile time error
+/// ~~~
+///
+/// # Image conversion
 ///
 /// Image files can be converted using ImageMagick:
 ///
@@ -288,8 +343,8 @@ const_assert!(size_of::<MOSVideoInterfaceControllerII>() == 0x2f);
 /// for bits_in_byte in bits.astype(int):
 ///     print(int(''.join('01'[i] for i in bits_in_byte), 2), end=',')
 /// ~~~
-pub fn to_sprite_pointer(address: u16) -> u8 {
-    debug_assert!(address % 64 == 0);
-    debug_assert!(address / 64 < 256);
-    return (address / 64) as u8;
+pub const fn to_sprite_pointer(address: u16) -> u8 {
+    assert!(address % 64 == 0);
+    assert!(address / 64 < 256);
+    (address / 64) as u8
 }

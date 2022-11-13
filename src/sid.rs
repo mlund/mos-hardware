@@ -97,7 +97,7 @@ pub enum DecayTime {
 }
 
 /// Combines attack and decay times for register `ATDCY`
-/// 
+///
 /// ## Example:
 /// ~~~
 /// const TIME: u8 = combine_attack_decay(AttackTime::Ms38, DecayTime::Ms240);
@@ -110,7 +110,7 @@ impl Voice {
     /// Sets the attack/decay cycle duration (`ATDCY`)
     ///
     /// See e.g. Mapping the C64, page 162.
-    /// 
+    ///
     /// ## Example:
     /// ~~~
     /// (*c64::SID).channel1.set_attack_decay(AttackTime::Ms38, DecayTime::Ms240);
@@ -131,15 +131,15 @@ pub struct MOSSoundInterfaceDevice {
     pub channel1: Voice,
     pub channel2: Voice,
     pub channel3: Voice,
-    pub filter_cutoff: WO<u16>,             // 0x15
+    pub filter_cutoff: WO<u16>, // 0x15
     /// `RESON` Filter resonance control (0x17)
     pub resonance_and_filter_setup: WO<u8>,
     /// `SIGVOL` Volume and filter select (0x18)
     pub volume_filter_mode: WO<u8>,
-    pub potentiometer_x: RO<u8>,            // 0x19
-    pub potentiometer_y: RO<u8>,            // 0x1a
-    pub channel3_oscillator: RO<u8>,        // 0x1b
-    pub channel3_envelope: RO<u8>,          // 0x1c
+    pub potentiometer_x: RO<u8>,     // 0x19
+    pub potentiometer_y: RO<u8>,     // 0x1a
+    pub channel3_oscillator: RO<u8>, // 0x1b
+    pub channel3_envelope: RO<u8>,   // 0x1c
 }
 
 const_assert!(size_of::<MOSSoundInterfaceDevice>() == 0x1d);
