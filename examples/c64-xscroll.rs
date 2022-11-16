@@ -179,8 +179,8 @@ pub extern "C" fn called_every_frame() {
             SCROLL.update(0);
         }
         (&*c64::VIC).border_color.write(vic2::BLACK);
-        MUSIC.play(); // excluded from border color profiling
     }
+    MUSIC.play(); // excluded from border color profiling
 }
 
 #[start]
