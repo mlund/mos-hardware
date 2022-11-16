@@ -75,6 +75,7 @@ be subject to significant changes.
   - [x] `vic2`
   - [x] `cia` (partially)
   - [x] `c64` memory map (particlly)
+  - [x] PSID file support for SID music
 - [Commander X16](https://www.commanderx16.com)
   - [x] `vera`
   - [x] `via` (partially)

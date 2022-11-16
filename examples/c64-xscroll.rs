@@ -18,10 +18,18 @@
 #![feature(start)]
 #![feature(default_alloc_error_handler)]
 
+extern crate alloc;
+extern crate mos_alloc;
+
 use core::panic::PanicInfo;
 use mos_hardware::{c64, peek, poke, vic2};
-use ufmt_stdio::*;
 use vic2::*;
+
+/// Trait that in the future may be used for IRQs (currently no effect)
+trait Interrupt {
+    /// Called for every trigger event
+    fn update(&mut self, counter: u8);
+}
 
 /// Classic, smooth x-scroll using VIC2's 0xd016 register
 struct SmoothScroll {
@@ -102,8 +110,10 @@ impl SmoothScroll {
         self.leftcopy_chars();
         self.text_index += 1;
     }
+}
 
-    pub fn update(&mut self) {
+impl Interrupt for SmoothScroll {
+    fn update(&mut self, _counter: u8) {
         self.move_pixel();
         if self.displacement == 7 {
             self.update_chars();
@@ -118,11 +128,12 @@ struct SpriteMove {
 
 impl SpriteMove {
     const OFFSET: u8 = 30;
-
     const fn new() -> SpriteMove {
         SpriteMove { counter_y: 0 }
     }
+}
 
+impl Interrupt for SpriteMove {
     fn update(&mut self, counter: u8) {
         const XSINE: [u8; 256] = mos_hardware::make_sine(1, 0);
         const YSINE: [u8; 256] = mos_hardware::make_sine(4, 70);
@@ -149,8 +160,14 @@ impl SpriteMove {
 /// Global since the interrupt wrapper currently do not take arguments
 static mut SCROLL: SmoothScroll = SmoothScroll::new();
 static mut SPRITE_MOVE: SpriteMove = SpriteMove::new();
+pub struct SidFile;
+static MUSIC: SidFile = mos_hardware::include_sid!("../assets/last_hero.sid");
 
-/// IRQ wrapper; called at every triggering event.
+/// IRQ wrapper; called at every triggering event
+///
+/// The raster time taken up by the rust code is
+/// visualized by changing the border color upon entering
+/// and exiting the function (SID tune is excluded).
 #[no_mangle]
 pub extern "C" fn called_every_frame() {
     static mut COUNTER: u8 = 0;
@@ -159,15 +176,18 @@ pub extern "C" fn called_every_frame() {
         SPRITE_MOVE.update(COUNTER);
         COUNTER += 2;
         if COUNTER % 2 == 0 {
-            SCROLL.update();
+            SCROLL.update(0);
         }
         (&*c64::VIC).border_color.write(vic2::BLACK);
+        MUSIC.play(); // excluded from border color profiling
     }
 }
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     c64::clear_screen();
+    MUSIC.to_memory();
+    MUSIC.init();
     unsafe {
         SCROLL.init();
     }
@@ -183,7 +203,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         (*c64::VIC).sprite_enable.write(Sprites::SPRITE0);
     }
     c64::vic2().set_sprite_color(0, GREEN);
-    c64::hardware_raster_irq(20); // trigger at raster line 20
+    c64::hardware_raster_irq(20);
     loop {} // let's not return to dead BASIC
 }
 
@@ -197,6 +217,11 @@ const RUST_LOGO: [u8; 63] = [
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     #[cfg(not(target_vendor = "nes-nrom-128"))]
-    print!("panic!");
-    loop {}
+    let mut i = 0u8;
+    loop {
+        unsafe {
+            c64::vic2().border_color.write(i);
+        }
+        i += 1;
+    }
 }
