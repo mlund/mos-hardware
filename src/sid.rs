@@ -278,9 +278,9 @@ macro_rules! include_sid {
 
             /// Copies data into found load address
             pub fn to_memory(&self) {
-                let ptr = SidFile::LOAD_ADDRESS as *mut [u8; SidFile::DATA_LEN -2 ];
+                let dst = SidFile::LOAD_ADDRESS as *mut [u8; SidFile::DATA_LEN];
                 unsafe {
-                    *ptr = SidFile::BYTES[SidFile::DATA_OFFSET..SidFile::BYTES.len()]
+                    *dst = SidFile::BYTES[SidFile::DATA_OFFSET..SidFile::BYTES.len()]
                         .try_into()
                         .unwrap();
                 }
