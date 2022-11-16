@@ -217,11 +217,10 @@ const RUST_LOGO: [u8; 63] = [
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     #[cfg(not(target_vendor = "nes-nrom-128"))]
-    let mut i = 0u8;
     loop {
         unsafe {
-            c64::vic2().border_color.write(i);
+            c64::vic2().border_color.write(RED);
+            c64::vic2().border_color.write(BLACK);
         }
-        i += 1;
     }
 }
