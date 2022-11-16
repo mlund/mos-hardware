@@ -61,6 +61,9 @@ The easiest way is to use the provided `.devcontainer.json` configuration for vs
 2. Open the project inside devcontainer when asked
 3. In the vscode terminal do:
    ~~~ bash
+   # if Docker uses qemu (i.e. on apple silicon)
+   export CARGO_NET_GIT_FETCH_WITH_CLI=true
+   
    # build for the MEGA65:
    cargo build --target mos-mega65-none
    ~~~
@@ -88,3 +91,4 @@ be subject to significant changes.
   - [x] Plasma effect (c64, mega65)
   - [x] Raster IRQ (c64)
   - [x] Sprites (c64)
+  - [x] Smooth x-scrooll (c64)
