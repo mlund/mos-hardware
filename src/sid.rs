@@ -197,10 +197,21 @@ impl MOSSoundInterfaceDevice {
     }
 }
 
+trait SidTune {
+    /// Number of subsongs
+    fn num_songs();
+    /// Initialisation routine
+    fn init(song: u8);
+    /// Play rountine to be called at every frame
+    fn play();
+}
+
 /// Macro to load and parse a PSID file at compile time (experimental)
 ///
 /// The PSID file format is described
-/// [here](https://gist.github.com/cbmeeks/2b107f0a8d36fc461ebb056e94b2f4d6)
+/// [here](https://gist.github.com/cbmeeks/2b107f0a8d36fc461ebb056e94b2f4d6).
+/// Since arrays in rust cannot be larger than `isize`, songs larger than
+/// 32 kb cannot be loaded.
 ///
 /// # Examples
 /// ~~~
@@ -209,8 +220,8 @@ impl MOSSoundInterfaceDevice {
 /// println!("Load address = 0x{:x}", SidFile::LOAD_ADDRESS);
 /// println!("Number of songs = {}", SidFile::NUM_SONGS);
 /// SID.to_memory(); // copy data to found load address
-/// SID.init(); // call song initialisation routine
-/// SID.play(); // call this at every frame
+/// SID.init(0);     // call song initialisation routine
+/// SID.play();      // call this at every frame
 /// ~~~
 #[macro_export]
 macro_rules! include_sid {
@@ -266,9 +277,23 @@ macro_rules! include_sid {
                 false => u16::from_be_bytes([SidFile::BYTES[0x08], SidFile::BYTES[0x09]]),
             };
 
-            /// Call song initialization routine
-            pub fn init(&self) {
-                unsafe { (*SidFile::INIT_PTR)() }
+            /// Call song initialisation routine
+            /// 
+            /// Before calling the init routine found in the the PSID file, the
+            /// accumulator (A) of set to the `song` number. This is done by placing
+            /// 6502 wrapper code at the end of the SID file.
+            /// @tody It would be nice to let the compiler decide where to place the
+            /// wrapper code (`address`), but so far no luck.
+            pub fn init(&self, song: u8) {
+                type Fptr = unsafe extern "C" fn() -> ();
+                let [high, low] = SidFile::INIT_ADDRESS.to_be_bytes();
+                let address = SidFile::LOAD_ADDRESS as usize + SidFile::DATA_LEN;
+                let init_fn = &address as *const usize as *const Fptr;
+                unsafe {
+                    // 0xa9 = lda; 0x4c = jmp
+                    *(address as *mut [u8; 5]) = [0xa9, song, 0x4c, low, high];
+                    (*init_fn)();
+                }
             }
 
             /// Call song play routine
