@@ -197,13 +197,16 @@ impl MOSSoundInterfaceDevice {
     }
 }
 
-trait SidTune {
+/// Trait for PSID tunes
+pub trait SidTune {
+    /// Copies const SID data to final load address
+    fn to_memory(&self);
     /// Number of subsongs
-    fn num_songs();
+    fn num_songs(&self) -> usize;
     /// Initialisation routine
-    fn init(song: u8);
+    fn init(&self, song: u8);
     /// Play rountine to be called at every frame
-    fn play();
+    fn play(&self);
 }
 
 /// Macro to load and parse a PSID file at compile time (experimental)
@@ -276,6 +279,12 @@ macro_rules! include_sid {
                 ]),
                 false => u16::from_be_bytes([SidFile::BYTES[0x08], SidFile::BYTES[0x09]]),
             };
+        }
+
+        impl mos_hardware::sid::SidTune for SidFile {
+            fn num_songs(&self) -> usize {
+                SidFile::NUM_SONGS
+            }
 
             /// Call song initialisation routine
             /// 
@@ -284,7 +293,7 @@ macro_rules! include_sid {
             /// 6502 wrapper code at the end of the SID file.
             /// @tody It would be nice to let the compiler decide where to place the
             /// wrapper code (`address`), but so far no luck.
-            pub fn init(&self, song: u8) {
+            fn init(&self, song: u8) {
                 type Fptr = unsafe extern "C" fn() -> ();
                 let [high, low] = SidFile::INIT_ADDRESS.to_be_bytes();
                 let address = SidFile::LOAD_ADDRESS as usize + SidFile::DATA_LEN;
@@ -297,12 +306,12 @@ macro_rules! include_sid {
             }
 
             /// Call song play routine
-            pub fn play(&self) {
+            fn play(&self) {
                 unsafe { (*SidFile::PLAY_PTR)() }
             }
 
             /// Copies data into found load address
-            pub fn to_memory(&self) {
+            fn to_memory(&self) {
                 let dst = SidFile::LOAD_ADDRESS as *mut [u8; SidFile::DATA_LEN];
                 unsafe {
                     *dst = SidFile::BYTES[SidFile::DATA_OFFSET..SidFile::BYTES.len()]

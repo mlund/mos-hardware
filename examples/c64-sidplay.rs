@@ -20,6 +20,7 @@
 
 use core::panic::PanicInfo;
 use mos_hardware::{c64, vic2};
+use mos_hardware::sid::SidTune;
 use vic2::*;
 
 pub struct SidFile;
