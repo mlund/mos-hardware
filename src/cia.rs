@@ -19,6 +19,7 @@
 //! Time-of-Day (TOD) clock. The device's most prominent use was in the Commodore 64
 //! and Commodore 128(D), each of which included two CIA chips.
 
+use bitflags::bitflags;
 use core::mem::size_of;
 use static_assertions::const_assert;
 use volatile_register::RW;
@@ -48,8 +49,8 @@ const_assert!(size_of::<TimeOfDay>() == 4);
 /// Time-of-Day (TOD) clock. The device's most prominent use was in the Commodore 64
 /// and Commodore 128(D), each of which included two CIA chips.
 pub struct MOSComplexInterfaceAdapter6526 {
-    pub port_a: RW<u8>,                // 0x00
-    pub port_b: RW<u8>,                // 0x01
+    pub port_a: RW<GameController>,    // 0x00
+    pub port_b: RW<GameController>,    // 0x01
     pub data_direction_port_a: RW<u8>, // 0x02
     pub data_direction_port_b: RW<u8>, // 0x03
     pub timer_a: RW<u16>,              // 0x04
@@ -62,3 +63,73 @@ pub struct MOSComplexInterfaceAdapter6526 {
 }
 
 const_assert!(size_of::<MOSComplexInterfaceAdapter6526>() == 16);
+
+/// Enum for joystick positions
+pub enum JoystickPosition {
+    Up,
+    Down,
+    Left,
+    Right,
+    UpLeft,
+    DownLeft,
+    UpRight,
+    DownRight,
+    Middle,
+}
+
+bitflags! {
+    /// Bit mask for joystick controller (CIA1 port 1 or 2)
+    /// 
+    /// # Examples
+    /// ~~~
+    /// let val = c64::cia1().port_a.read().complement(); // bits *unset* if pressed
+    /// if val.contains(GameController::FIRE | GameController::UP) {
+    ///     // joystick 2 up and fire pressed...
+    /// }
+    /// ~~~
+    pub struct GameController: u8 {
+        const UP    = 0b0000_0001; // bit 0
+        const DOWN  = 0b0000_0010; // bit 1
+        const LEFT  = 0b0000_0100; // bit 2
+        const RIGHT = 0b0000_1000; // bit 3
+        const FIRE  = 0b0001_0000; // bit 4
+        const UP_LEFT = Self::UP.bits | Self::LEFT.bits;
+        const UP_RIGHT = Self::UP.bits | Self::RIGHT.bits;
+        const DOWN_LEFT = Self::DOWN.bits | Self::LEFT.bits;
+        const DOWN_RIGHT = Self::DOWN.bits | Self::RIGHT.bits;
+    }
+}
+
+impl GameController {
+    /// Read joystick position and fire button status
+    /// 
+    /// # Examples
+    /// ~~~
+    /// let port_a = c64::cia1().port_a.read();
+    /// let (position, fire) = port_a.read_joystick();
+    /// ~~~
+    pub fn read_joystick(&self) -> (JoystickPosition, bool) {
+        let complement = self.complement(); // bit is unset if activated
+        let position = if complement.contains(GameController::UP_LEFT) {
+            JoystickPosition::UpLeft
+        } else if complement.contains(GameController::UP_RIGHT) {
+            JoystickPosition::UpRight
+        } else if complement.contains(GameController::DOWN_LEFT) {
+            JoystickPosition::DownLeft
+        } else if complement.contains(GameController::DOWN_RIGHT) {
+            JoystickPosition::DownRight
+        } else if complement.contains(GameController::UP) {
+            JoystickPosition::Up
+        } else if complement.contains(GameController::DOWN) {
+            JoystickPosition::Down
+        } else if complement.contains(GameController::LEFT) {
+            JoystickPosition::Left
+        } else if complement.contains(GameController::RIGHT) {
+            JoystickPosition::Right
+        } else {
+            JoystickPosition::Middle
+        };
+        let fire = complement.contains(GameController::FIRE);
+        (position, fire)
+    }
+}

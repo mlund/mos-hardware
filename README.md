@@ -92,3 +92,4 @@ be subject to significant changes.
   - [x] Raster IRQ (c64)
   - [x] Sprites (c64)
   - [x] Smooth x-scrooll (c64)
+  - [x] Joystick read (c64)
