@@ -77,40 +77,10 @@ pub enum JoystickPosition {
     Middle,
 }
 
-bitflags! {
-    /// Bit mask for joystick controller (CIA1 port 1 or 2)
-    /// 
-    /// # Examples
-    /// ~~~
-    /// let val = c64::cia1().port_a.read().complement(); // bits *unset* if pressed
-    /// if val.contains(GameController::FIRE | GameController::UP) {
-    ///     // joystick 2 up and fire pressed...
-    /// }
-    /// ~~~
-    pub struct GameController: u8 {
-        const UP    = 0b0000_0001; // bit 0
-        const DOWN  = 0b0000_0010; // bit 1
-        const LEFT  = 0b0000_0100; // bit 2
-        const RIGHT = 0b0000_1000; // bit 3
-        const FIRE  = 0b0001_0000; // bit 4
-        const UP_LEFT = Self::UP.bits | Self::LEFT.bits;
-        const UP_RIGHT = Self::UP.bits | Self::RIGHT.bits;
-        const DOWN_LEFT = Self::DOWN.bits | Self::LEFT.bits;
-        const DOWN_RIGHT = Self::DOWN.bits | Self::RIGHT.bits;
-    }
-}
-
-impl GameController {
-    /// Read joystick position and fire button status
-    /// 
-    /// # Examples
-    /// ~~~
-    /// let port_a = c64::cia1().port_a.read();
-    /// let (position, fire) = port_a.read_joystick();
-    /// ~~~
-    pub fn read_joystick(&self) -> (JoystickPosition, bool) {
-        let complement = self.complement(); // bit is unset if activated
-        let position = if complement.contains(GameController::UP_LEFT) {
+impl JoystickPosition {
+    pub const fn new(value: GameController) -> JoystickPosition {
+        let complement = value.complement(); // complement since bit is UNSET if active
+        if complement.contains(GameController::UP_LEFT) {
             JoystickPosition::UpLeft
         } else if complement.contains(GameController::UP_RIGHT) {
             JoystickPosition::UpRight
@@ -128,8 +98,58 @@ impl GameController {
             JoystickPosition::Right
         } else {
             JoystickPosition::Middle
-        };
-        let fire = complement.contains(GameController::FIRE);
+        }
+    }
+}
+
+bitflags! {
+    /// Bit mask for joystick controller (CIA1 port a or b)
+    /// 
+    /// Note that bits are _unset_ when joystick actions are
+    /// triggered which is why we use `.complement()`.
+    /// 
+    /// # Examples
+    /// ~~~
+    /// let val = c64::cia1().port_a.read().complement();
+    /// if val.contains(GameController::UP_FIRE) {
+    ///     // UP and FIRE pressed simultaneously...
+    /// }
+    /// ~~~
+    pub struct GameController: u8 {
+        const UP    = 0b0000_0001; // bit 0
+        const DOWN  = 0b0000_0010; // bit 1
+        const LEFT  = 0b0000_0100; // bit 2
+        const RIGHT = 0b0000_1000; // bit 3
+        const FIRE  = 0b0001_0000; // bit 4
+
+        const UP_FIRE    = Self::UP.bits | Self::FIRE.bits;
+        const DOWN_FIRE  = Self::DOWN.bits | Self::FIRE.bits;
+        const LEFT_FIRE  = Self::LEFT.bits | Self::FIRE.bits;
+        const RIGHT_FIRE = Self::RIGHT.bits | Self::FIRE.bits;
+
+        const UP_LEFT = Self::UP.bits | Self::LEFT.bits;
+        const UP_RIGHT = Self::UP.bits | Self::RIGHT.bits;
+        const DOWN_LEFT = Self::DOWN.bits | Self::LEFT.bits;
+        const DOWN_RIGHT = Self::DOWN.bits | Self::RIGHT.bits;
+
+        const UP_LEFT_FIRE = Self::UP.bits | Self::LEFT.bits | Self::FIRE.bits;
+        const UP_RIGHT_FIRE = Self::UP.bits | Self::RIGHT.bits | Self::FIRE.bits;
+        const DOWN_LEFT_FIRE = Self::DOWN.bits | Self::LEFT.bits | Self::FIRE.bits;
+        const DOWN_RIGHT_FIRE = Self::DOWN.bits | Self::RIGHT.bits | Self::FIRE.bits;
+    }
+}
+
+impl GameController {
+    /// Read joystick position and fire button status
+    /// 
+    /// # Examples
+    /// ~~~
+    /// let port_a = c64::cia1().port_a.read();
+    /// let (position, fire) = port_a.read_joystick();
+    /// ~~~
+    pub const fn read_joystick(&self) -> (JoystickPosition, bool) {
+        let position = JoystickPosition::new(*self);
+        let fire = self.complement().contains(GameController::FIRE);
         (position, fire)
     }
 }
