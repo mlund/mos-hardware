@@ -206,6 +206,16 @@ pub const fn vic2() -> &'static MOSVideoInterfaceControllerII {
     unsafe { &*VIC }
 }
 
+/// Get reference to CIA1 chip
+pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526 {
+    unsafe { &*CIA1 }
+}
+
+/// Get reference to CIA2 chip
+pub const fn cia2() -> &'static MOSComplexInterfaceAdapter6526 {
+    unsafe { &*CIA2 }
+}
+
 /// Clears screen, functional style (fill with SPACE character)
 pub fn clear_screen() {
     unsafe {
