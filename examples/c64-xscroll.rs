@@ -23,6 +23,7 @@ extern crate mos_alloc;
 
 use core::panic::PanicInfo;
 use mos_hardware::{c64, peek, poke, vic2};
+use mos_hardware::sid::SidTune;
 use vic2::*;
 
 /// Trait that in the future may be used for IRQs (currently no effect)
@@ -160,8 +161,12 @@ impl Interrupt for SpriteMove {
 /// Global since the interrupt wrapper currently do not take arguments
 static mut SCROLL: SmoothScroll = SmoothScroll::new();
 static mut SPRITE_MOVE: SpriteMove = SpriteMove::new();
-pub struct SidFile;
-static MUSIC: SidFile = mos_hardware::include_sid!("../assets/last_hero.sid");
+
+struct SidFile;
+impl SidTune for SidFile {
+    const BYTES: &'static [u8] = core::include_bytes!("../assets/last_hero.sid");
+}
+static MUSIC: SidFile = SidFile;
 
 /// IRQ wrapper; called at every triggering event
 ///
@@ -186,11 +191,11 @@ pub extern "C" fn called_every_frame() {
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     c64::clear_screen();
-    MUSIC.to_memory();
-    MUSIC.init();
     unsafe {
         SCROLL.init();
+        MUSIC.to_memory();
     }
+    MUSIC.init(0);
 
     // Copy Rust logo to sprite address and set sprite shape pointers
     const SPRITE_ADDRESS: u16 = 0x2000;

@@ -197,19 +197,7 @@ impl MOSSoundInterfaceDevice {
     }
 }
 
-/// Trait for PSID tunes
-pub trait SidTune {
-    /// Copies const SID data to final load address
-    fn to_memory(&self);
-    /// Number of subsongs
-    fn num_songs(&self) -> usize;
-    /// Initialisation routine
-    fn init(&self, song: u8);
-    /// Play rountine to be called at every frame
-    fn play(&self);
-}
-
-/// Macro to load and parse a PSID file at compile time (experimental)
+/// Trait for loading and parsing a PSID file at compile time
 ///
 /// The PSID file format is described
 /// [here](https://gist.github.com/cbmeeks/2b107f0a8d36fc461ebb056e94b2f4d6).
@@ -218,108 +206,106 @@ pub trait SidTune {
 ///
 /// # Examples
 /// ~~~
-/// pub struct SidFile;
-/// const SID: SidFile = include_sid!("Last_Hero.sid");
-/// println!("Load address = 0x{:x}", SidFile::LOAD_ADDRESS);
-/// println!("Number of songs = {}", SidFile::NUM_SONGS);
-/// SID.to_memory(); // copy data to found load address
-/// SID.init(0);     // call song initialisation routine
-/// SID.play();      // call this at every frame
+/// use mos_hardware::sid::SidTune;
+/// struct Music;
+/// impl SidTune for Music {
+///     const BYTES: &'static [u8] = core::include_bytes!("last_hero.sid");
+/// }
+/// let music = Music;
+/// unsafe  {
+///     music.to_memory(); // copy data to found load address (danger!)
+/// }
+/// music.init(0);     // call song initialisation routine
+/// music.play();      // call this at every frame
 /// ~~~
-#[macro_export]
-macro_rules! include_sid {
-    ($filename:expr) => {{
-        type Fptr = unsafe extern "C" fn() -> ();
+pub trait SidTune {
+    /// Full SID file as const byte array. Typically you would set
+    /// this with `core::include_bytes!`.
+    const BYTES: &'static [u8];
 
-        impl<'a> SidFile {
-            /// Raw bytes PSID header + data
-            const BYTES: &'static [u8] = core::include_bytes!($filename);
+    /// True if data has an optional 2-byte header stating the load address (C64 style)
+    const HAS_BASIC_LOAD_ADDRESS: bool =
+        match u16::from_be_bytes([Self::BYTES[0x08], Self::BYTES[0x09]]) {
+            0 => true,
+            _ => false,
+        };
 
-            /// True if data has an optional 2-byte header stating the load address (C64 style)
-            const HAS_BASIC_LOAD_ADDRESS: bool =
-                match u16::from_be_bytes([SidFile::BYTES[0x08], SidFile::BYTES[0x09]]) {
-                    0 => true,
-                    _ => false,
-                };
+    /// Offset where data begins, excluding any optional 2-byte load address
+    const DATA_OFFSET: usize = match Self::HAS_BASIC_LOAD_ADDRESS {
+        true => u16::from_be_bytes([Self::BYTES[0x06], Self::BYTES[0x07]]) as usize + 2,
+        false => u16::from_be_bytes([Self::BYTES[0x06], Self::BYTES[0x07]]) as usize,
+    };
 
-            /// Offset where data begins, excluding any optional 2-byte load address
-            const DATA_OFFSET: usize = match SidFile::HAS_BASIC_LOAD_ADDRESS {
-                true => {
-                    u16::from_be_bytes([SidFile::BYTES[0x06], SidFile::BYTES[0x07]]) as usize + 2
-                }
-                false => u16::from_be_bytes([SidFile::BYTES[0x06], SidFile::BYTES[0x07]]) as usize,
-            };
+    /// Length of data part (exludes the optional 2-byte load address)
+    const DATA_LEN: usize = Self::BYTES.len() - Self::DATA_OFFSET;
 
-            /// Length of data part (exludes the optional 2-byte load address)
-            const DATA_LEN: usize = SidFile::BYTES.len() - SidFile::DATA_OFFSET;
+    /// Address of init routine
+    const INIT_ADDRESS: u16 = u16::from_be_bytes([Self::BYTES[0x0a], Self::BYTES[0x0b]]);
 
-            /// Address of init routine
-            const INIT_ADDRESS: u16 =
-                u16::from_be_bytes([SidFile::BYTES[0x0a], SidFile::BYTES[0x0b]]);
+    /// Function pointer to init routine
+    const INIT_PTR: *const unsafe extern "C" fn() -> () =
+        &Self::INIT_ADDRESS as *const u16 as *const unsafe extern "C" fn() -> ();
 
-            /// Function pointer to init routine
-            const INIT_PTR: *const Fptr = &SidFile::INIT_ADDRESS as *const u16 as *const Fptr;
+    /// Address of play routine
+    const PLAY_ADDRESS: u16 = u16::from_be_bytes([Self::BYTES[0x0c], Self::BYTES[0x0d]]);
 
-            /// Address of play routine
-            const PLAY_ADDRESS: u16 =
-                u16::from_be_bytes([SidFile::BYTES[0x0c], SidFile::BYTES[0x0d]]);
+    /// Function pointer to play routine
+    const PLAY_PTR: *const unsafe extern "C" fn() -> () =
+        &Self::PLAY_ADDRESS as *const u16 as *const unsafe extern "C" fn() -> ();
 
-            /// Function pointer to play routine
-            const PLAY_PTR: *const Fptr = &SidFile::PLAY_ADDRESS as *const u16 as *const Fptr;
+    /// Number of subsongs
+    const NUM_SONGS: usize = u16::from_be_bytes([Self::BYTES[0x0e], Self::BYTES[0x0f]]) as usize;
 
-            /// Number of subsongs
-            const NUM_SONGS: usize =
-                u16::from_be_bytes([SidFile::BYTES[0x0e], SidFile::BYTES[0x0f]]) as usize;
+    /// Load address found either in PSID header or in data part
+    const LOAD_ADDRESS: u16 = match Self::HAS_BASIC_LOAD_ADDRESS {
+        true => u16::from_le_bytes([
+            Self::BYTES[Self::DATA_OFFSET - 2],
+            Self::BYTES[Self::DATA_OFFSET - 1],
+        ]),
+        false => u16::from_be_bytes([Self::BYTES[0x08], Self::BYTES[0x09]]),
+    };
 
-            /// Load address found either in PSID header or in data part
-            const LOAD_ADDRESS: u16 = match SidFile::HAS_BASIC_LOAD_ADDRESS {
-                true => u16::from_le_bytes([
-                    SidFile::BYTES[SidFile::DATA_OFFSET - 2],
-                    SidFile::BYTES[SidFile::DATA_OFFSET - 1],
-                ]),
-                false => u16::from_be_bytes([SidFile::BYTES[0x08], SidFile::BYTES[0x09]]),
-            };
+    fn num_songs(&self) -> usize {
+        Self::NUM_SONGS
+    }
+
+    /// Call song initialisation routine
+    ///
+    /// Before calling the init routine found in the the PSID file, the
+    /// accumulator (A) is set to the `song` number. This is done by placing
+    /// 6502 wrapper code at the end of the SID file.
+    ///
+    /// ## Todo
+    ///
+    /// It would be nice to let the compiler decide where to place the
+    /// wrapper code (`address`), but so far no luck.
+    fn init(&self, song: u8) {
+        let [high, low] = Self::INIT_ADDRESS.to_be_bytes();
+        let address = Self::LOAD_ADDRESS as usize + Self::DATA_LEN;
+        let init_fn = &address as *const usize as *const unsafe extern "C" fn() -> ();
+        unsafe {
+            // 0xa9 = lda; 0x4c = jmp
+            *(address as *mut [u8; 5]) = [0xa9, song, 0x4c, low, high];
+            (*init_fn)();
         }
+    }
 
-        impl mos_hardware::sid::SidTune for SidFile {
-            fn num_songs(&self) -> usize {
-                SidFile::NUM_SONGS
-            }
+    /// Call song play routine
+    fn play(&self) {
+        unsafe { (*(Self::PLAY_PTR))() }
+    }
 
-            /// Call song initialisation routine
-            /// 
-            /// Before calling the init routine found in the the PSID file, the
-            /// accumulator (A) of set to the `song` number. This is done by placing
-            /// 6502 wrapper code at the end of the SID file.
-            /// @tody It would be nice to let the compiler decide where to place the
-            /// wrapper code (`address`), but so far no luck.
-            fn init(&self, song: u8) {
-                type Fptr = unsafe extern "C" fn() -> ();
-                let [high, low] = SidFile::INIT_ADDRESS.to_be_bytes();
-                let address = SidFile::LOAD_ADDRESS as usize + SidFile::DATA_LEN;
-                let init_fn = &address as *const usize as *const Fptr;
-                unsafe {
-                    // 0xa9 = lda; 0x4c = jmp
-                    *(address as *mut [u8; 5]) = [0xa9, song, 0x4c, low, high];
-                    (*init_fn)();
-                }
-            }
-
-            /// Call song play routine
-            fn play(&self) {
-                unsafe { (*SidFile::PLAY_PTR)() }
-            }
-
-            /// Copies data into found load address
-            fn to_memory(&self) {
-                let dst = SidFile::LOAD_ADDRESS as *mut [u8; SidFile::DATA_LEN];
-                unsafe {
-                    *dst = SidFile::BYTES[SidFile::DATA_OFFSET..SidFile::BYTES.len()]
-                        .try_into()
-                        .unwrap();
-                }
-            }
-        }
-        SidFile {}
-    }};
+    /// Copies data into memory at load address specified in PSID file.
+    ///
+    /// Unsafe, as this will perform copy into hard-coded
+    /// memory pool that may clash with stack or allocated heap memory.
+    unsafe fn to_memory(&self)
+    where
+        [(); Self::DATA_LEN]:,
+    {
+        let dst = Self::LOAD_ADDRESS as *mut [u8; Self::DATA_LEN];
+        *dst = Self::BYTES[Self::DATA_OFFSET..Self::BYTES.len()]
+            .try_into()
+            .unwrap();
+    }
 }

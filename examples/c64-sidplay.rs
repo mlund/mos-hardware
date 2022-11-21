@@ -19,20 +19,25 @@
 #![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
-use mos_hardware::{c64, vic2};
+use mos_hardware::{c64, vic2, sid};
 use mos_hardware::sid::SidTune;
 use vic2::*;
 
 pub struct SidFile;
+impl sid::SidTune for SidFile {
+    const BYTES: &'static [u8] = core::include_bytes!("../assets/last_hero.sid");
+}
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-    const MUSIC: SidFile = mos_hardware::include_sid!("../assets/last_hero.sid");
-    MUSIC.to_memory();
-    MUSIC.init(0);
+    let music = SidFile;
+    unsafe {
+        music.to_memory();
+    }
+    music.init(0);
     loop {
         if c64::vic2().raster_counter.read() == 20 {
-            MUSIC.play();
+            music.play();
             while c64::vic2().raster_counter.read() < 80 {}
         }
     }
