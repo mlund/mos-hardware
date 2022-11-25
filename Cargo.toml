@@ -42,7 +42,7 @@ mos-alloc = "0.2.0"
 
 [build-dependencies]
 cc = "1"
-bindgen = "0.61"
+bindgen = "0.63"
 
 [dev-dependencies]
 ufmt-stdio = "0"
