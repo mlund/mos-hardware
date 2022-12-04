@@ -26,7 +26,7 @@
 
 use crate::sid::*;
 use crate::vic2::*;
-use crate::{peek, petscii, poke};
+pub use crate::{peek, petscii, poke};
 
 pub mod iomap;
 pub mod libc;
