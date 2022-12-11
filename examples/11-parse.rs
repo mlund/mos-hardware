@@ -2,16 +2,21 @@
 #![feature(start)]
 #![feature(default_alloc_error_handler)]
 
+extern crate alloc;
+extern crate mos_alloc;
+
+use alloc::{string::String};
 use core::panic::PanicInfo;
 use mos_hardware::mega65::libc::setlowercase;
-use mos_hardware::mega65::peek;
+use mos_hardware::mega65::libc::lpeek;
+use mos_hardware::mega65::libc::lpoke;
 // use mos_hardware::mega65::poke;
 use ufmt_stdio::*;
 
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
 
-static verbose: bool = false;
+static mut verbose: bool = false;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
@@ -45,42 +50,51 @@ let tokens = ["print", "input", "if", "then", "else", "do", "loop", "while",
     //    println!("{}", tokens[i]);
     //}
 
-    let filename = "";
-    get_filename(filename);
+    let mystring = String::from("test");
+    println!("{}", &mystring[..]);
 
-    println!("{}", filename);
+    let filename = get_filename();
+
+    println!("{}", &filename[..]);
     0
 }
 
-fn get_filename(mut filename: &str) {
-    let mut addr: u32 = 0x4ff00;
-    // 7020 bank 4:ba=dec("ff00")
-    // 7030 if peek(ba+0)=asc("s") and peek(ba+1)=asc("k") thenbegin
-    if peek!(addr as *mut u8) == 83   /* 's' */ &&
-       peek!((addr+1) as *mut u8) == 75 /* 'k' */
-    {
-        // 7040   vb=peek(dec("ff07"))and8
-        verbose = peek!(0x4ff07 as *mut u8) & 8 == 8;
-        // 7050   f$="":a=ba+16:dowhilepeek(a)<>0:f$=f$+chr$(peek(a)):a=a+1:loop:
-        addr += 16;
-        while peek!(addr as *mut u8) != 0 {
-            filename += peek!(addr as *mut u8);
-            addr += 1;
-        }
+fn get_filename() -> String {
+    let mut filename = String::new();
+    let mut addr: i32 = 0x4ff00;
+    unsafe {
+        lpoke(0xffd3020i32, 0);
+        // 7020 bank 4:ba=dec("ff00")
+        // 7030 if peek(ba+0)=asc("s") and peek(ba+1)=asc("k") thenbegin
+        if lpeek(addr) == 83   /* 's' */ &&
+        lpeek(addr+1) == 75 /* 'k' */
+        {
+            // 7040   vb=peek(dec("ff07"))and8
+            verbose = lpeek(0x4ff07i32) & 8 == 8;
+            if verbose {
+                println!("verbose");
+            }
+            // 7050   f$="":a=ba+16:dowhilepeek(a)<>0:f$=f$+chr$(peek(a)):a=a+1:loop:
+            addr += 16;
+            while lpeek(addr) != 0 {
+                filename.push(lpeek(addr) as char);
+                addr += 1;
+            }
 
-        // 7060   if peek(dec("ff07"))and1 thenreturn
-        if peek!(0x4ff07) & 1 {
-            // this bit got referred to as an autoload bit?
-            // it gets set by '11.edit' in the gosub 7720 (save filename in mailbox ram)
-            return;
-        }
+            // 7060   if peek(dec("ff07"))and1 thenreturn
+            if lpeek(0x4ff07i32) & 1 == 1 {
+                // this bit got referred to as an autoload bit?
+                // it gets set by '11.edit' in the gosub 7720 (save filename in mailbox ram)
+                return filename;
+            }
 
-        // 7070   print "filename? "+f$:print"{up}";
-        println!("FILENAME? {}", filename);        
-        // 7080 bend    
+            // 7070   print "filename? "+f$:print"{up}";
+            println!("FILENAME? {}", &filename[..]);        
+            // 7080 bend    
+        }
     }
 
-    return;
+    return filename;
     // NOTE: not sure how to do 'input' in rust yet, so skipping this part...
     // (maybe something in mega65's libc could do it?)
 
