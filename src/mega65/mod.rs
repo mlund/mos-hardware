@@ -27,7 +27,6 @@
 use crate::sid::*;
 use crate::vic2::*;
 use crate::{peek, poke};
-use core::{debug_assert};
 
 pub mod iomap;
 pub mod libc;
