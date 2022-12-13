@@ -269,8 +269,16 @@ pub fn get_real_time_clock() -> libc::m65_tm {
     rtc
 }
 
-pub fn set_extended_attributes(value: u8) {
+/// Sets VIC-III extended attributes mode to enable blink, underline, bold, highlight
+pub fn set_extended_attributes() {
     unsafe {
-        libc::setextendedattrib(value);
+        libc::setextendedattrib(1);
+    }
+}
+
+/// Clears VIC-III extended attributes mode to disable blink, underline, bold, highlight
+pub fn unset_extended_attributes() {
+    unsafe {
+        libc::setextendedattrib(0);
     }
 }
