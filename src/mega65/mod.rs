@@ -156,7 +156,9 @@ pub fn get_screen_size() -> Resolution<u8> {
     resolution
 }
 
-/// Initialize conio
+/// Initialises the conio internal state
+///
+/// This must be called before using any conio library function.
 pub fn conio_init() {
     unsafe {
         libc::conioinit();
