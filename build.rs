@@ -1,12 +1,11 @@
 /// Call to update mega65/libc/bindings.rs
+/// with `cargo build --lib --release`
 fn _make_mega65_libc_bindings() {
     let _bindings = bindgen::Builder::default()
         .header("src/mega65/libc/conio.h")
         .header("src/mega65/libc/debug.h")
         .header("src/mega65/libc/dirent.h")
-        // Include when rust-mos docker is updated to newer llvm-mos
-        // which has better support for 65c02
-        // .header("src/mega65/libc/fileio.h")
+        .header("src/mega65/libc/fileio.h")
         .header("src/mega65/libc/hal.h")
         .header("src/mega65/libc/memory.h")
         .header("src/mega65/libc/random.h")
@@ -44,9 +43,7 @@ fn main() {
             "src/mega65/libc/dirent.s",
             "src/mega65/libc/example.c",
             "src/mega65/libc/fat32.c",
-            // Include when rust-mos docker is updated to newer llvm-mos
-            // which has better support for 65c02
-            // "src/mega65/libc/fileio.s",
+            "src/mega65/libc/fileio.s",
             "src/mega65/libc/hal.c",
             "src/mega65/libc/memory.c",
             "src/mega65/libc/mouse.c",
