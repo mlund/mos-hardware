@@ -129,6 +129,18 @@ pub unsafe fn lpoke(address: u32, value: u8) {
     libc::lpoke(address as i32, value)
 }
 
+/// DMA copy in 28 bit address space
+pub unsafe fn lcopy(source: u32, destination: u32, length: u16) {
+    if length == 0 {
+        return
+    }
+    assert!(source <= MAX_28_BIT_ADDRESS);
+    assert!(destination + (length as u32) <= MAX_28_BIT_ADDRESS);
+    unsafe {
+        libc::lcopy(source as i32, destination as i32, length);
+    }
+}
+
 /// Struct used to store widht-height resolutions
 pub struct Resolution<T> {
     pub width: T,
