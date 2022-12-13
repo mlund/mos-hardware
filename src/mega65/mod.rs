@@ -187,6 +187,39 @@ pub fn goto_xy(x: u8, y: u8) {
     }
 }
 
+/// Output multiple screen codes at X,Y coordinates
+///
+/// Works with _null-terminated_ screen codes only.
+///
+/// # Examples
+/// ~~~
+/// use mos_hardware::{petscii, petscii_null}
+/// mega65::cputs_xy(2, 3, [8, 5, 12, 12, 15, 0].as_slice());
+/// mega65::cputs_xy(4, 6, petscii_null!("hello").as_slice());
+/// ~~~
+pub fn cputs_xy(x: u8, y: u8, screen_codes: &[u8]) {
+    assert_eq!(*screen_codes.last().unwrap(), 0u8);
+    unsafe {
+        libc::cputsxy(x, y, screen_codes.as_ptr());
+    }
+}
+
+/// Output screen codes at current position
+/// 
+/// Works with _null-terminated_ screen codes only.
+///
+/// # Examples
+/// ~~~
+/// use mos_hardware::{petscii, petscii_null}
+/// mega65::cputs(petscii_null!("hello").as_slice());
+/// ~~~
+pub fn cputs(screen_codes: &[u8]) {
+    assert_eq!(*screen_codes.last().unwrap(), 0u8);
+    unsafe {
+        libc::cputs(screen_codes.as_ptr());
+    }
+}
+
 /// Sets the current border color
 pub fn set_border_color(color: u8) {
     unsafe {

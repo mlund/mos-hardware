@@ -5,19 +5,15 @@
 //! found in `mega65::`. 
 //!
 //! ## TODO
-//! As of writing these functions do not seem to work as expected - at least not in xemu.
-//! Likely text manipulation is incompatible with rusts `print` macros and should instead
-//! be used with the functions found in `libc`.
-//! - `goto_xy()`
-//! - `go_home()`
-//! - `set_text_color()`
-//! - `get_real_time_clock()`
+//! - `goto_xy()`, `go_home()`, `text_color()` etc. do not affect `println!` output
+//! - `get_real_time_clock()` doesn't seem to work
 
 #![no_std]
 #![feature(start)]
 #![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
+use mos_hardware::{petscii, petscii_null};
 use mos_hardware::mega65::*;
 use ufmt_stdio::*;
 
@@ -25,9 +21,12 @@ use ufmt_stdio::*;
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     conio_init();
     clear_screen();
-    go_home();
-    goto_xy(1, 1);
     set_upper_case();
+    go_home();
+
+    set_text_color(libc::COLOUR_BLACK as u8);
+    cputs([8, 5, 12, 12, 15, 0].as_slice());
+    cputs_xy(4, 4, petscii_null!("hello from rust!").as_slice());
 
     let resolution = get_screen_size();
     println!("SCREEN SIZE = {} x {}", resolution.width, resolution.height);
@@ -44,7 +43,6 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     println!();
 
     set_border_color(libc::COLOUR_BROWN as u8);
-    set_text_color(libc::COLOUR_BLACK as u8);
 
     let rtc = get_real_time_clock();
     println!("TIME = {}:{}:{}", rtc.tm_hour, rtc.tm_min, rtc.tm_sec);
