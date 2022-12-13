@@ -56,6 +56,26 @@ pub enum VicBank {
     RegionC000 = 0x00, // Bank 3
 }
 
+/// Get reference to first SID chip
+pub const fn sid0() -> &'static MOSSoundInterfaceDevice {
+    unsafe { &*SID0 }
+}
+
+/// Get reference to second SID chip
+pub const fn sid1() -> &'static MOSSoundInterfaceDevice {
+    unsafe { &*SID1 }
+}
+
+/// Get reference to third SID chip
+pub const fn sid2() -> &'static MOSSoundInterfaceDevice {
+    unsafe { &*SID2 }
+}
+
+/// Get reference to fourth SID chip
+pub const fn sid3() -> &'static MOSSoundInterfaceDevice {
+    unsafe { &*SID3 }
+}
+
 /// Set CPU speed to 1 Mhz
 pub fn speed_mode1() {
     unsafe {
@@ -83,5 +103,117 @@ pub fn speed_mode40() {
         poke!(0xd031 as *mut u8, val);
         val = peek!(0xd054 as *mut u8) | 0b0100_0000; // set VFAST bit
         poke!(0xd054 as *mut u8, val);
+    }
+}
+
+/// Generate random byte
+pub fn rand8(max_value: u8) -> u8 {
+    unsafe {
+        libc::rand8(max_value)
+    }
+}
+
+/// Read into 24 bit memory
+pub fn lpeek(address: u32) -> u8 {
+    unsafe {
+        libc::lpeek(address as i32)
+    }
+}
+
+/// Write into 24 bit memory
+pub unsafe fn lpoke(address: u32, value: u8) {
+    libc::lpoke(address as i32, value)
+}
+
+/// Struct used to store widht-height resolutions
+pub struct Resolution<T> {
+    pub width: T,
+    pub height: T,
+}
+
+/// Returns screen resolution (char width, char heigh)
+pub fn get_screen_size() -> Resolution<u8> {
+    let mut resolution = Resolution{width: 0, height: 0};
+    unsafe {
+        libc::getscreensize(&mut resolution.width, &mut resolution.height);
+    }
+    resolution
+}
+
+/// Initialize conio
+pub fn conio_init() {
+    unsafe {
+        libc::conioinit();
+    }
+}
+
+/// Shift to lower case ROM charset
+pub fn set_lower_case() {
+    unsafe {
+        libc::setlowercase();
+    }
+}
+
+/// Shift to upper case ROM charset
+pub fn set_upper_case() {
+    unsafe {
+        libc::setuppercase();
+    }
+}
+
+/// Clear all chars on screen
+pub fn clear_screen() {
+    unsafe {
+        libc::clrscr();        
+    }
+}
+
+/// Goto top left corner
+pub fn go_home() {
+    unsafe {
+        libc::gohome();        
+    }
+}
+
+/// Goto specific character position
+pub fn goto_xy(x: u8, y: u8) {
+    unsafe {
+        libc::gotoxy(x, y);        
+    }
+}
+
+/// Sets the current border color
+pub fn set_border_color(color: u8) {
+    unsafe {
+        libc::bordercolor(color);
+    }
+}
+
+/// Sets the current screen (background) color
+pub fn set_background_color(color: u8) {
+    unsafe {
+        libc::bgcolor(color);
+    }
+}
+
+/// Sets the current text color
+pub fn set_text_color(color: u8) {
+    unsafe {
+        libc::textcolor(color);
+    }
+}
+
+/// Read real time clock
+pub fn get_real_time_clock() -> libc::m65_tm {
+    let mut rtc = libc::m65_tm::default();
+    unsafe {
+        libc::getrtc(&mut rtc);
+    }
+    rtc
+}
+
+pub fn set_extended_attributes(value: u8) {
+    unsafe {
+        libc::setextendedattrib(value);
     }
 }
