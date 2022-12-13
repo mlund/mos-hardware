@@ -204,6 +204,12 @@ pub fn set_text_color(color: u8) {
 }
 
 /// Read real time clock
+///
+/// # Examples
+/// ~~~
+/// let rtc = mega65::get_real_time_clock();
+/// println!("TIME = {}:{}:{}", rtc.tm_hour, rtc.tm_min, rtc.tm_sec);
+/// ~~~
 pub fn get_real_time_clock() -> libc::m65_tm {
     let mut rtc = libc::m65_tm::default();
     unsafe {
