@@ -70,7 +70,7 @@ void getrtc(struct m65_tm* tm)
         tm->tm_hour = unbcd(tm->tm_hour & 0x1f);
       }
     }
-    tm->tm_mday = unbcd(lpeek_debounced(0xffd7113)) - 1;
+    tm->tm_mday = unbcd(lpeek_debounced(0xffd7113));
     tm->tm_mon = unbcd(lpeek_debounced(0xffd7114));
     // RTC is based on 2000, not 1900
     tm->tm_year = unbcd(lpeek_debounced(0xffd7115)) + 100;
@@ -118,7 +118,7 @@ void setrtc(struct m65_tm* tm)
     }
 
     usleep(I2CDELAY);
-    lpoke(0xffd7113, tobcd(tm->tm_mday + 1));
+    lpoke(0xffd7113, tobcd(tm->tm_mday));
     usleep(I2CDELAY);
     lpoke(0xffd7114, tobcd(tm->tm_mon));
     if (tm->tm_year >= 100 && tm->tm_year <= 355) {

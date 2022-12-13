@@ -1,7 +1,7 @@
 #include <memory.h>
 
-struct dmagic_dmalist dmalist;
-unsigned char dma_byte;
+volatile struct dmagic_dmalist dmalist;
+volatile unsigned char dma_byte;
 
 void do_dma(void)
 {
