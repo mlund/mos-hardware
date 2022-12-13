@@ -77,6 +77,16 @@ pub enum JoystickPosition {
     Middle,
 }
 
+/// Enum for joystick position (complexity: N enum values)
+///
+/// This is a convenience enum with some overhead in that
+/// the status is usually conditionally dermined twice:
+///
+/// 1. When creating the enum with `new()`
+/// 2. When matching the resulting enum in calling code
+///
+/// It is faster but more low-level to directly probe `GameController`
+/// (see example)
 impl JoystickPosition {
     pub const fn new(value: GameController) -> JoystickPosition {
         let complement = value.complement(); // complement since bit is UNSET if active
@@ -104,14 +114,15 @@ impl JoystickPosition {
 
 bitflags! {
     /// Bit mask for joystick controller (CIA1 port a or b)
-    /// 
+    ///
     /// Note that bits are _unset_ when joystick actions are
     /// triggered which is why we use `.complement()`.
-    /// 
+    ///
     /// # Examples
     /// ~~~
-    /// let val = c64::cia1().port_a.read().complement();
-    /// if val.contains(GameController::UP_FIRE) {
+    /// use cia::GameController::{UP, FIRE};
+    /// let joystick = c64::cia1().port_a.read().complement();
+    /// if joystick.contains(UP | FIRE) {
     ///     // UP and FIRE pressed simultaneously...
     /// }
     /// ~~~
@@ -141,12 +152,24 @@ bitflags! {
 
 impl GameController {
     /// Read joystick position and fire button status
-    /// 
+    ///
     /// # Examples
+    ///
     /// ~~~
     /// let port_a = c64::cia1().port_a.read();
     /// let (position, fire) = port_a.read_joystick();
     /// ~~~
+    ///
+    /// # Note
+    ///
+    /// This is a convenience enum with some overhead in that
+    /// the status is usually conditionally dermined twice:
+    ///
+    /// 1. When creating the enum with `JoystickPosition::new()`
+    /// 2. When matching the resulting enum in calling code
+    ///
+    /// It is faster but more low-level to directly probe `GameController`
+    /// using bitflags.
     pub const fn read_joystick(&self) -> (JoystickPosition, bool) {
         let position = JoystickPosition::new(*self);
         let fire = self.complement().contains(GameController::FIRE);
