@@ -224,3 +224,17 @@ pub fn clear_screen() {
             .for_each(|i| *i = Keyboard::Space as u8);
     }
 }
+
+/// Shift to lower case ROM charset
+pub fn set_lower_case() {
+    unsafe {
+        vic2().screen_and_charset_bank.write(23);
+    }
+}
+
+/// Shift to upper case ROM charset
+pub fn set_upper_case() {
+    unsafe {
+        vic2().screen_and_charset_bank.write(21);
+    }
+}
