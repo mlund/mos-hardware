@@ -1,5 +1,8 @@
-/// Call to update mega65/libc/bindings.rs
-/// with `cargo build --lib --release`
+/// Call to update `mega65/libc/bindings.rs` with
+/// ~~~
+/// cargo build --lib --release
+/// rustfmt src/mega65/libc/bindings.rs
+/// ~~~
 fn _make_mega65_libc_bindings() {
     let _bindings = bindgen::Builder::default()
         .header("src/mega65/libc/conio.h")
