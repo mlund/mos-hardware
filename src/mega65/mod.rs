@@ -27,9 +27,12 @@
 use crate::sid::*;
 use crate::vic2::*;
 use crate::{peek, poke};
+use core::{debug_assert};
 
 pub mod iomap;
 pub mod libc;
+
+const MAX_24_BIT_ADDRESS: u32 = 0xFFFFFF;
 
 pub const DEFAULT_SCREEN: *mut u8 = (0x0800) as *mut u8;
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
@@ -115,6 +118,7 @@ pub fn rand8(max_value: u8) -> u8 {
 
 /// Read into 24 bit memory
 pub fn lpeek(address: u32) -> u8 {
+    debug_assert!(address <= MAX_24_BIT_ADDRESS);
     unsafe {
         libc::lpeek(address as i32)
     }
@@ -122,6 +126,7 @@ pub fn lpeek(address: u32) -> u8 {
 
 /// Write into 24 bit memory
 pub unsafe fn lpoke(address: u32, value: u8) {
+    debug_assert!(address <= MAX_24_BIT_ADDRESS);
     libc::lpoke(address as i32, value)
 }
 
