@@ -137,3 +137,10 @@ macro_rules! petscii {
         screen_codes
     }};
 }
+
+#[macro_export]
+macro_rules! petscii_null {
+    ($A:expr) => {{
+       const_str::concat_bytes!(petscii!($A), 0u8)
+    }};
+}
