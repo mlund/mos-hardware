@@ -233,6 +233,13 @@ pub fn cputs(screen_codes: &[u8]) {
     }
 }
 
+/// Waits until a character is in the keyboard buffer and returns it as ASCII code
+pub fn cgetc() -> u8 {
+    unsafe {
+        libc::cgetc()
+    }
+}
+
 /// Sets the current border color
 pub fn set_border_color(color: u8) {
     unsafe {
