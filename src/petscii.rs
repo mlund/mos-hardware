@@ -1,6 +1,5 @@
 //
 // Copyright 2022 Mikael Lund aka Wombat
-// Copyright 2018 David Simmons (https://github.com/simmons/cbm)
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,19 +14,22 @@
 // limitations under the License.
 //
 
-//! Utility functions for working with PETSCII characters
-//! 
+//! Utility functions for working with single PETSCII characters
+//!
 //! This is based on the following resources:
 //! - PETSCII to unicode look-up table from https://github.com/simmons/cbm
 //!   which in turn is from https://sta.c64.org/cbm64pettoscr.html.
 //! - PETSCII to screen code conversion based on https://sta.c64.org/cbm64pettoscr.html.
+
+use core::convert::From;
+use core::fmt;
 
 /// The Unicode code point we use for untranslatable PETSCII characters.
 pub const NONE: char = char::REPLACEMENT_CHARACTER;
 
 /// From: http://style64.org/petscii/
 #[rustfmt::skip]
-pub const PETSCII_TO_CHAR_MAP: [char; 256] = [
+const PETSCII_TO_CHAR_MAP: [char; 256] = [
     // control codes
     NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
     NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
@@ -87,44 +89,123 @@ pub const PETSCII_TO_CHAR_MAP: [char; 256] = [
     '\u{259d}', '\u{2518}', '\u{2598}', '\u{2592}',
 ];
 
-/// Convert PETSCII to screen code
-/// https://sta.c64.org/cbm64pettoscr.html
-pub const fn petscii_to_screen_code(petscii: u8) -> u8 {
-    match petscii {
-        0..=31 => petscii + 128,
-        32..=63 => petscii,
-        64..=95 => petscii - 64,
-        96..=127 => petscii - 32,
-        128..=159 => petscii + 64,
-        160..=191 => petscii - 64,
-        192..=254 => petscii - 128,
-        255 => 94,
-    }
-}
-
-/// Convert unicode char to PETSCII byte
+/// Structure for working with single PETSCII characters
 ///
-/// Panics if impossible conversion
-pub const fn to_petscii(unicode: char) -> u8 {
-    let mut petscii = 0;
-    while petscii < PETSCII_TO_CHAR_MAP.len() {
-        if unicode == PETSCII_TO_CHAR_MAP[petscii] {
-            return petscii as u8;
-        }
-        petscii += 1;
+/// # Examples
+/// ~~~
+/// use mos_hardware::petscii::Petscii;
+///
+/// let a = Petscii::default();
+/// assert_eq!(u8::from(a), 0);
+///
+/// let byte: u8 = Petscii::from(1).into(); // u8 -> petscii -> u8
+/// assert_eq!(byte, 1);
+///
+/// let c: Petscii = 'c'.into();
+/// assert_eq!(u8::from(c), 67);
+/// assert_eq!(c.to_char(), 'c');
+/// assert_eq!(char::from(c), 'c');
+///
+/// let unicode: char = c.into();
+/// assert_eq!(unicode, 'c');
+///
+#[derive(Default, Copy, Clone, PartialEq, Eq, Debug)]
+pub struct Petscii(u8);
+
+impl Petscii {
+    /// Create from byte
+    pub const fn from_byte(byte: u8) -> Petscii {
+        Petscii(byte)
     }
-    panic!("INVALID LETTER");
+
+    /// Create from unicode character
+    pub const fn from_char(letter: char) -> Petscii {
+        let mut petscii = 0;
+        while petscii < PETSCII_TO_CHAR_MAP.len() {
+            if letter == PETSCII_TO_CHAR_MAP[petscii] {
+                return Petscii::from_byte(petscii as u8);
+            }
+            petscii += 1;
+        }
+        panic!("INVALID LETTER");
+    }
+
+    /// Convert PETSCII to screen code
+    ///
+    /// See https://sta.c64.org/cbm64pettoscr.html
+    ///
+    /// # Examples
+    /// ~~~
+    /// use mos_hardware::petscii::Petscii;
+    /// let value = Petscii::from('c');
+    /// assert_eq!(value.to_byte(), 67);
+    /// assert_eq!(value.to_screen_code(), 3);
+    /// ~~~
+    pub const fn to_screen_code(&self) -> u8 {
+        match self.0 {
+            0..=31 => self.0 + 128,
+            32..=63 => self.0,
+            64..=95 => self.0 - 64,
+            96..=127 => self.0 - 32,
+            128..=159 => self.0 + 64,
+            160..=191 => self.0 - 64,
+            192..=254 => self.0 - 128,
+            255 => 94,
+        }
+    }
+
+    /// Convert to unicode
+    pub const fn to_char(&self) -> char {
+        PETSCII_TO_CHAR_MAP[self.0 as usize]
+    }
+
+    /// Convert to byte
+    pub const fn to_byte(&self) -> u8 {
+        self.0
+    }
 }
 
-/// Convert string slice to array of screen codes at compile time
-/// 
-/// Examples:
+impl From<Petscii> for char {
+    fn from(petscii: Petscii) -> Self {
+        petscii.to_char()
+    }
+}
+
+impl From<Petscii> for u8 {
+    fn from(petscii: Petscii) -> Self {
+        petscii.0
+    }
+}
+
+impl From<u8> for Petscii {
+    fn from(value: u8) -> Self {
+        Petscii::from_byte(value)
+    }
+}
+
+impl From<char> for Petscii {
+    fn from(value: char) -> Self {
+        Petscii::from_char(value)
+    }
+}
+
+/// Display as char
+impl fmt::Display for Petscii {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.char())
+    }
+}
+
+/// Convert string slice to array of screen codes at _compile time_
+///
+/// Examples
 /// ~~~
-/// use mos-hardware::petscii;
-/// const SCREEN_CODES: [u8; 4] = petscii!("way!");
+/// use mos_hardware::screen_codes;
+/// const SCREEN_CODES: [u8; 4] = screen_codes!("way!");
+/// assert_eq!(SCREEN_CODES, [23, 1, 25, 33]);
 /// ~~~
 #[macro_export]
-macro_rules! petscii {
+macro_rules! screen_codes {
     ($A:expr) => {{
         use $crate::petscii::*;
         const N: usize = const_str::to_char_array!($A).len();
@@ -132,17 +213,26 @@ macro_rules! petscii {
         let mut screen_codes = [0u8; N];
         let mut i = 0;
         while i < N {
-            let petscii = to_petscii(CHARS[i]);
-            screen_codes[i] = petscii_to_screen_code(petscii);
+            let petscii = Petscii::from_char(CHARS[i]);
+            screen_codes[i] = petscii.to_screen_code();
             i += 1;
         }
         screen_codes
     }};
 }
 
+/// As `screen_codes!` but null-terminated
+///
+/// # Examples
+/// ~~~
+/// use mos_hardware::screen_codes_null;
+/// const SCREEN_CODES: [u8; 5] = screen_codes_null!("way!");
+/// assert_eq!(SCREEN_CODES, [23, 1, 25, 33, 0]);
+///
 #[macro_export]
-macro_rules! petscii_null {
+macro_rules! screen_codes_null {
     ($A:expr) => {{
-       const_str::concat_bytes!(petscii!($A), 0u8)
+        use $crate::screen_codes;
+        *const_str::concat_bytes!(screen_codes!($A), 0u8)
     }};
 }

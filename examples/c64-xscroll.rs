@@ -25,7 +25,7 @@ use core::panic::PanicInfo;
 use mos_hardware::{c64, peek, poke, vic2};
 use mos_hardware::sid::SidTune;
 use vic2::*;
-use mos_hardware::petscii;
+use mos_hardware::screen_codes;
 
 /// Trait that in the future may be used for IRQs (currently no effect)
 trait Interrupt {
@@ -51,7 +51,7 @@ impl SmoothScroll {
         (0x0400 + (40 * SmoothScroll::YPOSITION + 39 as u16)) as *mut u8;
     /// PETSCII encoded scroll text
 
-    const SCROLL_TEXT: [u8; 254] = petscii!("Hello from RUST! This is a tiny demo written \
+    const SCROLL_TEXT: [u8; 254] = screen_codes!("Hello from RUST! This is a tiny demo written \
     in rust using the llvm-mos backend for 6502 code generation. \
     The top color flickering reflects the time spend on rust in the raster interrupt \
     (scroll and sprite movement) while SID music playback is excluded. ");
