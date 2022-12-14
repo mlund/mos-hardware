@@ -2,9 +2,6 @@
 // Copyright 2022 Mikael Lund aka Wombat
 // Copyright 2018 David Simmons (https://github.com/simmons/cbm)
 //
-// Uses the petscii<->unicode look-up table from https://github.com/simmons/cbm
-// and PETSCII to screen code conversion from https://sta.c64.org/cbm64pettoscr.html
-//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,11 +16,16 @@
 //
 
 //! Utility functions for working with PETSCII characters
+//! 
+//! This is based on the following resources:
+//! - PETSCII to unicode look-up table from https://github.com/simmons/cbm
+//!   which in turn is from https://sta.c64.org/cbm64pettoscr.html.
+//! - PETSCII to screen code conversion based on https://sta.c64.org/cbm64pettoscr.html.
 
-// The Unicode code point we use for untranslatable PETSCII characters.
+/// The Unicode code point we use for untranslatable PETSCII characters.
 pub const NONE: char = char::REPLACEMENT_CHARACTER;
 
-// From: http://style64.org/petscii/
+/// From: http://style64.org/petscii/
 #[rustfmt::skip]
 pub const PETSCII_TO_CHAR_MAP: [char; 256] = [
     // control codes
@@ -85,6 +87,35 @@ pub const PETSCII_TO_CHAR_MAP: [char; 256] = [
     '\u{259d}', '\u{2518}', '\u{2598}', '\u{2592}',
 ];
 
+/// Convert PETSCII to screen code
+/// https://sta.c64.org/cbm64pettoscr.html
+pub const fn petscii_to_screen_code(petscii: u8) -> u8 {
+    match petscii {
+        0..=31 => petscii + 128,
+        32..=63 => petscii,
+        64..=95 => petscii - 64,
+        96..=127 => petscii - 32,
+        128..=159 => petscii + 64,
+        160..=191 => petscii - 64,
+        192..=254 => petscii - 128,
+        255 => 94,
+    }
+}
+
+/// Convert unicode char to PETSCII byte
+///
+/// Panics if impossible conversion
+pub const fn to_petscii(unicode: char) -> u8 {
+    let mut petscii = 0;
+    while petscii < PETSCII_TO_CHAR_MAP.len() {
+        if unicode == PETSCII_TO_CHAR_MAP[petscii] {
+            return petscii as u8;
+        }
+        petscii += 1;
+    }
+    panic!("INVALID LETTER");
+}
+
 /// Convert string slice to array of screen codes at compile time
 /// 
 /// Examples:
@@ -95,42 +126,13 @@ pub const PETSCII_TO_CHAR_MAP: [char; 256] = [
 #[macro_export]
 macro_rules! petscii {
     ($A:expr) => {{
-        use $crate::petscii::PETSCII_TO_CHAR_MAP;
-
-        /// Convert PETSCII to screen code
-        /// https://sta.c64.org/cbm64pettoscr.html
-        const fn petscii_to_screen_code(petscii: u8) -> u8 {
-            match petscii {
-                0..=31 => petscii + 128,
-                32..=63 => petscii,
-                64..=95 => petscii - 64,
-                96..=127 => petscii - 32,
-                128..=159 => petscii + 64,
-                160..=191 => petscii - 64,
-                192..=254 => petscii - 128,
-                255 => 94,
-            }
-        }
-
-        /// Convert unicode char to PETSCII byte
-        const fn unicode_to_petscii(unicode: char) -> u8 {
-            let mut petscii = 0;
-            while petscii < PETSCII_TO_CHAR_MAP.len() {
-                if unicode == PETSCII_TO_CHAR_MAP[petscii] {
-                    return petscii as u8;
-                }
-                petscii += 1;
-            }
-            panic!("INVALID LETTER");
-        }
-
+        use $crate::petscii::*;
         const N: usize = const_str::to_char_array!($A).len();
         const CHARS: [char; N] = const_str::to_char_array!($A);
-
         let mut screen_codes = [0u8; N];
         let mut i = 0;
         while i < N {
-            let petscii = unicode_to_petscii(CHARS[i]);
+            let petscii = to_petscii(CHARS[i]);
             screen_codes[i] = petscii_to_screen_code(petscii);
             i += 1;
         }
