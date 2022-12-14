@@ -2,33 +2,37 @@
 //!
 //! This shows how to use mega65-libc which is exposed to rust using bindgen.
 //! A limited, but growing number of these are wrapped in _safe_ rust functions
-//! found in `mega65::`. 
+//! found in `mega65::`.
 //!
-//! ## TODO
+//! ## Notes
 //! - `goto_xy()`, `go_home()`, `text_color()` etc. do not affect `println!` output
-//! - `get_real_time_clock()` doesn't seem to work
+//! - `get_real_time_clock()` returns zero values
 
 #![no_std]
 #![feature(start)]
 #![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
-use mos_hardware::{petscii, petscii_null};
 use mos_hardware::mega65::*;
+use mos_hardware::screen_codes_null;
+use mos_hardware::petscii::Petscii;
 use ufmt_stdio::*;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     conio_init();
+    set_border_color(libc::COLOUR_BROWN as u8);
     clear_screen();
     set_upper_case();
-    go_home();
 
+    go_home();
     set_text_color(libc::COLOUR_BLACK as u8);
     // raw null-terminated array of screen codes
     cputs([8, 5, 12, 12, 15, 0].as_slice());
     // convert unicode to null-terminated screen code array at compile time (no overhead!)
-    cputs_xy(4, 4, petscii_null!("hello from rust!").as_slice());
+    cputs_xy(4, 4, screen_codes_null!("hello from rust!").as_slice());
+
+    //println!("PETSCII DISPLAY TEST: {}", Petscii::from('c'));
 
     let resolution = get_screen_size();
     println!("SCREEN SIZE = {} x {}", resolution.width, resolution.height);
@@ -44,10 +48,19 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     }
     println!();
 
-    set_border_color(libc::COLOUR_BROWN as u8);
-
     let rtc = get_real_time_clock();
     println!("TIME = {}:{}:{}", rtc.tm_hour, rtc.tm_min, rtc.tm_sec);
+
+    // libc user input
+    println!("OK TO CONTINUE?");
+    flush_keyboard_buffer();
+    let pressed_key = cgetc().to_char().to_ascii_lowercase();
+    let message = match pressed_key {
+        'y' => "LET US CONTINUE",
+        _ => "LET US STOP",
+    };
+    println!("{}", message);
+
     0
 }
 

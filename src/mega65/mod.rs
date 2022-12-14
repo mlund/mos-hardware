@@ -26,7 +26,7 @@
 
 use crate::sid::*;
 use crate::vic2::*;
-use crate::{peek, poke};
+use crate::{peek, petscii, poke};
 
 pub mod iomap;
 pub mod libc;
@@ -110,17 +110,13 @@ pub fn speed_mode40() {
 
 /// Generate random byte
 pub fn rand8(max_value: u8) -> u8 {
-    unsafe {
-        libc::rand8(max_value)
-    }
+    unsafe { libc::rand8(max_value) }
 }
 
 /// Read into 28 bit memory
 pub fn lpeek(address: u32) -> u8 {
     assert!(address <= MAX_28_BIT_ADDRESS);
-    unsafe {
-        libc::lpeek(address as i32)
-    }
+    unsafe { libc::lpeek(address as i32) }
 }
 
 /// Write into 28 bit memory
@@ -132,7 +128,7 @@ pub unsafe fn lpoke(address: u32, value: u8) {
 /// DMA copy in 28 bit address space
 pub unsafe fn lcopy(source: u32, destination: u32, length: u16) {
     if length == 0 {
-        return
+        return;
     }
     assert!(source <= MAX_28_BIT_ADDRESS);
     assert!(destination + (length as u32) <= MAX_28_BIT_ADDRESS);
@@ -149,7 +145,10 @@ pub struct Resolution<T> {
 
 /// Returns screen resolution (char width, char heigh)
 pub fn get_screen_size() -> Resolution<u8> {
-    let mut resolution = Resolution{width: 0, height: 0};
+    let mut resolution = Resolution {
+        width: 0,
+        height: 0,
+    };
     unsafe {
         libc::getscreensize(&mut resolution.width, &mut resolution.height);
     }
@@ -182,21 +181,21 @@ pub fn set_upper_case() {
 /// Clear all chars on screen
 pub fn clear_screen() {
     unsafe {
-        libc::clrscr();        
+        libc::clrscr();
     }
 }
 
 /// Goto top left corner
 pub fn go_home() {
     unsafe {
-        libc::gohome();        
+        libc::gohome();
     }
 }
 
 /// Goto specific character position
 pub fn goto_xy(x: u8, y: u8) {
     unsafe {
-        libc::gotoxy(x, y);        
+        libc::gotoxy(x, y);
     }
 }
 
@@ -218,7 +217,7 @@ pub fn cputs_xy(x: u8, y: u8, screen_codes: &[u8]) {
 }
 
 /// Output screen codes at current position
-/// 
+///
 /// Works with _null-terminated_ screen codes only.
 ///
 /// # Examples
@@ -233,11 +232,16 @@ pub fn cputs(screen_codes: &[u8]) {
     }
 }
 
-/// Waits until a character is in the keyboard buffer and returns it as ASCII code
-pub fn cgetc() -> u8 {
+/// Flush keyboard buffer
+pub fn flush_keyboard_buffer() {
     unsafe {
-        libc::cgetc()
+        libc::flushkeybuf();
     }
+}
+
+/// Waits until a character is in the keyboard buffer and returns as petscii
+pub fn cgetc() -> petscii::Petscii {
+    unsafe { libc::cgetc() }.into()
 }
 
 /// Sets the current border color
