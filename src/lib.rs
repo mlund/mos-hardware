@@ -44,7 +44,6 @@
 
 #![no_std]
 #![feature(const_option)]
-#![feature(core_ffi_c)]
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 
