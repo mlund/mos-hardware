@@ -15,7 +15,6 @@
 use core::panic::PanicInfo;
 use mos_hardware::mega65::*;
 use mos_hardware::screen_codes_null;
-use mos_hardware::petscii::Petscii;
 use ufmt_stdio::*;
 
 #[start]
@@ -31,8 +30,6 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     cputs([8, 5, 12, 12, 15, 0].as_slice());
     // convert unicode to null-terminated screen code array at compile time (no overhead!)
     cputs_xy(4, 4, screen_codes_null!("hello from rust!").as_slice());
-
-    //println!("PETSCII DISPLAY TEST: {}", Petscii::from('c'));
 
     let resolution = get_screen_size();
     println!("SCREEN SIZE = {} x {}", resolution.width, resolution.height);

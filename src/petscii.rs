@@ -192,7 +192,7 @@ impl From<char> for Petscii {
 /// Display as char
 impl fmt::Display for Petscii {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.char())
+        write!(f, "{}", self.to_char())
     }
 }
 
