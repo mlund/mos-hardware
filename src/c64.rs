@@ -206,6 +206,11 @@ pub const fn vic2() -> &'static MOSVideoInterfaceControllerII {
     unsafe { &*VIC }
 }
 
+/// Get reference to SID chip
+pub const fn sid() -> &'static MOSSoundInterfaceDevice {
+    unsafe { &*SID }
+}
+
 /// Get reference to CIA1 chip
 pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526 {
     unsafe { &*CIA1 }
