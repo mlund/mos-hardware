@@ -20,10 +20,12 @@ directory to see how Rust can be used to generate simple demo effects.
 ### Read and write to labelled hardware registers
 
 ~~~ rust
-use mos_hardware::{c64,vic2};
-let old_border_color = (*c64::VIC).border_color.read();
-(*c64::VIC).border_color.write(vic2::LIGHT_RED);
-(*c64::SID).potentiometer_x.write(3); // error: read-only register
+use mos_hardware::{c64, vic2};
+let old_border_color = c64::vic2().border_color.read();
+unsafe {
+    c64::vic2().border_color.write(vic2::LIGHT_RED);
+    c64::sid().potentiometer_x.write(3); // compile error: read-only register
+}
 ~~~
 
 ### Use bitflags to safely control hardware
@@ -31,8 +33,11 @@ let old_border_color = (*c64::VIC).border_color.read();
 ...for example where the VIC-II chip accesses screen memory and character sets:
 
 ~~~ rust
+use mos_hardware::{c64, vic2};
 let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
-(*c64::VIC).screen_and_charset_bank.write(bank);
+unsafe {
+    c64::vic2().screen_and_charset_bank.write(bank);
+}
 ~~~
 
 ### Convenience functions to perform hardware-specific tasks
@@ -40,8 +45,10 @@ let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::CharsetBank::AT_2000.bits();
 ...for example to generate random numbers using noise from the C64's SID chip:
 
 ~~~ rust
-(*c64::SID).start_random_generator();
-let value = (*c64::SID).random_byte();
+use mos_hardware::c64::*;
+clear_screen();
+sid().start_random_generator();
+let value = sid().random_byte();
 ~~~
 
 ## Getting started

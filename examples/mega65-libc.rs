@@ -62,7 +62,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 }
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(_: &PanicInfo) -> ! {
     #[cfg(not(target_vendor = "nes-nrom-128"))]
     print!("PANIC!");
     loop {}

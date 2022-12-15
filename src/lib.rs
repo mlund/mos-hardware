@@ -22,24 +22,24 @@
 //! Read and write to labelled hardware registers:
 //! ~~~
 //! use mos_hardware::{c64,vic2};
-//!
-//! let old_border_color = (*c64::VIC).border_color.read();
-//! (*c64::VIC).border_color.write(vic2::LIGHT_RED);
-//! (*c64::SID).potentiometer_x.write(3); // error: read-only register
+//! let old_border_color = c64::vic2.border_color.read();
+//! unsafe {
+//!     c64::vic2().border_color.write(vic2::LIGHT_RED);
+//! }
 //! ~~~
 //!
 //! Use bitflags to control hardware behaviour, _e.g._ where the VIC-II chip accesses
 //! screen memory and character sets:
 //! ~~~
 //! let bank = vic2::ScreenBank::AT_2C00.bits() | vic2::ScreenBank::AT_2000.bits();
-//! (*c64::VIC).screen_and_charset_bank.write(bank);
+//! c64::vic2().screen_and_charset_bank.write(bank);
 //! ~~~
 //!
 //! Convenience functions to perform hardware-specific tasks, _e.g._ generate random numbers
 //! using noise from the C64's SID chip:
 //! ~~~
-//! (*c64::SID).start_random_generator();
-//! let value = (*c64::SID).random_byte();
+//! c64::sid().start_random_generator();
+//! let value = c64::sid().random_byte();
 //! ~~~
 
 #![no_std]
@@ -53,10 +53,10 @@ pub mod c64;
 pub mod cia;
 pub mod cx16;
 pub mod mega65;
+pub mod petscii;
 pub mod sid;
 pub mod vera;
 pub mod vic2;
-pub mod petscii;
 
 use core::iter::Iterator;
 

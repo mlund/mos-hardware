@@ -149,8 +149,8 @@ impl MOSSoundInterfaceDevice {
     ///
     /// Example:
     /// ```
-    /// (*c64::SID).start_random_generator();
-    /// let random_byte = rand8!(*c64::SID);
+    /// c64::sid().start_random_generator();
+    /// let random_byte = c64::sid().rand8(20);
     /// ```
     /// More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
     pub fn start_random_generator(&self) {
@@ -174,8 +174,8 @@ impl MOSSoundInterfaceDevice {
     ///
     /// # Examples
     /// ~~~
-    /// (*c64::SID).start_random_generator();
-    /// let value = (*c64::SID).random_byte();
+    /// c64::sid().start_random_generator();
+    /// let value = c64::sid().random_byte();
     /// ~~~
     /// More information [here](https://www.atarimagazines.com/compute/issue72/random_numbers.php).
     /// Currently there's no way to select the subsong as this requires that the
