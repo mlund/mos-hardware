@@ -28,10 +28,6 @@ debug = 2
 [lib]
 doctest = false
 
-[patch.crates-io]
-ufmt = {git="https://github.com/mrk-its/ufmt", branch="ptr_width_16_fix"}
-ufmt-write = {git="https://github.com/mrk-its/ufmt", branch="ptr_width_16_fix"}
-
 [dependencies]
 memoffset = {version = "0.7.1", features = ["unstable_const"]}
 static_assertions = "1.1.0"
