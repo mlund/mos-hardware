@@ -15,21 +15,19 @@ use ufmt_stdio::*;
 
 /// Generate stochastic character set
 fn make_charset(charset_ptr: *mut u8) {
-    const BITS: [u8; 8] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
-    unsafe {
-        (*c64::SID).start_random_generator();
-    }
+    //const BITS: [u8; 8] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
+    c64::sid().start_random_generator();
 
     repeat_element(mos_hardware::SINETABLE.iter().copied(), 8)
         .enumerate()
         .for_each(|(cnt, sine)| {
-            let mut char_pattern = 0;
+            let mut char_pattern: u8 = 0;
+            BITS.iter()
+                .filter(|_| c64::sid().random_byte() > sine)
+                .for_each(|bit| {
+                    char_pattern |= bit;
+                });
             unsafe {
-                BITS.iter()
-                    .filter(|_| (*c64::SID).random_byte() > sine)
-                    .for_each(|bit| {
-                        char_pattern |= bit;
-                    });
                 poke!(charset_ptr.offset(cnt as isize), char_pattern);
             }
             if cnt % 64 == 0 {
@@ -40,7 +38,7 @@ fn make_charset(charset_ptr: *mut u8) {
 
 /// Render entire 40x25 screen
 /// @todo Rename to meaningful variable names (reminiscence from C)
-unsafe fn render_plasma(screen_ptr: *mut u8) {
+fn render_plasma(screen_ptr: *mut u8) {
     static mut C1A: u8 = 0;
     static mut C1B: u8 = 0;
     static mut C2A: u8 = 0;
@@ -48,37 +46,37 @@ unsafe fn render_plasma(screen_ptr: *mut u8) {
     static mut XBUF: [u8; 40] = [0; 40];
     static mut YBUF: [u8; 25] = [0; 25];
 
-    let mut c1a = C1A;
-    let mut c1b = C1B;
-    YBUF.iter_mut().for_each(|y| {
-        *y = add!(
-            mos_hardware::SINETABLE[c1a as usize],
-            mos_hardware::SINETABLE[c1b as usize]
-        );
-        c1a = add!(c1a, 4);
-        c1b = add!(c1b, 9);
-    });
-    C1A = add!(C1A, 3);
-    C1B = sub!(C1B, 5);
+    unsafe {
+        let mut c1a = C1A;
+        let mut c1b = C1B;
+        YBUF.iter_mut().for_each(|y| {
+            *y = add!(
+                mos_hardware::SINETABLE[c1a as usize],
+                mos_hardware::SINETABLE[c1b as usize]
+            );
+            c1a = add!(c1a, 4);
+            c1b = add!(c1b, 9);
+        });
+        C1A = add!(C1A, 3);
+        C1B = sub!(C1B, 5);
 
-    let mut c2a = C2A;
-    let mut c2b = C2B;
-    XBUF.iter_mut().for_each(|x| {
-        *x = add!(
-            mos_hardware::SINETABLE[c2a as usize],
-            mos_hardware::SINETABLE[c2b as usize]
-        );
-        c2a = add!(c2a, 3);
-        c2b = add!(c2b, 7);
-    });
-    C2A = add!(C2A, 2);
-    C2B = sub!(C2B, 3);
+        let mut c2a = C2A;
+        let mut c2b = C2B;
+        XBUF.iter_mut().for_each(|x| {
+            *x = add!(
+                mos_hardware::SINETABLE[c2a as usize],
+                mos_hardware::SINETABLE[c2b as usize]
+            );
+            c2a = add!(c2a, 3);
+            c2b = add!(c2b, 7);
+        });
+        C2A = add!(C2A, 2);
+        C2B = sub!(C2B, 3);
 
-    iproduct!(YBUF.iter().copied(), XBUF.iter().copied())
-        .enumerate()
-        .for_each(|(cnt, (y, x))| {
-            poke!(screen_ptr.offset(cnt as isize), add!(y, x));
-        })
+        iproduct!(YBUF.iter().copied(), XBUF.iter().copied())
+            .enumerate()
+            .for_each(|(cnt, (y, x))| poke!(screen_ptr.offset(cnt as isize), add!(y, x)));
+    }
 }
 
 #[start]
@@ -91,20 +89,17 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     const PAGE2: u8 =
         vic2::ScreenBank::from_address(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
 
-    unsafe {
-        make_charset(CHARSET as *mut u8);
-        loop {
-            render_plasma(SCREEN1 as *mut u8);
-            (*c64::VIC).screen_and_charset_bank.write(PAGE1);
-            render_plasma(SCREEN2 as *mut u8);
-            (*c64::VIC).screen_and_charset_bank.write(PAGE2);
-        }
+    make_charset(CHARSET as *mut u8);
+    loop {
+        render_plasma(SCREEN1 as *mut u8);
+        unsafe { c64::vic2().screen_and_charset_bank.write(PAGE1) };
+        render_plasma(SCREEN2 as *mut u8);
+        unsafe { c64::vic2().screen_and_charset_bank.write(PAGE2) };
     }
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    #[cfg(not(target_vendor = "nes-nrom-128"))]
     print!("!");
     loop {}
 }
