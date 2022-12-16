@@ -15,7 +15,7 @@ use ufmt_stdio::*;
 
 /// Generate stochastic character set
 fn make_charset(charset_ptr: *mut u8) {
-    //const BITS: [u8; 8] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
+    const BITS: [u8; 8] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
     c64::sid().start_random_generator();
 
     repeat_element(mos_hardware::SINETABLE.iter().copied(), 8)
@@ -73,9 +73,19 @@ fn render_plasma(screen_ptr: *mut u8) {
         C2A = add!(C2A, 2);
         C2B = sub!(C2B, 3);
 
-        iproduct!(YBUF.iter().copied(), XBUF.iter().copied())
-            .enumerate()
-            .for_each(|(cnt, (y, x))| poke!(screen_ptr.offset(cnt as isize), add!(y, x)));
+        // OK!
+        let mut cnt: isize = 0;
+        for y in YBUF.iter() {
+            for x in XBUF.iter() {
+                poke!(screen_ptr.offset(cnt), add!(*x, *y));
+                cnt += 1;
+            }
+        }
+
+        // NOT OK but used to work. Nothing seems to be copied to screen
+        // iproduct!(YBUF.iter().copied(), XBUF.iter().copied())
+        //     .enumerate()
+        //     .for_each(|(cnt, (y, x))| poke!(screen_ptr.offset(cnt as isize), add!(y, x)));
     }
 }
 
