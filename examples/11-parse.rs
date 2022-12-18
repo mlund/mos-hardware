@@ -5,12 +5,13 @@
 extern crate alloc;
 extern crate mos_alloc;
 
-use alloc::{string::String};
+use alloc::{string::String, vec::Vec};
 use core::panic::PanicInfo;
 use mos_hardware::mega65::libc::setlowercase;
 use mos_hardware::mega65::libc::lpeek;
-use mos_hardware::mega65::libc::lpoke;
-// use mos_hardware::mega65::poke;
+//use mos_hardware::mega65::libc::lpoke;
+use mos_hardware::mega65::libc::mega65_fast;
+
 use ufmt_stdio::*;
 
 const RVS_ON: &str = "\x12";
@@ -20,8 +21,8 @@ static mut verbose: bool = false;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-// rw$
-let tokens = ["print", "input", "if", "then", "else", "do", "loop", "while",
+    // rw$
+    let tokens = ["print", "input", "if", "then", "else", "do", "loop", "while",
         "until", "gosub", "goto", "open", "close", "dopen", "dclose", "for", "next",
         "getkey", "hex$", "dim", "peek", "poke", "wait", "dec", "chr$", "asc", "sgn", "sqr",
         "graphic", "clr", "screen", "def", "begin", "bend", "len", "mid$", "right$", "left$",
@@ -42,10 +43,37 @@ let tokens = ["print", "input", "if", "then", "else", "do", "loop", "while",
         "sprite", "sprsav", "sys", "tab", "tempo", "troff", "tron", "type", "usr", "verify",
         "vol", "xor", "key"];
 
+    // pf$ = type_suffix
+    let type_suffix = ["", "%", "$", "&"];
+
+    // b() = bin_conv[]
+    let mut bin_conv: [u16; 16] = [0; 16];
+    bin_conv[0] = 1;
+    for x in 1..16 {
+        bin_conv[x] = bin_conv[x-1] * 2;
+    }
+
+    // ln%() = map_gen_line_to_orig_line[]
+    let map_gen_line_to_orig_line: [u16; 1000] = [0; 1000];
+
+    // li$() = processed_lines
+    //let mut processed_lines: Vec<String> =  vec![String::new(); 1000];
+    let processed_lines: Vec<String> = Vec::with_capacity(1000);
+    //let mut processed_lines: [String; 1000] = [String::from(""); 1000];
+
     unsafe { setlowercase(); }
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
     println!();
     
+    // tl$ = tl_string
+    let mut tl_string = String::from("                                                                               ");
+    // bl$ = bl_string
+    let mut bl_string: String = String::new();
+    bl_string.push_str(&tl_string[..]);
+    bl_string.push_str(&tl_string[..]);
+    bl_string.push_str(&tl_string[..]);
+    bl_string.push_str(&tl_string[..]);
+
     //for i in 0..tokens.len() {
     //    println!("{}", tokens[i]);
     //}
@@ -55,7 +83,44 @@ let tokens = ["print", "input", "if", "then", "else", "do", "loop", "while",
 
     let filename = get_filename();
 
+    unsafe { mega65_fast(); }
+
     println!("{}", &filename[..]);
+
+    // ------------------- pass 1 ---------------
+    // nl = next_line_flag
+    let mut next_line_flag = false;
+
+    // wh$ = whitespace_chars
+    let whitespace_chars: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
+
+    // clean up temporary files
+    let source_line_counter = 0;
+
+    // TODO: 195 clr ti: rem keep start time for timing
+    let mut cb_addr: i32 = 0x8010000;
+    let mut ca_addr: i32 = cb_addr;
+    
+    print!("PASS 1 ");
+
+    // rl = current_line_index (zero-indexed, increments by one)
+    let current_line_index = 0;
+    // tl = total_lines
+    let mut total_lines: u16 = 0;
+    unsafe { total_lines = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16; }
+
+    ca_addr += 2;
+
+    unsafe
+    {
+        while current_line_index != total_lines
+        {
+            let line_length = lpeek(ca_addr) as usize;
+            let current_line = String::from(&bl_string[..line_length]);
+            let line_ptr = &current_line;
+        }
+    }
+
     0
 }
 
@@ -63,7 +128,6 @@ fn get_filename() -> String {
     let mut filename = String::new();
     let mut addr: i32 = 0x4ff00;
     unsafe {
-        lpoke(0xffd3020i32, 0);
         // 7020 bank 4:ba=dec("ff00")
         // 7030 if peek(ba+0)=asc("s") and peek(ba+1)=asc("k") thenbegin
         if lpeek(addr) == 83   /* 's' */ &&
