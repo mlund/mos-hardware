@@ -9,7 +9,8 @@ use alloc::{string::String, vec::Vec};
 use core::panic::PanicInfo;
 use mos_hardware::mega65::libc::setlowercase;
 use mos_hardware::mega65::libc::lpeek;
-//use mos_hardware::mega65::libc::lpoke;
+use mos_hardware::mega65::libc::cputs;
+use mos_hardware::mega65::libc::lpoke;
 use mos_hardware::mega65::libc::mega65_fast;
 
 use ufmt_stdio::*;
@@ -18,6 +19,17 @@ const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
 
 static mut verbose: bool = false;
+
+/*fn print(s: String) {
+    let cstr: Vec<u8> = Vec::with_capacity(s.len() + 1);
+    let x = 0;
+    let ptr = &s[..].as_ptr();
+
+    for x in 0..s.len() {
+        cstr[x] = *ptr;
+        ptr += 1;
+    }
+}*/
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
@@ -43,6 +55,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         "sprite", "sprsav", "sys", "tab", "tempo", "troff", "tron", "type", "usr", "verify",
         "vol", "xor", "key"];
 
+    prepare_test_memory();
+
     // pf$ = type_suffix
     let type_suffix = ["", "%", "$", "&"];
 
@@ -56,23 +70,28 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // ln%() = map_gen_line_to_orig_line[]
     let map_gen_line_to_orig_line: [u16; 1000] = [0; 1000];
 
+    unsafe { setlowercase(); }
+    println!("testing TESTING 1, 2, 3...");
+
     // li$() = processed_lines
-    //let mut processed_lines: Vec<String> =  vec![String::new(); 1000];
-    let processed_lines: Vec<String> = Vec::with_capacity(1000);
-    //let mut processed_lines: [String; 1000] = [String::from(""); 1000];
+    // NOTE: Seems like rust chokes if this is too large?
+    //let processed_lines: Vec<String> = Vec::with_capacity(1000);
 
     unsafe { setlowercase(); }
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
+    
+    //unsafe { cputs("hello".as_ptr()); }
     println!();
     
     // tl$ = tl_string
-    let mut tl_string = String::from("                                                                               ");
+    let mut tl_string = String::from("                                                                                ");
     // bl$ = bl_string
-    let mut bl_string: String = String::new();
-    bl_string.push_str(&tl_string[..]);
-    bl_string.push_str(&tl_string[..]);
-    bl_string.push_str(&tl_string[..]);
-    bl_string.push_str(&tl_string[..]);
+    //let mut bl_string: String = String::new();
+    //bl_string.push_str(&tl_string[..]);
+    //bl_string.push_str(&tl_string[..]);
+    //bl_string.push_str(&tl_string[..]);
+
+    tl_string = String::new();
 
     //for i in 0..tokens.len() {
     //    println!("{}", tokens[i]);
@@ -100,11 +119,11 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // TODO: 195 clr ti: rem keep start time for timing
     let mut cb_addr: i32 = 0x8010000;
     let mut ca_addr: i32 = cb_addr;
-    
+
     print!("PASS 1 ");
 
     // rl = current_line_index (zero-indexed, increments by one)
-    let current_line_index = 0;
+    let mut current_line_index = 0;
     // tl = total_lines
     let mut total_lines: u16 = 0;
     unsafe { total_lines = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16; }
@@ -115,13 +134,43 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     {
         while current_line_index != total_lines
         {
-            let line_length = lpeek(ca_addr) as usize;
-            let current_line = String::from(&bl_string[..line_length]);
-            let line_ptr = &current_line;
+            let line_length: u8 = lpeek(ca_addr) as u8;
+            ca_addr += 1;
+            let mut current_line = String::new();
+            let mut idx: u8 = 0;
+            while idx < line_length {
+                current_line.push(lpeek(ca_addr) as char);
+                ca_addr += 1;
+                idx += 1;
+            }
+
+            println!("l{}: {}", current_line_index, &current_line[..]);
+            current_line_index += 1;
+
+            //let line_ptr = current_line.as_ptr();
+            if line_length != 0 {
+                //lcopy(line_length, ca_addr, )
+            }
+
+            //break;
         }
     }
 
     0
+}
+
+fn prepare_test_memory() {
+    let data: [u8;80] = [
+        0x08, 0x00, 0x0f, 0x23, 0x4f, 0x55, 0x54, 0x50, 0x55, 0x54, 0x20, 0x22, 0x48, 0x45, 0x4c, 0x4c,
+        0x4f, 0x22, 0x00, 0x0a, 0x23, 0x44, 0x45, 0x43, 0x4c, 0x41, 0x52, 0x45, 0x20, 0x58, 0x00, 0x05,
+        0x2e, 0x4d, 0x41, 0x49, 0x4e, 0x11, 0x20, 0x20, 0x46, 0x4f, 0x52, 0x20, 0x58, 0x20, 0x3d, 0x20,
+        0x30, 0x20, 0x54, 0x4f, 0x20, 0x31, 0x35, 0x0b, 0x20, 0x20, 0x20, 0x20, 0x50, 0x52, 0x49, 0x4e,
+        0x54, 0x20, 0x58, 0x08, 0x20, 0x20, 0x4e, 0x45, 0x58, 0x54, 0x20, 0x58, 0x54, 0x20, 0x3d, 0x20
+    ];
+
+    for idx in 0..data.len() {
+        unsafe { lpoke(0x8010000i32 + idx as i32, data[idx]); }
+    }
 }
 
 fn get_filename() -> String {
