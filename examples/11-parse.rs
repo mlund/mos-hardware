@@ -111,7 +111,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut next_line_flag = false;
 
     // wh$ = whitespace_chars
-    let whitespace_chars: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
+    let whitespace_chars: &[u8] = &[32, 160, 29, 9]; // space, shift+space, right, tab
 
     // clean up temporary files
     let source_line_counter = 0;
@@ -120,7 +120,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut cb_addr: i32 = 0x8010000;
     let mut ca_addr: i32 = cb_addr;
 
-    print!("PASS 1 ");
+    println!("PASS 1 ");
 
     // rl = current_line_index (zero-indexed, increments by one)
     let mut current_line_index = 0;
@@ -147,16 +147,25 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
             println!("l{}: {}", current_line_index, &current_line[..]);
             current_line_index += 1;
 
-            //let line_ptr = current_line.as_ptr();
-            if line_length != 0 {
-                //lcopy(line_length, ca_addr, )
-            }
+            current_line = String::from(trim_left(&current_line[..], &whitespace_chars[..]));
+            println!("{}", &current_line[..]);
 
             //break;
         }
     }
 
     0
+}
+
+fn trim_left<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
+{
+    let mut i = 0;
+
+    while i < line.len() && trim_chars.contains(&line.as_bytes()[i]) {
+        i = i + 1;
+    }
+    
+    &line[i..]
 }
 
 fn prepare_test_memory() {
