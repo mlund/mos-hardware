@@ -132,6 +132,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     unsafe
     {
+        //200
         while current_line_index != total_lines
         {
             let line_length: u8 = lpeek(ca_addr) as u8;
@@ -149,6 +150,36 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
             current_line = String::from(trim_left(&current_line[..], &whitespace_chars[..]));
             println!("{}", &current_line[..]);
+
+            let mut quote_flag = false;
+            let mut cut_tail_idx = None;
+
+            // single-quote comment trimming logic
+            // -----------------------------------
+            //422
+            cut_tail_idx = current_line.find('\'');
+            if cut_tail_idx != None {
+                //423
+                if current_line.contains('"') {
+                    //424
+                    cut_tail_idx = None;
+                    //440
+                    for in_line_idx in 0..current_line.len() {
+                        let c = current_line.chars().nth(in_line_idx).unwrap();
+                        if c == '"' { // quote-quote?
+                            quote_flag = !quote_flag;
+                        } else if c == '\'' && !quote_flag {
+                            cut_tail_idx = Some(in_line_idx);
+                            break;
+                        }
+                    }
+                }
+                //540
+                if cut_tail_idx != None {
+                    current_line = String::from(&current_line[..cut_tail_idx.unwrap()]);
+                }
+            }
+            println!("'{}'", &current_line[..]);
 
             //break;
         }
@@ -169,12 +200,14 @@ fn trim_left<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
 }
 
 fn prepare_test_memory() {
-    let data: [u8;80] = [
+    let data: [u8;97] = [
         0x08, 0x00, 0x0f, 0x23, 0x4f, 0x55, 0x54, 0x50, 0x55, 0x54, 0x20, 0x22, 0x48, 0x45, 0x4c, 0x4c,
         0x4f, 0x22, 0x00, 0x0a, 0x23, 0x44, 0x45, 0x43, 0x4c, 0x41, 0x52, 0x45, 0x20, 0x58, 0x00, 0x05,
         0x2e, 0x4d, 0x41, 0x49, 0x4e, 0x11, 0x20, 0x20, 0x46, 0x4f, 0x52, 0x20, 0x58, 0x20, 0x3d, 0x20,
         0x30, 0x20, 0x54, 0x4f, 0x20, 0x31, 0x35, 0x0b, 0x20, 0x20, 0x20, 0x20, 0x50, 0x52, 0x49, 0x4e,
-        0x54, 0x20, 0x58, 0x08, 0x20, 0x20, 0x4e, 0x45, 0x58, 0x54, 0x20, 0x58, 0x54, 0x20, 0x3d, 0x20
+        0x54, 0x20, 0x58, 0x1d, 0x20, 0x20, 0x4e, 0x45, 0x58, 0x54, 0x20, 0x58, 0x20, 0x20, 0x20, 0x27,
+        0x20, 0x54, 0x52, 0x41, 0x49, 0x4c, 0x49, 0x4e, 0x47, 0x20, 0x43, 0x4f, 0x4d, 0x4d, 0x45, 0x4e,
+        0x54
     ];
 
     for idx in 0..data.len() {
