@@ -135,6 +135,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         //200
         while current_line_index != total_lines
         {
+            // copy line's data into 'curent_line'
+            // -----------------------------------
             let line_length: u8 = lpeek(ca_addr) as u8;
             ca_addr += 1;
             let mut current_line = String::new();
@@ -181,6 +183,12 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
             }
             println!("'{}'", &current_line[..]);
 
+            //560-580
+            if current_line.len() > 0 {
+                current_line = String::from(trim_right(&current_line[..], &whitespace_chars[..]));
+                println!("'{}'", &current_line[..]);
+            }
+
             //break;
         }
     }
@@ -197,6 +205,18 @@ fn trim_left<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
     }
     
     &line[i..]
+}
+
+fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
+{
+    let mut i = line.len()-1;
+
+    while i >= 0 && trim_chars.contains(&line.as_bytes()[i]) {
+        i = i - 1;
+        println!("{}", i);
+    }
+    
+    &line[..(i+1)]
 }
 
 fn prepare_test_memory() {
