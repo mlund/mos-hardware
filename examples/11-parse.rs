@@ -60,7 +60,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // pf$ = type_suffix
     let type_suffix = ["", "%", "$", "&"];
 
-    // b() = bin_conv[]
+    // TODO: Convert to `bin_conv` constant evaluation: https://doc.rust-lang.org/reference/const_eval.html
     let mut bin_conv: [u16; 16] = [0; 16];
     bin_conv[0] = 1;
     for x in 1..16 {
@@ -166,13 +166,15 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                     //424
                     cut_tail_idx = None;
                     //440
-                    for in_line_idx in 0..current_line.len() {
-                        let c = current_line.chars().nth(in_line_idx).unwrap();
-                        if c == '"' { // quote-quote?
-                            quote_flag = !quote_flag;
-                        } else if c == '\'' && !quote_flag {
-                            cut_tail_idx = Some(in_line_idx);
-                            break;
+                    for (in_line_idx, c) in current_line.chars().enumerate() {
+                        //let c = current_line.chars().nth(in_line_idx).unwrap();
+                        match c {
+                            ':' => quote_flag = !quote_flag,
+                            '\'' => if !quote_flag {
+                                cut_tail_idx = Some(in_line_idx);
+                                break;    
+                            },
+                            _ => (),
                         }
                     }
                 }
@@ -189,6 +191,10 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 println!("'{}'", &current_line[..]);
             }
 
+            //585
+            if current_line.len() > 0 {
+                
+            }
             //break;
         }
     }
@@ -213,7 +219,6 @@ fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
 
     while i >= 0 && trim_chars.contains(&line.as_bytes()[i]) {
         i = i - 1;
-        println!("{}", i);
     }
     
     &line[..(i+1)]
