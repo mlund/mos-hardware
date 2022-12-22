@@ -58,7 +58,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     prepare_test_memory();
 
     // pf$ = type_suffix
-    let type_suffix = ["", "%", "$", "&"];
+    let TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
 
     // TODO: Convert to `bin_conv` constant evaluation: https://doc.rust-lang.org/reference/const_eval.html
     let mut bin_conv: [u16; 16] = [0; 16];
@@ -235,8 +235,8 @@ fn prepare_test_memory() {
         0x54
     ];
 
-    for idx in 0..data.len() {
-        unsafe { lpoke(0x8010000i32 + idx as i32, data[idx]); }
+    for (idx, byte) in data.iter().enumerate() {
+        unsafe { lpoke(0x8010000i32 + idx as i32, *byte); }
     }
 }
 
