@@ -75,7 +75,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     // li$() = processed_lines
     // NOTE: Seems like rust chokes if this is too large?
-    //let processed_lines: Vec<String> = Vec::with_capacity(1000);
+    let processed_lines: Vec<String> = Vec::with_capacity(1000);
 
     set_lower_case();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
@@ -129,6 +129,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     total_lines = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16;
 
     ca_addr += 2;
+
+    let pp_line = 0; // ln = index into li$ (current post-processed line)
 
     //200
     while current_line_index != total_lines
@@ -191,7 +193,10 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
         //585
         if current_line.len() > 0 {
-            
+            let mut delete_line_flag = false;
+            if unsafe {verbose} {
+                //println!(">>{}{}{}", )
+            }
         }
         //break;
     }
