@@ -212,13 +212,13 @@ fn trim_left<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
 
 fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
 {
-    let mut i = line.len()-1;
+    let mut i: i16 = (line.len()-1) as i16;
 
-    while i >= 0 && trim_chars.contains(&line.as_bytes()[i]) {
+    while i >= 0 && trim_chars.contains(&line.as_bytes()[i as usize]) {
         i = i - 1;
     }
     
-    &line[..(i+1)]
+    &line[..((i+1) as usize)]
 }
 
 fn prepare_test_memory() {
