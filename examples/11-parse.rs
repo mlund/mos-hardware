@@ -70,14 +70,14 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // ln%() = map_gen_line_to_orig_line[]
     let map_gen_line_to_orig_line: [u16; 1000] = [0; 1000];
 
-    unsafe { setlowercase(); }
+    setlowercase();
     println!("testing TESTING 1, 2, 3...");
 
     // li$() = processed_lines
     // NOTE: Seems like rust chokes if this is too large?
     //let processed_lines: Vec<String> = Vec::with_capacity(1000);
 
-    unsafe { setlowercase(); }
+    setlowercase();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
     
     //unsafe { cputs("hello".as_ptr()); }
