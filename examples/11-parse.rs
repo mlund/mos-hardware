@@ -111,7 +111,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut next_line_flag = false;
 
     // wh$ = whitespace_chars
-    let whitespace_chars: &[u8] = &[32, 160, 29, 9]; // space, shift+space, right, tab
+    let whitespace_chars: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
 
     // clean up temporary files
     let source_line_counter = 0;
