@@ -7,10 +7,10 @@ extern crate mos_alloc;
 
 use alloc::{string::String, vec::Vec};
 use core::panic::PanicInfo;
-use mos_hardware::mega65::libc::setlowercase;
-use mos_hardware::mega65::libc::lpeek;
+use mos_hardware::mega65::set_lower_case;
+use mos_hardware::mega65::lpeek;
 use mos_hardware::mega65::libc::cputs;
-use mos_hardware::mega65::libc::lpoke;
+use mos_hardware::mega65::lpoke;
 use mos_hardware::mega65::libc::mega65_fast;
 
 use ufmt_stdio::*;
@@ -70,14 +70,14 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // ln%() = map_gen_line_to_orig_line[]
     let map_gen_line_to_orig_line: [u16; 1000] = [0; 1000];
 
-    setlowercase();
+    set_lower_case();
     println!("testing TESTING 1, 2, 3...");
 
     // li$() = processed_lines
     // NOTE: Seems like rust chokes if this is too large?
     //let processed_lines: Vec<String> = Vec::with_capacity(1000);
 
-    setlowercase();
+    set_lower_case();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
     
     //unsafe { cputs("hello".as_ptr()); }
@@ -117,8 +117,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let source_line_counter = 0;
 
     // TODO: 195 clr ti: rem keep start time for timing
-    let mut cb_addr: i32 = 0x8010000;
-    let mut ca_addr: i32 = cb_addr;
+    let mut cb_addr: u32 = 0x8010000;
+    let mut ca_addr: u32 = cb_addr;
 
     println!("PASS 1 ");
 
@@ -126,77 +126,74 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut current_line_index = 0;
     // tl = total_lines
     let mut total_lines: u16 = 0;
-    unsafe { total_lines = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16; }
+    total_lines = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16;
 
     ca_addr += 2;
 
-    unsafe
+    //200
+    while current_line_index != total_lines
     {
-        //200
-        while current_line_index != total_lines
-        {
-            // copy line's data into 'curent_line'
-            // -----------------------------------
-            let line_length: u8 = lpeek(ca_addr) as u8;
+        // copy line's data into 'curent_line'
+        // -----------------------------------
+        let line_length: u8 = lpeek(ca_addr) as u8;
+        ca_addr += 1;
+        let mut current_line = String::new();
+        let mut idx: u8 = 0;
+        while idx < line_length {
+            current_line.push(lpeek(ca_addr) as char);
             ca_addr += 1;
-            let mut current_line = String::new();
-            let mut idx: u8 = 0;
-            while idx < line_length {
-                current_line.push(lpeek(ca_addr) as char);
-                ca_addr += 1;
-                idx += 1;
-            }
+            idx += 1;
+        }
 
-            println!("l{}: {}", current_line_index, &current_line[..]);
-            current_line_index += 1;
+        println!("l{}: {}", current_line_index, &current_line[..]);
+        current_line_index += 1;
 
-            current_line = String::from(trim_left(&current_line[..], &whitespace_chars[..]));
-            println!("{}", &current_line[..]);
+        current_line = String::from(trim_left(&current_line[..], &whitespace_chars[..]));
+        println!("{}", &current_line[..]);
 
-            let mut quote_flag = false;
-            let mut cut_tail_idx = None;
+        let mut quote_flag = false;
+        let mut cut_tail_idx = None;
 
-            // single-quote comment trimming logic
-            // -----------------------------------
-            //422
-            cut_tail_idx = current_line.find('\'');
-            if cut_tail_idx != None {
-                //423
-                if current_line.contains('"') {
-                    //424
-                    cut_tail_idx = None;
-                    //440
-                    for (in_line_idx, c) in current_line.chars().enumerate() {
-                        //let c = current_line.chars().nth(in_line_idx).unwrap();
-                        match c {
-                            ':' => quote_flag = !quote_flag,
-                            '\'' => if !quote_flag {
-                                cut_tail_idx = Some(in_line_idx);
-                                break;    
-                            },
-                            _ => (),
-                        }
+        // single-quote comment trimming logic
+        // -----------------------------------
+        //422
+        cut_tail_idx = current_line.find('\'');
+        if cut_tail_idx != None {
+            //423
+            if current_line.contains('"') {
+                //424
+                cut_tail_idx = None;
+                //440
+                for (in_line_idx, c) in current_line.chars().enumerate() {
+                    //let c = current_line.chars().nth(in_line_idx).unwrap();
+                    match c {
+                        ':' => quote_flag = !quote_flag,
+                        '\'' => if !quote_flag {
+                            cut_tail_idx = Some(in_line_idx);
+                            break;    
+                        },
+                        _ => (),
                     }
                 }
-                //540
-                if cut_tail_idx != None {
-                    current_line = String::from(&current_line[..cut_tail_idx.unwrap()]);
-                }
             }
-            println!("'{}'", &current_line[..]);
-
-            //560-580
-            if current_line.len() > 0 {
-                current_line = String::from(trim_right(&current_line[..], &whitespace_chars[..]));
-                println!("'{}'", &current_line[..]);
+            //540
+            if cut_tail_idx != None {
+                current_line = String::from(&current_line[..cut_tail_idx.unwrap()]);
             }
-
-            //585
-            if current_line.len() > 0 {
-                
-            }
-            //break;
         }
+        println!("'{}'", &current_line[..]);
+
+        //560-580
+        if current_line.len() > 0 {
+            current_line = String::from(trim_right(&current_line[..], &whitespace_chars[..]));
+            println!("'{}'", &current_line[..]);
+        }
+
+        //585
+        if current_line.len() > 0 {
+            
+        }
+        //break;
     }
 
     0
@@ -236,13 +233,13 @@ fn prepare_test_memory() {
     ];
 
     for (idx, byte) in data.iter().enumerate() {
-        unsafe { lpoke(0x8010000i32 + idx as i32, *byte); }
+        unsafe { lpoke(0x8010000u32 + idx as u32, *byte); }
     }
 }
 
 fn get_filename() -> String {
     let mut filename = String::new();
-    let mut addr: i32 = 0x4ff00;
+    let mut addr: u32 = 0x4ff00;
     unsafe {
         // 7020 bank 4:ba=dec("ff00")
         // 7030 if peek(ba+0)=asc("s") and peek(ba+1)=asc("k") thenbegin
@@ -250,7 +247,7 @@ fn get_filename() -> String {
         lpeek(addr+1) == 75 /* 'k' */
         {
             // 7040   vb=peek(dec("ff07"))and8
-            verbose = lpeek(0x4ff07i32) & 8 == 8;
+            verbose = lpeek(0x4ff07u32) & 8 == 8;
             if verbose {
                 println!("verbose");
             }
@@ -262,7 +259,7 @@ fn get_filename() -> String {
             }
 
             // 7060   if peek(dec("ff07"))and1 thenreturn
-            if lpeek(0x4ff07i32) & 1 == 1 {
+            if lpeek(0x4ff07u32) & 1 == 1 {
                 // this bit got referred to as an autoload bit?
                 // it gets set by '11.edit' in the gosub 7720 (save filename in mailbox ram)
                 return filename;
