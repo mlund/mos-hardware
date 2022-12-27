@@ -143,6 +143,7 @@ pub unsafe fn lcopy(source: u32, destination: u32, length: u16) {
 }
 
 /// Struct used to store widht-height resolutions
+#[derive(Default)]
 pub struct Resolution<T> {
     pub width: T,
     pub height: T,
@@ -150,10 +151,7 @@ pub struct Resolution<T> {
 
 /// Returns screen resolution (char width, char heigh)
 pub fn get_screen_size() -> Resolution<u8> {
-    let mut resolution = Resolution {
-        width: 0,
-        height: 0,
-    };
+    let mut resolution = Resolution::default();
     unsafe {
         libc::getscreensize(&mut resolution.width, &mut resolution.height);
     }
