@@ -24,9 +24,9 @@ struct Plasma {
 }
 
 impl Plasma {
-    /// Create new instance and initialize character set
-    pub fn new(charset_address: *mut u8) -> Plasma {
-        Plasma::make_charset(charset_address);
+    /// Create new instance and initialize character set at given address
+    pub fn new(charset_address: u16) -> Plasma {
+        Plasma::make_charset(charset_address as *mut u8);
         Plasma {
             yindex1: 0,
             yindex2: 0,
@@ -37,7 +37,7 @@ impl Plasma {
         }
     }
     /// Generate stochastic character set
-    pub fn make_charset(charset_address: *mut u8) {
+    fn make_charset(charset_address: *mut u8) {
         let generate_char = |sine| {
             const BITS: [u8; 8] = [1, 2, 4, 8, 16, 32, 64, 128];
             let mut char_pattern: u8 = 0;
@@ -51,10 +51,10 @@ impl Plasma {
 
         repeat_element(SINETABLE.iter().copied(), 8)
             .enumerate()
-            .for_each(|(cnt, sine)| {
+            .for_each(|(offset, sine)| {
                 let character = generate_char(sine);
                 unsafe {
-                    charset_address.add(cnt).write_volatile(character);
+                    charset_address.add(offset).write_volatile(character);
                 }
             });
     }
@@ -96,10 +96,10 @@ impl Plasma {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-    const CHARSET: u16 = 0x3000; // Custom character set location
-    let mut plasma = Plasma::new(CHARSET as *mut u8);
-    mega65::set_charset_address(CHARSET);
-    mega65::speed_mode3(); // reduce CPU speed to 3.5 Mhz
+    const CHARSET_ADDRESS: u16 = 0x3000;
+    let mut plasma = Plasma::new(CHARSET_ADDRESS);
+    mega65::set_charset_address(CHARSET_ADDRESS);
+    mega65::speed_mode3(); // reduce cpu speed
     loop {
         plasma.render(mega65::DEFAULT_SCREEN);
     }
