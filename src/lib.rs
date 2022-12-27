@@ -172,6 +172,11 @@ pub const fn make_sine(divide: u8, add: u8) -> [u8; SINETABLE.len()] {
     array
 }
 
+/// Cyclic sine from 0x80..0..0xff..0x80
+pub const fn sine(index: u8) -> u8 {
+    SINETABLE[index as usize]
+}
+
 /// Tabulated, cyclic sine table
 pub const SINETABLE: [u8; 256] = [
     0x80, 0x7d, 0x7a, 0x77, 0x74, 0x70, 0x6d, 0x6a, 0x67, 0x64, 0x61, 0x5e, 0x5b, 0x58, 0x55, 0x52,
