@@ -9,11 +9,9 @@
 #![feature(default_alloc_error_handler)]
 
 extern crate mos_hardware;
-extern crate ufmt_stdio;
 
 use core::panic::PanicInfo;
-use mos_hardware::{mega65, repeat_element, sine, vic2, SINETABLE};
-use ufmt_stdio::*;
+use mos_hardware::{mega65, repeat_element, sine, SINETABLE};
 
 /// Class for rendering a character mode plasma effect
 struct Plasma {
@@ -58,9 +56,6 @@ impl Plasma {
                 unsafe {
                     charset_address.add(cnt).write_volatile(character);
                 }
-                if cnt % 64 == 0 {
-                    print!(".");
-                }
             });
     }
 
@@ -102,13 +97,8 @@ impl Plasma {
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     const CHARSET: u16 = 0x3000; // Custom character set location
-    let page = vic2::ScreenBank::from_address(mega65::DEFAULT_SCREEN as u16).bits()
-        | vic2::CharsetBank::from(CHARSET).bits();
-
     let mut plasma = Plasma::new(CHARSET as *mut u8);
-
-    unsafe { (*mega65::VICII).screen_and_charset_bank.write(page) };
-
+    mega65::set_charset_address(CHARSET);
     mega65::speed_mode3(); // reduce CPU speed to 3.5 Mhz
     loop {
         plasma.render(mega65::DEFAULT_SCREEN);
@@ -117,7 +107,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    #[cfg(not(target_vendor = "nes-nrom-128"))]
-    print!("!");
-    loop {}
+    loop {
+        mega65::set_border_color(0);
+        mega65::set_border_color(2);
+    }
 }
