@@ -296,3 +296,10 @@ pub fn unset_extended_attributes() {
         libc::setextendedattrib(0);
     }
 }
+
+/// Set character set address using mega65-libc
+pub fn set_charset_address(address: u16) {
+    unsafe {
+        libc::setcharsetaddr(address as i32);
+    }
+}
