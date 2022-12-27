@@ -58,6 +58,11 @@ pub enum VicBank {
     RegionC000 = 0x00, // Bank 3
 }
 
+/// Get reference to VIC2 chip
+pub const fn vic2() -> &'static MOSVideoInterfaceControllerII {
+    unsafe { &*VICII }
+}
+
 /// Get reference to first SID chip
 pub const fn sid0() -> &'static MOSSoundInterfaceDevice {
     unsafe { &*SID0 }
