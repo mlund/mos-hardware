@@ -68,14 +68,14 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     }
 
     // ln%() = map_gen_line_to_orig_line[]
-    let map_gen_line_to_orig_line: [u16; 1000] = [0; 1000];
+    let map_gen_line_to_orig_line: [u16; 500] = [0; 500];
 
     set_lower_case();
     println!("testing TESTING 1, 2, 3...");
 
     // li$() = processed_lines
     // NOTE: Seems like rust chokes if this is too large?
-    let processed_lines: Vec<String> = Vec::with_capacity(1000);
+    let processed_lines: Vec<String> = Vec::with_capacity(500);
 
     set_lower_case();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
@@ -97,8 +97,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     //    println!("{}", tokens[i]);
     //}
 
-    let mystring = String::from("test");
-    println!("{}", &mystring[..]);
+    //let mystring = String::from("test");
+    //println!("{}", &mystring[..]);
 
     let filename = get_filename();
 
@@ -114,7 +114,10 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let whitespace_chars: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
 
     // clean up temporary files
-    let source_line_counter = 0;
+    // NOTE: sl/source_line_counter and rl/current_line_index serve the same purpose
+    // so I will remove 'current_line_index'
+    let mut source_line_counter = 0;    // sl
+    let mut post_proc_line_counter = 0; // ln
 
     // TODO: 195 clr ti: rem keep start time for timing
     let mut cb_addr: u32 = 0x8010000;
@@ -123,7 +126,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     println!("PASS 1 ");
 
     // rl = current_line_index (zero-indexed, increments by one)
-    let mut current_line_index = 0;
+    // removing this one, as it's equivalent to sl/soure_line_counter
+    //let mut current_line_index = 0;
     // tl = total_lines
     let mut total_lines: u16 = 0;
     total_lines = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16;
@@ -133,7 +137,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let pp_line = 0; // ln = index into li$ (current post-processed line)
 
     //200
-    while current_line_index != total_lines
+    while source_line_counter != total_lines
     {
         // copy line's data into 'curent_line'
         // -----------------------------------
@@ -147,8 +151,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
             idx += 1;
         }
 
-        println!("l{}: {}", current_line_index, &current_line[..]);
-        current_line_index += 1;
+        println!("l{}: {}", source_line_counter, &current_line[..]);
 
         current_line = String::from(trim_left(&current_line[..], &whitespace_chars[..]));
         println!("{}", &current_line[..]);
@@ -183,22 +186,24 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 current_line = String::from(&current_line[..cut_tail_idx.unwrap()]);
             }
         }
-        println!("'{}'", &current_line[..]);
+        //println!("'{}'", &current_line[..]);
 
         //560-580
         if current_line.len() > 0 {
             current_line = String::from(trim_right(&current_line[..], &whitespace_chars[..]));
-            println!("'{}'", &current_line[..]);
+            //println!("'{}'", &current_line[..]);
         }
 
         //585
         if current_line.len() > 0 {
             let mut delete_line_flag = false;
             if unsafe {verbose} {
-                //println!(">>{}{}{}", )
+                println!(">> {} {} {}", post_proc_line_counter, source_line_counter, &current_line[..]);
             }
         }
-        //break;
+
+        // 750
+        source_line_counter += 1;
     }
 
     0
@@ -227,6 +232,13 @@ fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
 }
 
 fn prepare_test_memory() {
+    // turn on verbose flag
+    // (in memory doesn't work yet, as I'd have to put dummy info into 0x4ff00 to be parsed by get_filename()
+    // unsafe { lpoke(0x4ff07u32, 0x08u8); }
+
+    // so for now, just hardcode the flag
+    unsafe { verbose = true; }
+
     let data: [u8;97] = [
         0x08, 0x00, 0x0f, 0x23, 0x4f, 0x55, 0x54, 0x50, 0x55, 0x54, 0x20, 0x22, 0x48, 0x45, 0x4c, 0x4c,
         0x4f, 0x22, 0x00, 0x0a, 0x23, 0x44, 0x45, 0x43, 0x4c, 0x41, 0x52, 0x45, 0x20, 0x58, 0x00, 0x05,
