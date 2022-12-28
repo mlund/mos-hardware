@@ -9,83 +9,93 @@
 #![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
-use itertools::iproduct;
+use mos_hardware::vic2::{BLACK, RED};
 use mos_hardware::*;
 use ufmt_stdio::*;
 
-/// Generate stochastic character set
-fn make_charset(charset_ptr: *mut u8) {
-    const BITS: [u8; 8] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
-    c64::sid().start_random_generator();
+/// Class for rendering a character mode plasma effect
+struct Plasma {
+    yindex1: u8,
+    yindex2: u8,
+    xindex1: u8,
+    xindex2: u8,
+    xbuffer: [u8; 40],
+    ybuffer: [u8; 25],
+}
 
-    repeat_element(mos_hardware::SINETABLE.iter().copied(), 8)
-        .enumerate()
-        .for_each(|(cnt, sine)| {
+impl Plasma {
+    /// Create new instance and initialize character set at given address
+    pub fn new(charset_address: u16) -> Plasma {
+        Plasma::make_charset(charset_address as *mut u8);
+        Plasma {
+            yindex1: 0,
+            yindex2: 0,
+            xindex1: 0,
+            xindex2: 0,
+            xbuffer: [0; 40],
+            ybuffer: [0; 25],
+        }
+    }
+    /// Generate stochastic character set
+    fn make_charset(charset_address: *mut u8) {
+        c64::sid().start_random_generator();
+
+        let generate_char = |sine| {
+            const BITS: [u8; 8] = [1, 2, 4, 8, 16, 32, 64, 128];
             let mut char_pattern: u8 = 0;
             BITS.iter()
                 .filter(|_| c64::sid().random_byte() > sine)
                 .for_each(|bit| {
                     char_pattern |= bit;
                 });
-            unsafe {
-                poke!(charset_ptr.offset(cnt as isize), char_pattern);
-            }
-            if cnt % 64 == 0 {
-                print!(".");
-            }
-        });
-}
+            char_pattern
+        };
 
-/// Render entire 40x25 screen
-/// @todo Rename to meaningful variable names (reminiscence from C)
-fn render_plasma(screen_ptr: *mut u8) {
-    static mut C1A: u8 = 0;
-    static mut C1B: u8 = 0;
-    static mut C2A: u8 = 0;
-    static mut C2B: u8 = 0;
-    static mut XBUF: [u8; 40] = [0; 40];
-    static mut YBUF: [u8; 25] = [0; 25];
+        repeat_element(SINETABLE.iter().copied(), 8)
+            .enumerate()
+            .for_each(|(offset, sine)| {
+                let character = generate_char(sine);
+                unsafe {
+                    charset_address.add(offset).write_volatile(character);
+                }
+                if offset % 64 == 0 {
+                    print!(".");
+                }
+            });
+    }
 
-    unsafe {
-        let mut c1a = C1A;
-        let mut c1b = C1B;
-        YBUF.iter_mut().for_each(|y| {
-            *y = add!(
-                mos_hardware::SINETABLE[c1a as usize],
-                mos_hardware::SINETABLE[c1b as usize]
-            );
-            c1a = add!(c1a, 4);
-            c1b = add!(c1b, 9);
-        });
-        C1A = add!(C1A, 3);
-        C1B = sub!(C1B, 5);
+    /// Render entire screen at given address
+    pub fn render(&mut self, screen_address: *mut u8) {
+        let mut i = self.yindex1;
+        let mut j = self.yindex2;
+        for y in self.ybuffer.iter_mut() {
+            *y = sine(i).wrapping_add(sine(j));
+            i = i.wrapping_add(4);
+            j = j.wrapping_add(9);
+        }
+        self.yindex1 = self.yindex1.wrapping_add(3);
+        self.yindex2 = self.yindex2.wrapping_sub(5);
 
-        let mut c2a = C2A;
-        let mut c2b = C2B;
-        XBUF.iter_mut().for_each(|x| {
-            *x = add!(
-                mos_hardware::SINETABLE[c2a as usize],
-                mos_hardware::SINETABLE[c2b as usize]
-            );
-            c2a = add!(c2a, 3);
-            c2b = add!(c2b, 7);
-        });
-        C2A = add!(C2A, 2);
-        C2B = sub!(C2B, 3);
+        i = self.xindex1;
+        j = self.xindex2;
+        for x in self.xbuffer.iter_mut() {
+            *x = sine(i).wrapping_add(sine(j));
+            i = i.wrapping_add(3);
+            j = j.wrapping_add(7);
+        }
+        self.xindex1 = self.xindex1.wrapping_add(2);
+        self.xindex2 = self.xindex2.wrapping_sub(3);
 
-        // OK!
-        let mut cnt: isize = 0;
-        for y in YBUF.iter() {
-            for x in XBUF.iter() {
-                poke!(screen_ptr.offset(cnt), add!(*x, *y));
-                cnt += 1;
+        let mut offset: usize = 0; // screen memory offset
+        for y in self.ybuffer.iter().copied() {
+            for x in self.xbuffer.iter().copied() {
+                let sum = x.wrapping_add(y);
+                unsafe {
+                    screen_address.add(offset).write_volatile(sum);
+                }
+                offset += 1;
             }
         }
-
-        // NOT OK but used to work. Nothing seems to be copied to screen
-        // iproduct!(YBUF.iter().copied(), XBUF.iter().copied())
-        //     .enumerate()
-        //     .for_each(|(cnt, (y, x))| poke!(screen_ptr.offset(cnt as isize), add!(y, x)));
     }
 }
 
@@ -99,17 +109,22 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     const PAGE2: u8 =
         vic2::ScreenBank::from_address(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
 
-    make_charset(CHARSET as *mut u8);
+    let mut plasma = Plasma::new(CHARSET);
+
     loop {
-        render_plasma(SCREEN1 as *mut u8);
+        plasma.render(SCREEN1 as *mut u8);
         unsafe { c64::vic2().screen_and_charset_bank.write(PAGE1) };
-        render_plasma(SCREEN2 as *mut u8);
+        plasma.render(SCREEN2 as *mut u8);
         unsafe { c64::vic2().screen_and_charset_bank.write(PAGE2) };
     }
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    print!("!");
-    loop {}
+    loop {
+        unsafe {
+            c64::vic2().border_color.write(RED);
+            c64::vic2().border_color.write(BLACK);
+        }
+    }
 }
