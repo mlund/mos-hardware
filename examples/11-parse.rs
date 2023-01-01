@@ -9,7 +9,7 @@ use alloc::{string::String, vec::Vec};
 use core::panic::PanicInfo;
 use mos_hardware::mega65::set_lower_case;
 use mos_hardware::mega65::lpeek;
-use mos_hardware::mega65::libc::cputs;
+//use mos_hardware::mega65::libc::cputs;
 use mos_hardware::mega65::lpoke;
 use mos_hardware::mega65::libc::mega65_fast;
 
@@ -18,7 +18,11 @@ use ufmt_stdio::*;
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
 
-static mut verbose: bool = false;
+struct GlobalVars {
+    verbose: bool,
+    current_line: String,
+    pp_line: u16,
+}
 
 /*fn print(s: String) {
     let cstr: Vec<u8> = Vec::with_capacity(s.len() + 1);
@@ -33,6 +37,12 @@ static mut verbose: bool = false;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+    let mut var = GlobalVars {
+        verbose: true,
+        current_line: String::new(),
+        pp_line: 0,
+    };
+
     // rw$
     let tokens = ["print", "input", "if", "then", "else", "do", "loop", "while",
         "until", "gosub", "goto", "open", "close", "dopen", "dclose", "for", "next",
@@ -55,7 +65,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         "sprite", "sprsav", "sys", "tab", "tempo", "troff", "tron", "type", "usr", "verify",
         "vol", "xor", "key"];
 
-    prepare_test_memory();
+    prepare_test_memory(&mut var);
 
     // pf$ = type_suffix
     let TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
@@ -100,7 +110,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     //let mystring = String::from("test");
     //println!("{}", &mystring[..]);
 
-    let filename = get_filename();
+    let filename = get_filename(&mut var);
 
     unsafe { mega65_fast(); }
 
@@ -134,7 +144,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     ca_addr += 2;
 
-    let pp_line = 0; // ln = index into li$ (current post-processed line)
+    var.pp_line = 0; // ln = index into li$ (current post-processed line)
 
     //200
     while source_line_counter != total_lines
@@ -143,18 +153,18 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         // -----------------------------------
         let line_length: u8 = lpeek(ca_addr) as u8;
         ca_addr += 1;
-        let mut current_line = String::new();
+        var.current_line = String::new();
         let mut idx: u8 = 0;
         while idx < line_length {
-            current_line.push(lpeek(ca_addr) as char);
+            var.current_line.push(lpeek(ca_addr) as char);
             ca_addr += 1;
             idx += 1;
         }
 
-        println!("l{}: {}", source_line_counter, &current_line[..]);
+        println!("l{}: {}", source_line_counter, &var.current_line[..]);
 
-        current_line = String::from(trim_left(&current_line[..], &whitespace_chars[..]));
-        println!("{}", &current_line[..]);
+        var.current_line = String::from(trim_left(&var.current_line[..], &whitespace_chars[..]));
+        println!("{}", &var.current_line[..]);
 
         let mut quote_flag = false;
         let mut cut_tail_idx = None;
@@ -162,14 +172,14 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         // single-quote comment trimming logic
         // -----------------------------------
         //422
-        cut_tail_idx = current_line.find('\'');
+        cut_tail_idx = var.current_line.find('\'');
         if cut_tail_idx != None {
             //423
-            if current_line.contains('"') {
+            if var.current_line.contains('"') {
                 //424
                 cut_tail_idx = None;
                 //440
-                for (in_line_idx, c) in current_line.chars().enumerate() {
+                for (in_line_idx, c) in var.current_line.chars().enumerate() {
                     //let c = current_line.chars().nth(in_line_idx).unwrap();
                     match c {
                         ':' => quote_flag = !quote_flag,
@@ -183,22 +193,28 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
             }
             //540
             if cut_tail_idx != None {
-                current_line = String::from(&current_line[..cut_tail_idx.unwrap()]);
+                var.current_line = String::from(&var.current_line[..cut_tail_idx.unwrap()]);
             }
         }
         //println!("'{}'", &current_line[..]);
 
         //560-580
-        if current_line.len() > 0 {
-            current_line = String::from(trim_right(&current_line[..], &whitespace_chars[..]));
+        if var.current_line.len() > 0 {
+            var.current_line = String::from(trim_right(&var.current_line[..], &whitespace_chars[..]));
             //println!("'{}'", &current_line[..]);
         }
 
         //585
-        if current_line.len() > 0 {
+        if var.current_line.len() > 0 {
             let mut delete_line_flag = false;
-            if unsafe {verbose} {
-                println!(">> {} {} {}", post_proc_line_counter, source_line_counter, &current_line[..]);
+            if var.verbose {
+                println!(">> {} {} {}", post_proc_line_counter, source_line_counter, &var.current_line[..]);
+                // 600
+                if (&var.current_line[..1]).eq(".") {
+                    println!("dot!");
+                    next_line_flag = true;
+                    parse_label(&mut var);
+                }
             }
         }
 
@@ -207,6 +223,13 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     }
 
     0
+}
+
+fn parse_label(var: &mut GlobalVars)
+{
+    if var.verbose {
+        println!("label {} at pp_line {}", &var.current_line[..], var.pp_line);
+    }
 }
 
 fn trim_left<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
@@ -231,13 +254,13 @@ fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
     &line[..((i+1) as usize)]
 }
 
-fn prepare_test_memory() {
+fn prepare_test_memory(var: &mut GlobalVars) {
     // turn on verbose flag
     // (in memory doesn't work yet, as I'd have to put dummy info into 0x4ff00 to be parsed by get_filename()
     // unsafe { lpoke(0x4ff07u32, 0x08u8); }
 
     // so for now, just hardcode the flag
-    unsafe { verbose = true; }
+    var.verbose = true;
 
     let data: [u8;97] = [
         0x08, 0x00, 0x0f, 0x23, 0x4f, 0x55, 0x54, 0x50, 0x55, 0x54, 0x20, 0x22, 0x48, 0x45, 0x4c, 0x4c,
@@ -254,38 +277,36 @@ fn prepare_test_memory() {
     }
 }
 
-fn get_filename() -> String {
+fn get_filename(var: &mut GlobalVars) -> String {
     let mut filename = String::new();
     let mut addr: u32 = 0x4ff00;
-    unsafe {
-        // 7020 bank 4:ba=dec("ff00")
-        // 7030 if peek(ba+0)=asc("s") and peek(ba+1)=asc("k") thenbegin
-        if lpeek(addr) == 83   /* 's' */ &&
-        lpeek(addr+1) == 75 /* 'k' */
-        {
-            // 7040   vb=peek(dec("ff07"))and8
-            verbose = lpeek(0x4ff07u32) & 8 == 8;
-            if verbose {
-                println!("verbose");
-            }
-            // 7050   f$="":a=ba+16:dowhilepeek(a)<>0:f$=f$+chr$(peek(a)):a=a+1:loop:
-            addr += 16;
-            while lpeek(addr) != 0 {
-                filename.push(lpeek(addr) as char);
-                addr += 1;
-            }
-
-            // 7060   if peek(dec("ff07"))and1 thenreturn
-            if lpeek(0x4ff07u32) & 1 == 1 {
-                // this bit got referred to as an autoload bit?
-                // it gets set by '11.edit' in the gosub 7720 (save filename in mailbox ram)
-                return filename;
-            }
-
-            // 7070   print "filename? "+f$:print"{up}";
-            println!("FILENAME? {}", &filename[..]);        
-            // 7080 bend    
+    // 7020 bank 4:ba=dec("ff00")
+    // 7030 if peek(ba+0)=asc("s") and peek(ba+1)=asc("k") thenbegin
+    if lpeek(addr) == 83   /* 's' */ &&
+    lpeek(addr+1) == 75 /* 'k' */
+    {
+        // 7040   vb=peek(dec("ff07"))and8
+        var.verbose = lpeek(0x4ff07u32) & 8 == 8;
+        if var.verbose {
+            println!("verbose");
         }
+        // 7050   f$="":a=ba+16:dowhilepeek(a)<>0:f$=f$+chr$(peek(a)):a=a+1:loop:
+        addr += 16;
+        while lpeek(addr) != 0 {
+            filename.push(lpeek(addr) as char);
+            addr += 1;
+        }
+
+        // 7060   if peek(dec("ff07"))and1 thenreturn
+        if lpeek(0x4ff07u32) & 1 == 1 {
+            // this bit got referred to as an autoload bit?
+            // it gets set by '11.edit' in the gosub 7720 (save filename in mailbox ram)
+            return filename;
+        }
+
+        // 7070   print "filename? "+f$:print"{up}";
+        println!("FILENAME? {}", &filename[..]);        
+        // 7080 bend    
     }
 
     return filename;
