@@ -27,18 +27,19 @@ fn _make_mega65_libc_bindings() {
 }
 
 #[cfg(feature = "docs-rs")]
-fn main() {
-} // Skip the script when the doc is building
+fn main() {} // Skip the script when the doc is building
 
 #[cfg(not(feature = "docs-rs"))]
 fn main() {
     //_make_mega65_libc_bindings();
     cc::Build::new()
-        .compiler("mos-c64-clang")
+        .compiler("clang")
+        .target("mos-c64")
         .file("src/irq.c")
         .compile("irq");
     cc::Build::new()
-        .compiler("mos-mega65-clang")
+        .compiler("clang")
+        .target("mos-mega65")
         .include("src/mega65/libc")
         .files([
             "src/mega65/libc/conio.c",
