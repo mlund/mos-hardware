@@ -1,7 +1,8 @@
 {
-  "image": "mrkits/rust-mos",
+  "image": "mikaellund/rust-mos:sdk0.11.7",
   "onCreateCommand": "echo settings set target.load-cwd-lldbinit true > /home/mos/.lldbinit",
   "settings": {
+    "rust-analyzer.checkOnSave.command": "check",
     "rust-analyzer.checkOnSave.allTargets": false,
     "rust-analyzer.diagnostics.disabled": [
         "unresolved-macro-call",
