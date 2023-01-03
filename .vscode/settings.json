@@ -1,0 +1,11 @@
+{
+    "rust-analyzer.diagnostics.disabled": [
+        "unresolved-proc-macro"
+    ],
+    "rust-analyzer.checkOnSave.command": "check",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "rust-analyzer.rustfmt.extraArgs": [
+        "+stable"
+    ]
+}
