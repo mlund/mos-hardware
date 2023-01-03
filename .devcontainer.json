@@ -1,7 +1,5 @@
 {
   "image": "mrkits/rust-mos",
-  // "workspaceMount": "source=/home/mrk/repos,target=/workspaces/repos,type=bind",
-  // "workspaceFolder": "/workspaces/repos/aoc2021",
   "onCreateCommand": "echo settings set target.load-cwd-lldbinit true > /home/mos/.lldbinit",
   "settings": {
     "rust-analyzer.checkOnSave.allTargets": false,
