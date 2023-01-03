@@ -209,51 +209,45 @@ impl MOSSoundInterfaceDevice {
 /// let mut rng = SIDRng::default();
 /// let value = [11, 23].choose(&mut rng).unwrap(); // 11 or 23
 /// ~~~
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct SIDRng {
-    sid_chip: *const MOSSoundInterfaceDevice,
+    sid: &'static MOSSoundInterfaceDevice, //*const MOSSoundInterfaceDevice,
 }
 
 impl SIDRng {
     /// Initialize and start SID oscillator
-    pub fn default(sid_address: *const MOSSoundInterfaceDevice) -> SIDRng {
-        unsafe { (*sid_address).start_random_generator() };
-        SIDRng {
-            sid_chip: sid_address,
-        }
-    }
-
-    fn sid(&self) -> &'static MOSSoundInterfaceDevice {
-        unsafe { &*self.sid_chip }
+    pub fn default(sid_address: &'static MOSSoundInterfaceDevice) -> SIDRng {
+        sid_address.start_random_generator();
+        SIDRng { sid: sid_address }
     }
 }
 
 impl RngCore for SIDRng {
     fn next_u32(&mut self) -> u32 {
         u32::from_ne_bytes([
-            self.sid().random_byte(),
-            self.sid().random_byte(),
-            self.sid().random_byte(),
-            self.sid().random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
         ])
     }
 
     fn next_u64(&mut self) -> u64 {
         u64::from_ne_bytes([
-            self.sid().random_byte(),
-            self.sid().random_byte(),
-            self.sid().random_byte(),
-            self.sid().random_byte(),
-            self.sid().random_byte(),
-            self.sid().random_byte(),
-            self.sid().random_byte(),
-            self.sid().random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
         ])
     }
 
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         dest.iter_mut()
-            .for_each(|byte| *byte = self.sid().random_byte());
+            .for_each(|byte| *byte = self.sid.random_byte());
     }
 
     fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
