@@ -200,23 +200,27 @@ impl MOSSoundInterfaceDevice {
 
 /// Random number generator using the SID oscillator
 ///
-/// Implements the `RngCore` trait and can be used with
-/// Rust's `rand` crate.
+/// Implements the [`rand::RngCore`](https://docs.rs/rand/latest/rand/trait.RngCore.html)
+/// trait and can thus be used with Rusts `rand` crate.
+/// For single random bytes, it is likely more efficient to use `random_byte()`
+/// from the SID chip directly, as the smallest integer implemented in `RngCore` is `u32`,
+/// i.e. four random bytes.
 ///
 /// ## Examples
 /// ~~~
+/// use mos_hardware::{c64, sid};
 /// use rand::seq::SliceRandom;
-/// let mut rng = SIDRng::default();
+/// let mut rng = sid::SIDRng::new(c64::sid());
 /// let value = [11, 23].choose(&mut rng).unwrap(); // 11 or 23
 /// ~~~
 #[derive(Clone)]
 pub struct SIDRng {
-    sid: &'static MOSSoundInterfaceDevice, //*const MOSSoundInterfaceDevice,
+    sid: &'static MOSSoundInterfaceDevice,
 }
 
 impl SIDRng {
     /// Initialize and start SID oscillator
-    pub fn default(sid_address: &'static MOSSoundInterfaceDevice) -> SIDRng {
+    pub fn new(sid_address: &'static MOSSoundInterfaceDevice) -> SIDRng {
         sid_address.start_random_generator();
         SIDRng { sid: sid_address }
     }
