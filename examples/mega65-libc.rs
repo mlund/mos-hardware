@@ -48,6 +48,11 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let rtc = get_real_time_clock();
     println!("TIME = {}:{}:{}", rtc.tm_hour, rtc.tm_min, rtc.tm_sec);
 
+    // Hardware math accelerator
+    let (mul, whole, fraction) = math_accelerator().multiply_divide(0xa, 3);
+    println!("10 MUL 3 = {}", mul);
+    println!("10 DIV 3 = {} W FRACTION {}", whole, fraction);
+
     // libc user input
     println!("OK TO CONTINUE?");
     flush_keyboard_buffer();
