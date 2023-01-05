@@ -1,5 +1,5 @@
 {
-  "image": "mikaellund/rust-mos:sdk0.11.7",
+  "image": "mrkits/rust-mos:latest",
   "onCreateCommand": "echo settings set target.load-cwd-lldbinit true > /home/mos/.lldbinit",
   "settings": {
     "rust-analyzer.checkOnSave.command": "check",
@@ -9,5 +9,5 @@
         "macro-error"
     ]
   },
-  "extensions": ["rust-lang.rust-analyzer", "serayuzgur.crates", "vadimcn.vscode-lldb"]
+  "extensions": ["rust-lang.rust-analyzer", "serayuzgur.crates", "vadimcn.vscode-lldb", "tlgkccampbell.code-ca65", "tamasfe.even-better-toml"]
 }
