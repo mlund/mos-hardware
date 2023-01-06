@@ -41,10 +41,10 @@ rand_core = "0.6"
 rand = {version = "0.8", default-features = false}
 itertools = {version = "0.10", default-features = false}
 mos-alloc = "0.2"
-ufmt-stdio = "0"
+ufmt-stdio = "0.3"
 
 [build-dependencies]
-cc = "1"
+cc = "1.0"
 bindgen = "0.63"
 
 [features]
