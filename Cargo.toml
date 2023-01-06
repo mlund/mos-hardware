@@ -30,22 +30,22 @@ panic = "abort"
 doctest = false
 
 [dependencies]
-memoffset = {version = "0.8.0", features = ["unstable_const"]}
-static_assertions = "1.1.0"
-bitflags = "1.3.2"
-volatile-register = "0.2.1"
-const-str = "0.5.3"
-rand_core = "0.6.4"
+memoffset = {version = "0.8", features = ["unstable_const"]}
+static_assertions = "1.1"
+bitflags = "1.3"
+volatile-register = "0.2"
+const-str = "0.5"
+rand_core = "0.6"
 
 [dev-dependencies]
 rand = {version = "0.8", default-features = false}
 itertools = {version = "0.10", default-features = false}
-mos-alloc = "0.2.0"
+mos-alloc = "0.2"
 ufmt-stdio = "0"
 
 [build-dependencies]
 cc = "1"
-bindgen = "0.63.0"
+bindgen = "0.63"
 
 [features]
 docs-rs = []
