@@ -553,13 +553,13 @@ extern "C" {
     pub fn close(fd: ::core::ffi::c_uchar);
 }
 extern "C" {
-    pub fn open(filename: *mut ::core::ffi::c_char) -> ::core::ffi::c_uchar;
+    pub fn open(filename: *const ::core::ffi::c_char) -> ::core::ffi::c_uchar;
 }
 extern "C" {
     pub fn read512(buffer: *mut ::core::ffi::c_uchar) -> ::core::ffi::c_ushort;
 }
 extern "C" {
-    pub fn chdir(filename: *mut ::core::ffi::c_char) -> ::core::ffi::c_uchar;
+    pub fn chdir(filename: *const ::core::ffi::c_char) -> ::core::ffi::c_uchar;
 }
 extern "C" {
     pub fn chdirroot() -> ::core::ffi::c_uchar;
