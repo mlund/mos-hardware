@@ -228,11 +228,44 @@ macro_rules! screen_codes {
 /// use mos_hardware::screen_codes_null;
 /// const SCREEN_CODES: [u8; 5] = screen_codes_null!("way!");
 /// assert_eq!(SCREEN_CODES, [23, 1, 25, 33, 0]);
-///
+/// ~~~
 #[macro_export]
 macro_rules! screen_codes_null {
     ($A:expr) => {{
         use $crate::screen_codes;
         *const_str::concat_bytes!(screen_codes!($A), 0u8)
+    }};
+}
+
+/// Convert string slice to array of petscii bytes at _compile time_
+///
+/// Examples
+/// ~~~
+/// use mos_hardware::petscii_codes;
+/// const PETSCII_BYTES: [u8; 4] = petscii_codes!("way!");
+/// ~~~
+#[macro_export]
+macro_rules! petscii_codes {
+    ($A:expr) => {{
+        use $crate::petscii::*;
+        const N: usize = const_str::to_char_array!($A).len();
+        const CHARS: [char; N] = const_str::to_char_array!($A);
+        let mut petscii_bytes = [0u8; N];
+        let mut i = 0;
+        while i < N {
+            let petscii = Petscii::from_char(CHARS[i]);
+            screen_codes[i] = petscii.to_byte();
+            i += 1;
+        }
+        petscii_bytes
+    }};
+}
+
+/// As `petscii_codes!` but null-terminated
+#[macro_export]
+macro_rules! petscii_codes_null {
+    ($A:expr) => {{
+        use $crate::petscii_codes;
+        *const_str::concat_bytes!(petscii_codes!($A), 0u8)
     }};
 }
