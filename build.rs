@@ -41,6 +41,7 @@ fn main() {
         .compiler("clang")
         .target("mos-mega65")
         .include("src/mega65/libc")
+        .include("/usr/local/mos-platform/common/include")
         .files([
             "src/mega65/libc/conio.c",
             "src/mega65/libc/debug.c",
