@@ -18,10 +18,17 @@ use ufmt_stdio::*;
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
 
+struct Label {
+    name: &str, // lb$ = label name
+    pp_line: u16, // ll$ = (post-processed line)
+}
+
 struct GlobalVars {
     verbose: bool,
     current_line: String,
     pp_line: u16,
+    delete_line_flag: bool,
+    labels: Vec<Label>,
 }
 
 /*fn print(s: String) {
@@ -41,6 +48,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         verbose: true,
         current_line: String::new(),
         pp_line: 0,
+        delete_line_flag: false,
+        labels: Vec::with_capacity(200),
     };
 
     // rw$
@@ -206,7 +215,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
         //585
         if var.current_line.len() > 0 {
-            let mut delete_line_flag = false;
+            // dl = delete_line_flag
+            var.delete_line_flag = false;
             if var.verbose {
                 println!(">> {} {} {}", post_proc_line_counter, source_line_counter, &var.current_line[..]);
                 // 600
@@ -225,12 +235,16 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     0
 }
 
+// 1500
 fn parse_label(var: &mut GlobalVars)
 {
     if var.verbose {
         println!("label {} at pp_line {}", &var.current_line[..], var.pp_line);
     }
+    var.delete_line_flag = true;
+    var.labels.push(Label {name: &(var.current_line[1..]), pp_line: var.pp_line + 1});
 }
+
 
 fn trim_left<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
 {
@@ -305,8 +319,8 @@ fn get_filename(var: &mut GlobalVars) -> String {
         }
 
         // 7070   print "filename? "+f$:print"{up}";
-        println!("FILENAME? {}", &filename[..]);        
-        // 7080 bend    
+        println!("FILENAME? {}", &filename[..]);
+        // 7080 bend
     }
 
     return filename;
