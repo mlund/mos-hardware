@@ -26,12 +26,26 @@ fn _make_mega65_libc_bindings() {
         .expect("Couldn't write bindings!");
 }
 
+/// update cbm kernal bindings
+fn _make_cbm_kernal_bindings() {
+    let _bindings = bindgen::Builder::default()
+        .header("cbm.h") // from llvm-mos-sdk/mos-targets/commodore/cbm.h
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .ctypes_prefix("::core::ffi")
+        .use_core()
+        .derive_default(true)
+        .generate()
+        .unwrap()
+        .write_to_file("src/cbm_kernal.rs")
+        .expect("Couldn't write bindings!");
+}
 #[cfg(feature = "docs-rs")]
 fn main() {} // Skip the script when the doc is building
 
 #[cfg(not(feature = "docs-rs"))]
 fn main() {
     //_make_mega65_libc_bindings();
+    //_make_cbm_kernal_bindings();
     cc::Build::new()
         .compiler("clang")
         .target("mos-c64")

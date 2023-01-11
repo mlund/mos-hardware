@@ -57,6 +57,7 @@ pub mod petscii;
 pub mod sid;
 pub mod vera;
 pub mod vic2;
+pub mod cbm_kernal;
 
 use core::iter::Iterator;
 
