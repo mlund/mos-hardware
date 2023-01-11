@@ -51,18 +51,19 @@ extern crate static_assertions;
 
 #[cfg(feature = "c64")]
 pub mod c64;
-#[cfg(feature = "c64")]
+#[cfg(feature = "cia")]
 pub mod cia;
 #[cfg(feature = "cx16")]
 pub mod cx16;
 #[cfg(feature = "mega65")]
 pub mod mega65;
+#[cfg(feature = "petscii")]
 pub mod petscii;
-#[cfg(feature = "c64")]
+#[cfg(feature = "sid")]
 pub mod sid;
-#[cfg(feature = "cx16")]
+#[cfg(feature = "vera")]
 pub mod vera;
-#[cfg(feature = "c64")]
+#[cfg(feature = "vic2")]
 pub mod vic2;
 
 use core::iter::Iterator;
