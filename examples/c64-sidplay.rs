@@ -19,8 +19,8 @@
 #![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
-use mos_hardware::{c64, vic2, sid};
 use mos_hardware::sid::SidTune;
+use mos_hardware::{c64, sid, vic2};
 use vic2::*;
 
 pub struct SidFile;

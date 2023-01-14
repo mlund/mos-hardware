@@ -50,6 +50,7 @@
 extern crate static_assertions;
 
 pub mod c64;
+pub mod cbm_kernal;
 pub mod cia;
 pub mod cx16;
 pub mod mega65;
@@ -57,7 +58,6 @@ pub mod petscii;
 pub mod sid;
 pub mod vera;
 pub mod vic2;
-pub mod cbm_kernal;
 
 use core::iter::Iterator;
 

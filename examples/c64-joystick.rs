@@ -19,7 +19,7 @@
 #![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
-use mos_hardware::{c64};
+use mos_hardware::c64;
 use mos_hardware::cia::JoystickPosition;
 use ufmt_stdio::*;
 
