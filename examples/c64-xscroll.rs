@@ -22,10 +22,10 @@ extern crate alloc;
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
-use mos_hardware::{c64, peek, poke, vic2};
-use mos_hardware::sid::SidTune;
-use vic2::*;
 use mos_hardware::screen_codes;
+use mos_hardware::sid::SidTune;
+use mos_hardware::{c64, vic2};
+use vic2::*;
 
 /// Trait that in the future may be used for IRQs (currently no effect)
 trait Interrupt {
@@ -51,12 +51,14 @@ impl SmoothScroll {
         (0x0400 + (40 * SmoothScroll::YPOSITION + 39 as u16)) as *mut u8;
     /// PETSCII encoded scroll text
 
-    const SCROLL_TEXT: [u8; 254] = screen_codes!("Hello from RUST! This is a tiny demo written \
+    const SCROLL_TEXT: [u8; 254] = screen_codes!(
+        "Hello from RUST! This is a tiny demo written \
     in rust using the llvm-mos backend for 6502 code generation. \
     The top color flickering reflects the time spend on rust in the raster interrupt \
-    (scroll and sprite movement) while SID music playback is excluded. ");
+    (scroll and sprite movement) while SID music playback is excluded. "
+    );
 
-    const fn new() -> SmoothScroll {
+    const fn default() -> SmoothScroll {
         SmoothScroll {
             text_index: 0,
             displacement: 7,
@@ -93,8 +95,10 @@ impl SmoothScroll {
         // faster than core::ptr::copy(LEFTMOST_CHAR.offset(1), LEFTMOST_CHAR, 39)
         for i in 1..40 {
             unsafe {
-                let character = peek!(SmoothScroll::LEFTMOST_CHAR.offset(i));
-                poke!(SmoothScroll::LEFTMOST_CHAR.offset(i - 1), character);
+                let character = SmoothScroll::LEFTMOST_CHAR.offset(i).read_volatile();
+                SmoothScroll::LEFTMOST_CHAR
+                    .offset(i - 1)
+                    .write_volatile(character);
             }
         }
     }
@@ -106,10 +110,7 @@ impl SmoothScroll {
             self.text_index = 0;
         }
         unsafe {
-            poke!(
-                SmoothScroll::RIGHTMOST_CHAR,
-                SmoothScroll::SCROLL_TEXT[self.text_index]
-            );
+            SmoothScroll::RIGHTMOST_CHAR.write_volatile(SmoothScroll::SCROLL_TEXT[self.text_index]);
         }
         self.leftcopy_chars();
         self.text_index += 1;
@@ -132,7 +133,7 @@ struct SpriteMove {
 
 impl SpriteMove {
     const OFFSET: u8 = 30;
-    const fn new() -> SpriteMove {
+    const fn default() -> SpriteMove {
         SpriteMove { counter_y: 0 }
     }
 }
@@ -162,8 +163,8 @@ impl Interrupt for SpriteMove {
 }
 
 /// Global since the interrupt wrapper currently do not take arguments
-static mut SCROLL: SmoothScroll = SmoothScroll::new();
-static mut SPRITE_MOVE: SpriteMove = SpriteMove::new();
+static mut SCROLL: SmoothScroll = SmoothScroll::default();
+static mut SPRITE_MOVE: SpriteMove = SpriteMove::default();
 
 struct SidFile;
 impl SidTune for SidFile {
@@ -180,13 +181,13 @@ static MUSIC: SidFile = SidFile;
 pub extern "C" fn called_every_frame() {
     static mut COUNTER: u8 = 0;
     unsafe {
-        (&*c64::VIC).border_color.write(vic2::LIGHT_GREEN);
+        c64::vic2().border_color.write(vic2::LIGHT_GREEN);
         SPRITE_MOVE.update(COUNTER);
         COUNTER += 2;
         if COUNTER % 2 == 0 {
             SCROLL.update(0);
         }
-        (&*c64::VIC).border_color.write(vic2::BLACK);
+        c64::vic2().border_color.write(vic2::BLACK);
     }
     MUSIC.play(); // excluded from border color profiling
 }
@@ -206,10 +207,10 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     const SPRITE_PTR: u8 = vic2::to_sprite_pointer(SPRITE_ADDRESS);
     unsafe {
         *(SPRITE_ADDRESS as *mut [u8; 63]) = RUST_LOGO;
-        poke!(c64::DEFAULT_SPRITE_PTR[0], SPRITE_PTR);
-        (*c64::VIC).sprite_expand_x.write(Sprites::SPRITE0);
-        (*c64::VIC).sprite_expand_y.write(Sprites::SPRITE0);
-        (*c64::VIC).sprite_enable.write(Sprites::SPRITE0);
+        c64::DEFAULT_SPRITE_PTR[0].write_volatile(SPRITE_PTR);
+        c64::vic2().sprite_expand_x.write(Sprites::SPRITE0);
+        c64::vic2().sprite_expand_y.write(Sprites::SPRITE0);
+        c64::vic2().sprite_enable.write(Sprites::SPRITE0);
     }
     c64::vic2().set_sprite_color(0, GREEN);
     c64::hardware_raster_irq(20);

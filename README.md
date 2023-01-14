@@ -86,6 +86,7 @@ be subject to significant changes.
   - [x] `cia` (partially)
   - [x] `c64` memory map (particlly)
   - [x] PSID file support for SID music
+  - [x] Random number trait (`RngCore`)
 - [Commander X16](https://www.commanderx16.com)
   - [x] `vera`
   - [x] `via` (partially)
@@ -100,3 +101,4 @@ be subject to significant changes.
   - [x] Sprites (c64)
   - [x] Smooth x-scrooll (c64)
   - [x] Joystick read (c64)
+  - [x] 10print maze (c64)

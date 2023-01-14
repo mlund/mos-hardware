@@ -65,6 +65,7 @@ pub mod sid;
 pub mod vera;
 #[cfg(feature = "vic2")]
 pub mod vic2;
+pub mod cbm_kernal;
 
 use core::iter::Iterator;
 
@@ -178,6 +179,11 @@ pub const fn make_sine(divide: u8, add: u8) -> [u8; SINETABLE.len()] {
         i += 1;
     }
     array
+}
+
+/// Cyclic sine from 0x80..0..0xff..0x80
+pub const fn sine(index: u8) -> u8 {
+    SINETABLE[index as usize]
 }
 
 /// Tabulated, cyclic sine table

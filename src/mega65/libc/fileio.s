@@ -6,12 +6,16 @@ ptr1:
         .ds.b 1 ;; 1 byte
 ptr2:
         .ds.b 1
+tmp1:
+        .ds.b 1
 tmp2:
         .ds.b 1
 tmp3:
         .ds.b 1
+sp:
+        .ds.b 1
 
-.section code
+    .section code,"a"
 
 mega65_io_enable:
 	lda #$47
@@ -19,7 +23,24 @@ mega65_io_enable:
 	lda #$53
 	sta $d02f
 	rts
-
+cc65_args_read_ptr1_16:	
+        ;; sp here is the ca65 sp ZP variable, not the stack pointer of a 4510
+	
+        lda (sp),y
+        sta ptr1
+        iny
+        lda (sp),y
+        sta ptr1+1
+	iny
+	rts
+        
+cc65_args_read_tmp1_8:	
+        ;; sp here is the ca65 sp ZP variable, not the stack pointer of a 4510
+        lda (sp),y
+        sta tmp1
+        iny
+	rts
+        
 cc65_copy_ptr1_string_to_0100:	
         ;; Copy file name
 	phy

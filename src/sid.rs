@@ -21,6 +21,7 @@
 use crate::*;
 use bitflags::bitflags;
 use core::mem::size_of;
+use rand_core::{Error, RngCore};
 use static_assertions::const_assert;
 use volatile_register::{RO, WO};
 
@@ -194,6 +195,67 @@ impl MOSSoundInterfaceDevice {
                 return r;
             }
         }
+    }
+}
+
+/// Random number generator using the SID oscillator
+///
+/// Implements the [`rand::RngCore`](https://docs.rs/rand/latest/rand/trait.RngCore.html)
+/// trait and can thus be used with Rusts `rand` crate.
+/// For single random bytes, it is likely more efficient to use `random_byte()`
+/// from the SID chip directly, as the smallest integer implemented in `RngCore` is `u32`,
+/// i.e. four random bytes.
+///
+/// ## Examples
+/// ~~~
+/// use mos_hardware::{c64, sid};
+/// use rand::seq::SliceRandom;
+/// let mut rng = sid::SIDRng::new(c64::sid());
+/// let value = [11, 23].choose(&mut rng).unwrap(); // 11 or 23
+/// ~~~
+#[derive(Clone)]
+pub struct SIDRng {
+    sid: &'static MOSSoundInterfaceDevice,
+}
+
+impl SIDRng {
+    /// Initialize and start SID oscillator
+    pub fn new(sid_address: &'static MOSSoundInterfaceDevice) -> SIDRng {
+        sid_address.start_random_generator();
+        SIDRng { sid: sid_address }
+    }
+}
+
+impl RngCore for SIDRng {
+    fn next_u32(&mut self) -> u32 {
+        u32::from_ne_bytes([
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+        ])
+    }
+
+    fn next_u64(&mut self) -> u64 {
+        u64::from_ne_bytes([
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+            self.sid.random_byte(),
+        ])
+    }
+
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        dest.iter_mut()
+            .for_each(|byte| *byte = self.sid.random_byte());
+    }
+
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
+        Ok(self.fill_bytes(dest))
     }
 }
 

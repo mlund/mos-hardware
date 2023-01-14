@@ -30,6 +30,7 @@ use crate::{peek, petscii, poke};
 
 pub mod iomap;
 pub mod libc;
+pub mod math;
 
 const MAX_28_BIT_ADDRESS: u32 = 0xFFFFFFF;
 
@@ -51,11 +52,23 @@ pub const SID3: *const MOSSoundInterfaceDevice = (0xd460) as *const MOSSoundInte
 
 pub const COLOR_RAM: *mut u8 = (0xd800) as *mut u8;
 
+/// Math multiplication-division status flags
+pub const MATH_STATUS: *const volatile_register::RO<math::StatusFlags> =
+    (0xd70f) as *const volatile_register::RO<math::StatusFlags>;
+
+/// Math Acceleration registers
+pub const MATH_ACCELERATOR: *const math::MathAccelerator = (0xd768) as *const math::MathAccelerator;
+
 pub enum VicBank {
     Region0000 = 0x11, // Bank 0
     Region4000 = 0x10, // Bank 1
     Region8000 = 0x01, // Bank 2
     RegionC000 = 0x00, // Bank 3
+}
+
+/// Get reference to VIC2 chip
+pub const fn vic2() -> &'static MOSVideoInterfaceControllerII {
+    unsafe { &*VICII }
 }
 
 /// Get reference to first SID chip
@@ -76,6 +89,11 @@ pub const fn sid2() -> &'static MOSSoundInterfaceDevice {
 /// Get reference to fourth SID chip
 pub const fn sid3() -> &'static MOSSoundInterfaceDevice {
     unsafe { &*SID3 }
+}
+
+/// Get reference to math accelerator
+pub const fn math_accelerator() -> &'static math::MathAccelerator {
+    unsafe { &*MATH_ACCELERATOR }
 }
 
 /// Set CPU speed to 1 Mhz
@@ -138,6 +156,7 @@ pub unsafe fn lcopy(source: u32, destination: u32, length: u16) {
 }
 
 /// Struct used to store widht-height resolutions
+#[derive(Default)]
 pub struct Resolution<T> {
     pub width: T,
     pub height: T,
@@ -145,10 +164,7 @@ pub struct Resolution<T> {
 
 /// Returns screen resolution (char width, char heigh)
 pub fn get_screen_size() -> Resolution<u8> {
-    let mut resolution = Resolution {
-        width: 0,
-        height: 0,
-    };
+    let mut resolution = Resolution::default();
     unsafe {
         libc::getscreensize(&mut resolution.width, &mut resolution.height);
     }
@@ -291,5 +307,12 @@ pub fn set_extended_attributes() {
 pub fn unset_extended_attributes() {
     unsafe {
         libc::setextendedattrib(0);
+    }
+}
+
+/// Set character set address using mega65-libc
+pub fn set_charset_address(address: u16) {
+    unsafe {
+        libc::setcharsetaddr(address as i32);
     }
 }
