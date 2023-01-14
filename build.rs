@@ -3,6 +3,8 @@
 /// cargo build --lib --release
 /// rustfmt src/mega65/libc/bindings.rs
 /// ~~~
+/// Call to update mega65/libc/bindings.rs
+#[cfg(feature = "mega65")]
 fn _make_mega65_libc_bindings() {
     let _bindings = bindgen::Builder::default()
         .header("src/mega65/libc/conio.h")
@@ -46,11 +48,14 @@ fn main() {} // Skip the script when the doc is building
 fn main() {
     //_make_mega65_libc_bindings();
     //_make_cbm_kernal_bindings();
+    #[cfg(feature = "c64")]
     cc::Build::new()
         .compiler("clang")
         .target("mos-c64")
         .file("src/irq.c")
         .compile("irq");
+
+    #[cfg(feature = "mega65")]
     cc::Build::new()
         .compiler("clang")
         .target("mos-mega65")
