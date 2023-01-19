@@ -29,7 +29,7 @@ use core::ops::Shl;
 use crate::sid::*;
 use crate::vic2::*;
 use crate::{peek, petscii, poke};
-use rand_core::{Error, RngCore};
+use rand_core::{Error, RngCore, SeedableRng};
 
 pub mod iomap;
 pub mod libc;
@@ -149,6 +149,14 @@ pub fn rand8(max_value: u8) -> u8 {
 #[derive(Default)]
 pub struct LibcRng {}
 
+impl LibcRng {
+    /// New using seed
+    pub fn new(seed: LibcSeed) -> Self {
+        unsafe { libc::srand(u32::from_ne_bytes(seed.0)) };
+        LibcRng::default()
+    }
+}
+
 impl RngCore for LibcRng {
     fn next_u32(&mut self) -> u32 {
         unsafe { libc::rand32(u32::MAX) }
@@ -164,6 +172,23 @@ impl RngCore for LibcRng {
     fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
         self.fill_bytes(dest);
         Ok(())
+    }
+}
+
+/// 32-bit random number seed
+#[derive(Default)]
+pub struct LibcSeed(pub [u8; 4]);
+
+impl AsMut<[u8]> for LibcSeed {
+    fn as_mut(&mut self) -> &mut [u8] {
+        &mut self.0
+    }
+}
+
+impl SeedableRng for LibcRng {
+    type Seed = LibcSeed;
+    fn from_seed(seed: Self::Seed) -> Self {
+        LibcRng::new(seed)
     }
 }
 

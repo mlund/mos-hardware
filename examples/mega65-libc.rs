@@ -14,6 +14,7 @@
 use core::panic::PanicInfo;
 use mos_hardware::mega65::*;
 use mos_hardware::screen_codes_null;
+use rand::{seq::SliceRandom, SeedableRng};
 use ufmt_stdio::*;
 
 #[start]
@@ -37,6 +38,13 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     for _ in 0..10 {
         print!("{} ", rand8(u8::MAX));
     }
+
+    print!("\nRANDOM SHUFFLE USING RNGCORE TRAIT:  ");
+    let mut rng = LibcRng::seed_from_u64(1);
+    let mut seq = [0, 1, 2, 3, 4, 5, 6, 7, 9];
+    seq.shuffle(&mut rng);
+    println!("{:?}", &seq);
+
     print!("\nRANDUM BYTES FROM SID:  ");
     sid0().start_random_generator();
     for _ in 0..10 {
