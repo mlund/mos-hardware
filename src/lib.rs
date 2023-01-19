@@ -46,6 +46,7 @@
 #![feature(const_option)]
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
+#![feature(error_in_core)]
 
 extern crate static_assertions;
 

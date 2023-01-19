@@ -10,7 +10,6 @@
 
 #![no_std]
 #![feature(start)]
-#![feature(default_alloc_error_handler)]
 
 use core::panic::PanicInfo;
 use mos_hardware::mega65::*;
