@@ -24,6 +24,8 @@
 //! Like the original C65, it also has a Commodore 64 mode with a level of compatibility
 //! similar to that of the Commodore 128 running in C64 mode
 
+use core::ops::Shl;
+
 use crate::sid::*;
 use crate::vic2::*;
 use crate::{peek, petscii, poke};
@@ -152,7 +154,8 @@ impl RngCore for LibcRng {
         unsafe { libc::rand32(u32::MAX) }
     }
     fn next_u64(&mut self) -> u64 {
-        ((self.next_u32() as u64) << 32) | (self.next_u32() as u64)
+        // https://stackoverflow.com/questions/2768890/how-to-combine-two-32-bit-integers-into-one-64-bit-integer
+        u64::from(self.next_u32()).shl(32) | u64::from(self.next_u32())
     }
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         dest.iter_mut()
