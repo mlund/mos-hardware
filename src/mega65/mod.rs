@@ -27,6 +27,7 @@
 use crate::sid::*;
 use crate::vic2::*;
 use crate::{peek, petscii, poke};
+use rand_core::{Error, RngCore};
 
 pub mod iomap;
 pub mod libc;
@@ -129,6 +130,38 @@ pub fn speed_mode40() {
 /// Generate random byte
 pub fn rand8(max_value: u8) -> u8 {
     unsafe { libc::rand8(max_value) }
+}
+
+/// Non-deterministic random number generator using MEGA65 Libc
+///
+/// Implements the [`rand::RngCore`](https://docs.rs/rand/latest/rand/trait.RngCore.html)
+/// trait and can thus be used with Rusts `rand` crate.
+///
+/// ## Examples
+/// ~~~
+/// use mos_hardware::mega65;
+/// use rand::seq::SliceRandom;
+/// let mut rng = LibcRng::default();
+/// let value = [11, 23].choose(&mut rng).unwrap(); // 11 or 23
+/// ~~~
+#[derive(Default)]
+pub struct LibcRng {}
+
+impl RngCore for LibcRng {
+    fn next_u32(&mut self) -> u32 {
+        unsafe { libc::rand32(u32::MAX) }
+    }
+    fn next_u64(&mut self) -> u64 {
+        ((self.next_u32() as u64) << 32) | (self.next_u32() as u64)
+    }
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        dest.iter_mut()
+            .for_each(|byte| *byte = unsafe { libc::rand8(u8::MAX) });
+    }
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
+        self.fill_bytes(dest);
+        Ok(())
+    }
 }
 
 /// Read into 28 bit memory

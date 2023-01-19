@@ -95,6 +95,7 @@ be subject to significant changes.
 - [MEGA65](https://mega65.org):
   - [x] partial support for vic3, vic4 and other hardware registers.
   - [x] [mega65-libc](https://github.com/MEGA65/mega65-libc) bindings
+  - [x] Random number trait (`RngCore`)
 - [Examples](https://github.com/mlund/mos-hardware/tree/main/examples):
   - [x] Plasma effect (c64, mega65)
   - [x] Raster IRQ (c64)
