@@ -6,7 +6,7 @@
 /// Call to update mega65/libc/bindings.rs
 #[cfg(feature = "mega65")]
 fn _make_mega65_libc_bindings() {
-    let _bindings = bindgen::Builder::default()
+    bindgen::Builder::default()
         .header("src/mega65/libc/conio.h")
         .header("src/mega65/libc/debug.h")
         .header("src/mega65/libc/dirent.h")
@@ -30,7 +30,7 @@ fn _make_mega65_libc_bindings() {
 
 /// update cbm kernal bindings
 fn _make_cbm_kernal_bindings() {
-    let _bindings = bindgen::Builder::default()
+    bindgen::Builder::default()
         .header("cbm.h") // from llvm-mos-sdk/mos-targets/commodore/cbm.h
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .ctypes_prefix("::core::ffi")

@@ -255,7 +255,8 @@ impl RngCore for SIDRng {
     }
 
     fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
-        Ok(self.fill_bytes(dest))
+        self.fill_bytes(dest);
+        Ok(())
     }
 }
 
@@ -286,11 +287,10 @@ pub trait SidTune {
     const BYTES: &'static [u8];
 
     /// True if data has an optional 2-byte header stating the load address (C64 style)
-    const HAS_BASIC_LOAD_ADDRESS: bool =
-        match u16::from_be_bytes([Self::BYTES[0x08], Self::BYTES[0x09]]) {
-            0 => true,
-            _ => false,
-        };
+    const HAS_BASIC_LOAD_ADDRESS: bool = matches!(
+        u16::from_be_bytes([Self::BYTES[0x08], Self::BYTES[0x09]]),
+        0
+    );
 
     /// Offset where data begins, excluding any optional 2-byte load address
     const DATA_OFFSET: usize = match Self::HAS_BASIC_LOAD_ADDRESS {
@@ -359,6 +359,7 @@ pub trait SidTune {
 
     /// Copies data into memory at load address specified in PSID file.
     ///
+    /// # Safety
     /// Unsafe, as this will perform copy into hard-coded
     /// memory pool that may clash with stack or allocated heap memory.
     unsafe fn to_memory(&self)

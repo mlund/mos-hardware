@@ -171,12 +171,18 @@ pub fn lpeek(address: u32) -> u8 {
 }
 
 /// Write into 28 bit memory
+///
+/// # Safety
+/// Unsafe as it writes directly to memory
 pub unsafe fn lpoke(address: u32, value: u8) {
     assert!(address <= MAX_28_BIT_ADDRESS);
     libc::lpoke(address as i32, value)
 }
 
 /// DMA copy in 28 bit address space
+///
+/// # Safety
+/// Unsafe as it writes directly to memory
 pub unsafe fn lcopy(source: u32, destination: u32, length: u16) {
     if length == 0 {
         return;
