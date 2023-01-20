@@ -41,7 +41,7 @@ impl Plasma {
             const BITS: [u8; 8] = [1, 2, 4, 8, 16, 32, 64, 128];
             let mut char_pattern: u8 = 0;
             BITS.iter()
-                .filter(|_| mega65::rand8(u8::MAX) > sine)
+                .filter(|_| mega65::random::rand8(u8::MAX) > sine)
                 .for_each(|bit| {
                     char_pattern |= bit;
                 });

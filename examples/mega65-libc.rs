@@ -36,11 +36,11 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     print!("RANDUM BYTES FROM LIBC: ");
     for _ in 0..10 {
-        print!("{} ", rand8(u8::MAX));
+        print!("{} ", random::rand8(u8::MAX));
     }
 
     print!("\nRANDOM SHUFFLE USING RNGCORE TRAIT:  ");
-    let mut rng = LibcRng::seed_from_u64(1);
+    let mut rng = random::LibcRng::seed_from_u64(1);
     let mut seq = [0, 1, 2, 3, 4, 5, 6, 7, 9];
     seq.shuffle(&mut rng);
     println!("{:?}", &seq);
