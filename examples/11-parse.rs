@@ -18,17 +18,17 @@ use ufmt_stdio::*;
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
 
-struct Label {
-    name: &str, // lb$ = label name
+struct Label<'a> {
+    name: &'a str, // lb$ = label name
     pp_line: u16, // ll$ = (post-processed line)
 }
 
-struct GlobalVars {
+struct GlobalVars<'a> {
     verbose: bool,
     current_line: String,
     pp_line: u16,
     delete_line_flag: bool,
-    labels: Vec<Label>,
+    labels: Vec<Label<'a>>,
 }
 
 /*fn print(s: String) {
@@ -236,7 +236,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 }
 
 // 1500
-fn parse_label(var: &mut GlobalVars)
+fn parse_label<'a>(var: &'a mut GlobalVars<'a>)
 {
     if var.verbose {
         println!("label {} at pp_line {}", &var.current_line[..], var.pp_line);
