@@ -1,3 +1,4 @@
+[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/mlund/mos-hardware)
 [![Crates.io](https://img.shields.io/crates/v/mos-hardware)](https://crates.io/crates/mos-hardware)
 [![docs.rs](https://img.shields.io/docsrs/mos-hardware)](https://docs.rs/mos-hardware/latest/mos_hardware)
 
@@ -62,11 +63,14 @@ If you want to start a new project which uses `mos-hardware`, there's a
 
 ### Docker and Visual Studio Code
 
-The easiest way is to use the provided `.devcontainer.json` configuration for vscode:
+The easiest way is to use the provided `.devcontainer.json` configuration for vscode
+by clicking the _Dev Containers Open_ badge above, assuming you have VSC and Docker installed.
+You can also do this manually:
 
 1. Configure Visual Studio Code with the _Remote - Containers_ extension
-2. Open the project inside devcontainer when asked
-3. In the vscode terminal do:
+2. Start Docker
+3. Open the project inside devcontainer when asked
+4. In the vscode terminal do:
    ~~~ bash
    # if Docker uses qemu (i.e. on apple silicon)
    export CARGO_NET_GIT_FETCH_WITH_CLI=true
