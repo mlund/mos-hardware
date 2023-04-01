@@ -148,55 +148,15 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     //200
     while source_line_counter != _total_lines
     {
-        println!("src-line={}", source_line_counter);
-        // copy line's data into 'curent_line'
-        // -----------------------------------
-        let line_length: u8 = lpeek(ca_addr) as u8;
-        ca_addr += 1;
-        current_line = String::new();
-        let mut idx: u8 = 0;
-        while idx < line_length {
-            current_line.push(lpeek(ca_addr) as char);
-            ca_addr += 1;
-            idx += 1;
-        }
+        copy_data_to_current_line(&mut ca_addr, &mut current_line);
 
         println!("l{}: {}", source_line_counter, &current_line[..]);
 
+        // 340
         current_line = String::from(trim_left(&current_line[..], &whitespace_chars[..]));
         println!("{}", &current_line[..]);
 
-        let mut quote_flag = false;
-        let mut _cut_tail_idx = None;
-
-        // single-quote comment trimming logic
-        // -----------------------------------
-        //422
-        _cut_tail_idx = current_line.find('\'');
-        if _cut_tail_idx != None {
-            //423
-            if current_line.contains('"') {
-                //424
-                _cut_tail_idx = None;
-                //440
-                for (in_line_idx, c) in current_line.chars().enumerate() {
-                    //let c = current_line.chars().nth(in_line_idx).unwrap();
-                    match c {
-                        ':' => quote_flag = !quote_flag,
-                        '\'' => if !quote_flag {
-                            _cut_tail_idx = Some(in_line_idx);
-                            break;    
-                        },
-                        _ => (),
-                    }
-                }
-            }
-            //540
-            if _cut_tail_idx != None {
-                current_line = String::from(&current_line[.._cut_tail_idx.unwrap()]);
-            }
-        }
-        //println!("'{}'", &current_line[..]);
+        single_quote_comment_trim(&mut current_line);
 
         //560-580
         if current_line.len() > 0 {
@@ -224,6 +184,50 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     }
 
     0
+}
+
+fn single_quote_comment_trim(current_line: &mut String) {
+    let mut quote_flag = false;
+    let mut _cut_tail_idx = None;
+
+    //422
+    _cut_tail_idx = (*current_line).find('\'');
+    if _cut_tail_idx != None {
+        //423
+        if (*current_line).contains('"') {
+            //424
+            _cut_tail_idx = None;
+            //440
+            for (in_line_idx, c) in (*current_line).chars().enumerate() {
+                //let c = (*current_line).chars().nth(in_line_idx).unwrap();
+                match c {
+                    '"' => quote_flag = !quote_flag,
+                    '\'' => if !quote_flag {
+                        _cut_tail_idx = Some(in_line_idx);
+                        break;    
+                    },
+                    _ => (),
+                }
+            }
+        }
+        //540
+        if _cut_tail_idx != None {
+            *current_line = String::from(&(*current_line)[.._cut_tail_idx.unwrap()]);
+        }
+    }
+    //println!("'{}'", &(*current_line)[..]);
+}
+
+fn copy_data_to_current_line(ca_addr: &mut u32, current_line: &mut String) {
+    let line_length: u8 = lpeek(*ca_addr) as u8;
+    *ca_addr += 1;
+    *current_line = String::new();
+    let mut idx: u8 = 0;
+    while idx < line_length {
+        (*current_line).push(lpeek(*ca_addr) as char);
+        *ca_addr += 1;
+        idx += 1;
+    }
 }
 
 // 1500
