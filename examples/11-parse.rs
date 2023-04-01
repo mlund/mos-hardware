@@ -18,17 +18,9 @@ use ufmt_stdio::*;
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
 
-struct Label<'a> {
-    name: &'a str, // lb$ = label name
+struct Label {
+    name: String, // lb$ = label name
     pp_line: u16, // ll$ = (post-processed line)
-}
-
-struct GlobalVars<'a> {
-    verbose: bool,
-    current_line: String,
-    pp_line: u16,
-    delete_line_flag: bool,
-    labels: Vec<Label<'a>>,
 }
 
 /*fn print(s: String) {
@@ -44,16 +36,14 @@ struct GlobalVars<'a> {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-    let mut var = GlobalVars {
-        verbose: true,
-        current_line: String::new(),
-        pp_line: 0,
-        delete_line_flag: false,
-        labels: Vec::with_capacity(200),
-    };
+    let mut current_line = String::new();
+    let mut verbose = true;
+    let mut pp_line: u16 = 0;
+    let mut delete_line_flag: bool = false;
+    let mut labels: Vec<Label> = Vec::with_capacity(200);
 
     // rw$
-    let tokens = ["print", "input", "if", "then", "else", "do", "loop", "while",
+    let _tokens = ["print", "input", "if", "then", "else", "do", "loop", "while",
         "until", "gosub", "goto", "open", "close", "dopen", "dclose", "for", "next",
         "getkey", "hex$", "dim", "peek", "poke", "wait", "dec", "chr$", "asc", "sgn", "sqr",
         "graphic", "clr", "screen", "def", "begin", "bend", "len", "mid$", "right$", "left$",
@@ -74,10 +64,10 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         "sprite", "sprsav", "sys", "tab", "tempo", "troff", "tron", "type", "usr", "verify",
         "vol", "xor", "key"];
 
-    prepare_test_memory(&mut var);
+    prepare_test_memory(&mut verbose);
 
     // pf$ = type_suffix
-    let TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
+    let _TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
 
     // TODO: Convert to `bin_conv` constant evaluation: https://doc.rust-lang.org/reference/const_eval.html
     let mut bin_conv: [u16; 16] = [0; 16];
@@ -87,14 +77,14 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     }
 
     // ln%() = map_gen_line_to_orig_line[]
-    let map_gen_line_to_orig_line: [u16; 500] = [0; 500];
+    let _map_gen_line_to_orig_line: [u16; 500] = [0; 500];
 
     set_lower_case();
     println!("testing TESTING 1, 2, 3...");
 
     // li$() = processed_lines
     // NOTE: Seems like rust chokes if this is too large?
-    let processed_lines: Vec<String> = Vec::with_capacity(500);
+    let _processed_lines: Vec<String> = Vec::with_capacity(500);
 
     set_lower_case();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
@@ -103,14 +93,14 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     println!();
     
     // tl$ = tl_string
-    let mut tl_string = String::from("                                                                                ");
+    let mut _tl_string = String::new(); //String::from("                                                                                ");
     // bl$ = bl_string
     //let mut bl_string: String = String::new();
     //bl_string.push_str(&tl_string[..]);
     //bl_string.push_str(&tl_string[..]);
     //bl_string.push_str(&tl_string[..]);
 
-    tl_string = String::new();
+    // tl_string = String::new();
 
     //for i in 0..tokens.len() {
     //    println!("{}", tokens[i]);
@@ -119,7 +109,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     //let mystring = String::from("test");
     //println!("{}", &mystring[..]);
 
-    let filename = get_filename(&mut var);
+    let filename = get_filename(&mut verbose);
 
     unsafe { mega65_fast(); }
 
@@ -127,7 +117,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     // ------------------- pass 1 ---------------
     // nl = next_line_flag
-    let mut next_line_flag = false;
+    let mut _next_line_flag = false;
 
     // wh$ = whitespace_chars
     let whitespace_chars: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
@@ -136,10 +126,10 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // NOTE: sl/source_line_counter and rl/current_line_index serve the same purpose
     // so I will remove 'current_line_index'
     let mut source_line_counter = 0;    // sl
-    let mut post_proc_line_counter = 0; // ln
+    let mut _post_proc_line_counter = 0; // ln
 
     // TODO: 195 clr ti: rem keep start time for timing
-    let mut cb_addr: u32 = 0x8010000;
+    let cb_addr: u32 = 0x8010000;
     let mut ca_addr: u32 = cb_addr;
 
     println!("PASS 1 ");
@@ -148,52 +138,53 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // removing this one, as it's equivalent to sl/soure_line_counter
     //let mut current_line_index = 0;
     // tl = total_lines
-    let mut total_lines: u16 = 0;
-    total_lines = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16;
+    let mut _total_lines: u16 = 0;
+    _total_lines = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16;
 
     ca_addr += 2;
 
-    var.pp_line = 0; // ln = index into li$ (current post-processed line)
+    pp_line = 0; // ln = index into li$ (current post-processed line)
 
     //200
-    while source_line_counter != total_lines
+    while source_line_counter != _total_lines
     {
+        println!("src-line={}", source_line_counter);
         // copy line's data into 'curent_line'
         // -----------------------------------
         let line_length: u8 = lpeek(ca_addr) as u8;
         ca_addr += 1;
-        var.current_line = String::new();
+        current_line = String::new();
         let mut idx: u8 = 0;
         while idx < line_length {
-            var.current_line.push(lpeek(ca_addr) as char);
+            current_line.push(lpeek(ca_addr) as char);
             ca_addr += 1;
             idx += 1;
         }
 
-        println!("l{}: {}", source_line_counter, &var.current_line[..]);
+        println!("l{}: {}", source_line_counter, &current_line[..]);
 
-        var.current_line = String::from(trim_left(&var.current_line[..], &whitespace_chars[..]));
-        println!("{}", &var.current_line[..]);
+        current_line = String::from(trim_left(&current_line[..], &whitespace_chars[..]));
+        println!("{}", &current_line[..]);
 
         let mut quote_flag = false;
-        let mut cut_tail_idx = None;
+        let mut _cut_tail_idx = None;
 
         // single-quote comment trimming logic
         // -----------------------------------
         //422
-        cut_tail_idx = var.current_line.find('\'');
-        if cut_tail_idx != None {
+        _cut_tail_idx = current_line.find('\'');
+        if _cut_tail_idx != None {
             //423
-            if var.current_line.contains('"') {
+            if current_line.contains('"') {
                 //424
-                cut_tail_idx = None;
+                _cut_tail_idx = None;
                 //440
-                for (in_line_idx, c) in var.current_line.chars().enumerate() {
+                for (in_line_idx, c) in current_line.chars().enumerate() {
                     //let c = current_line.chars().nth(in_line_idx).unwrap();
                     match c {
                         ':' => quote_flag = !quote_flag,
                         '\'' => if !quote_flag {
-                            cut_tail_idx = Some(in_line_idx);
+                            _cut_tail_idx = Some(in_line_idx);
                             break;    
                         },
                         _ => (),
@@ -201,29 +192,29 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 }
             }
             //540
-            if cut_tail_idx != None {
-                var.current_line = String::from(&var.current_line[..cut_tail_idx.unwrap()]);
+            if _cut_tail_idx != None {
+                current_line = String::from(&current_line[.._cut_tail_idx.unwrap()]);
             }
         }
         //println!("'{}'", &current_line[..]);
 
         //560-580
-        if var.current_line.len() > 0 {
-            var.current_line = String::from(trim_right(&var.current_line[..], &whitespace_chars[..]));
+        if current_line.len() > 0 {
+            current_line = String::from(trim_right(&current_line[..], &whitespace_chars[..]));
             //println!("'{}'", &current_line[..]);
         }
 
         //585
-        if var.current_line.len() > 0 {
+        if current_line.len() > 0 {
             // dl = delete_line_flag
-            var.delete_line_flag = false;
-            if var.verbose {
-                println!(">> {} {} {}", post_proc_line_counter, source_line_counter, &var.current_line[..]);
+            delete_line_flag = false;
+            if verbose {
+                println!(">> {} {} {}", _post_proc_line_counter, source_line_counter, &current_line[..]);
                 // 600
-                if (&var.current_line[..1]).eq(".") {
+                if (&current_line[..1]).eq(".") {
                     println!("dot!");
-                    next_line_flag = true;
-                    parse_label(&mut var);
+                    _next_line_flag = true;
+                    parse_label(verbose, &current_line, pp_line, &mut delete_line_flag, &mut labels);
                 }
             }
         }
@@ -236,13 +227,13 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 }
 
 // 1500
-fn parse_label<'a>(var: &'a mut GlobalVars<'a>)
+fn parse_label(verbose: bool, current_line: &String, pp_line: u16, delete_line_flag: &mut bool, labels: &mut Vec<Label>)
 {
-    if var.verbose {
-        println!("label {} at pp_line {}", &var.current_line[..], var.pp_line);
+    if verbose {
+        println!("label {} at pp_line {}", &(*current_line)[..], pp_line);
     }
-    var.delete_line_flag = true;
-    var.labels.push(Label {name: &(var.current_line[1..]), pp_line: var.pp_line + 1});
+    *delete_line_flag = true;
+    (*labels).push(Label {name: String::from(&((*current_line)[1..])), pp_line: pp_line + 1});
 }
 
 
@@ -268,13 +259,13 @@ fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
     &line[..((i+1) as usize)]
 }
 
-fn prepare_test_memory(var: &mut GlobalVars) {
+fn prepare_test_memory(verbose: &mut bool) {
     // turn on verbose flag
     // (in memory doesn't work yet, as I'd have to put dummy info into 0x4ff00 to be parsed by get_filename()
     // unsafe { lpoke(0x4ff07u32, 0x08u8); }
 
     // so for now, just hardcode the flag
-    var.verbose = true;
+    *verbose = true;
 
     let data: [u8;97] = [
         0x08, 0x00, 0x0f, 0x23, 0x4f, 0x55, 0x54, 0x50, 0x55, 0x54, 0x20, 0x22, 0x48, 0x45, 0x4c, 0x4c,
@@ -291,7 +282,7 @@ fn prepare_test_memory(var: &mut GlobalVars) {
     }
 }
 
-fn get_filename(var: &mut GlobalVars) -> String {
+fn get_filename(verbose: &mut bool) -> String {
     let mut filename = String::new();
     let mut addr: u32 = 0x4ff00;
     // 7020 bank 4:ba=dec("ff00")
@@ -300,8 +291,8 @@ fn get_filename(var: &mut GlobalVars) -> String {
     lpeek(addr+1) == 75 /* 'k' */
     {
         // 7040   vb=peek(dec("ff07"))and8
-        var.verbose = lpeek(0x4ff07u32) & 8 == 8;
-        if var.verbose {
+        *verbose = lpeek(0x4ff07u32) & 8 == 8;
+        if *verbose {
             println!("verbose");
         }
         // 7050   f$="":a=ba+16:dowhilepeek(a)<>0:f$=f$+chr$(peek(a)):a=a+1:loop:
