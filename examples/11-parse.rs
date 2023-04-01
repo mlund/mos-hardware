@@ -84,7 +84,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     // li$() = processed_lines
     // NOTE: Seems like rust chokes if this is too large?
-    let _processed_lines: Vec<String> = Vec::with_capacity(500);
+    let _processed_lines: Vec<String> = Vec::with_capacity(200);
 
     set_lower_case();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
@@ -283,6 +283,7 @@ fn prepare_test_memory(verbose: &mut bool) {
 }
 
 fn get_filename(verbose: &mut bool) -> String {
+    println!("get-filename");
     let mut filename = String::new();
     let mut addr: u32 = 0x4ff00;
     // 7020 bank 4:ba=dec("ff00")
