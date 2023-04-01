@@ -5,22 +5,234 @@
 extern crate alloc;
 extern crate mos_alloc;
 
+use alloc::string::ToString;
 use alloc::{string::String, vec::Vec};
 use core::panic::PanicInfo;
-use mos_hardware::mega65::set_lower_case;
+use core::str::FromStr;
 use mos_hardware::mega65::lpeek;
+use mos_hardware::mega65::set_lower_case;
 //use mos_hardware::mega65::libc::cputs;
-use mos_hardware::mega65::lpoke;
 use mos_hardware::mega65::libc::mega65_fast;
+use mos_hardware::mega65::lpoke;
 
 use ufmt_stdio::*;
 
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
+/// pf$ = type_suffix
+const _TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
+
+/// as at writing, rust doesn't allow for-loops in compile-time evaluation, hence the while-loop
+const BIN_CONV: [u16; 16] = {
+    let mut arr = [0; 16];
+    arr[0] = 1;
+    let mut i = 1;
+    while i < 16 {
+        arr[i] = arr[i - 1] * 2;
+        i += 1;
+    }
+    arr
+};
+
+// rw$
+const _TOKENS: [&str; 190] = [
+    "print",
+    "input",
+    "if",
+    "then",
+    "else",
+    "do",
+    "loop",
+    "while",
+    "until",
+    "gosub",
+    "goto",
+    "open",
+    "close",
+    "dopen",
+    "dclose",
+    "for",
+    "next",
+    "getkey",
+    "hex$",
+    "dim",
+    "peek",
+    "poke",
+    "wait",
+    "dec",
+    "chr$",
+    "asc",
+    "sgn",
+    "sqr",
+    "graphic",
+    "clr",
+    "screen",
+    "def",
+    "begin",
+    "bend",
+    "len",
+    "mid$",
+    "right$",
+    "left$",
+    "instr",
+    "for",
+    "next",
+    "step",
+    "trap",
+    "border",
+    "and",
+    "foreground",
+    "background",
+    "set",
+    "abs",
+    "sin",
+    "cos",
+    "tan",
+    "log",
+    "fre",
+    "cursor",
+    "pixel",
+    "window",
+    "rwindow",
+    "line",
+    "box",
+    "circle",
+    "ellipse",
+    "palette",
+    "restore",
+    "data",
+    "err$",
+    "er",
+    "el",
+    "cursor",
+    "on",
+    "off",
+    "val",
+    "scratch",
+    "return",
+    "rnd",
+    "stop",
+    "bank",
+    "ti",
+    "do",
+    "or",
+    "st",
+    "if",
+    "el",
+    "er",
+    "on",
+    "to",
+    "pen",
+    "get",
+    "end",
+    "int",
+    "not",
+    "ds",
+    "run",
+    "using",
+    "append",
+    "atn",
+    "auto",
+    "backup",
+    "bload",
+    "boot",
+    "bsave",
+    "bump",
+    "bverify",
+    "catalog",
+    "change",
+    "char",
+    "cmd",
+    "collision",
+    "color",
+    "concat",
+    "cont",
+    "copy",
+    "wpoke",
+    "wpeek",
+    "setbit",
+    "dclear",
+    "deffn",
+    "delete",
+    "fn",
+    "dir",
+    "disk",
+    "dload",
+    "dma",
+    "dmode",
+    "dpat",
+    "dsave",
+    "dverify",
+    "edma",
+    "envelope",
+    "erase",
+    "exit",
+    "exp",
+    "fast",
+    "filter",
+    "find",
+    "go64",
+    "header",
+    "help",
+    "highlight",
+    "joy",
+    "list",
+    "load",
+    "locate",
+    "lpen",
+    "mod",
+    "monitor",
+    "mouse",
+    "movspr",
+    "new",
+    "paint",
+    "play",
+    "pointer",
+    "polygon",
+    "pos",
+    "pot",
+    "pudef",
+    "rclr",
+    "rdot",
+    "read",
+    "record",
+    "rem",
+    "rename",
+    "resume",
+    "rgraphic",
+    "rmouse",
+    "rplay",
+    "rreg",
+    "rspcolor",
+    "rsppos",
+    "rsprite",
+    "save",
+    "scnclr",
+    "sleep",
+    "slow",
+    "sound",
+    "spc",
+    "sprcolor",
+    "sprite",
+    "sprsav",
+    "sys",
+    "tab",
+    "tempo",
+    "troff",
+    "tron",
+    "type",
+    "usr",
+    "verify",
+    "vol",
+    "xor",
+    "key",
+];
 
 struct Label {
-    name: String, // lb$ = label name
-    pp_line: u16, // ll$ = (post-processed line)
+    /// lb$ = label name
+    name: String,
+    /// ll$ = (post-processed line)
+    pp_line: u16,
 }
 
 /*fn print(s: String) {
@@ -42,39 +254,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut delete_line_flag: bool = false;
     let mut labels: Vec<Label> = Vec::with_capacity(200);
 
-    // rw$
-    let _tokens = ["print", "input", "if", "then", "else", "do", "loop", "while",
-        "until", "gosub", "goto", "open", "close", "dopen", "dclose", "for", "next",
-        "getkey", "hex$", "dim", "peek", "poke", "wait", "dec", "chr$", "asc", "sgn", "sqr",
-        "graphic", "clr", "screen", "def", "begin", "bend", "len", "mid$", "right$", "left$",
-        "instr", "for", "next", "step", "trap", "border", "and", "foreground",
-        "background", "set", "abs", "sin", "cos", "tan", "log", "fre", "cursor", "pixel",
-        "window", "rwindow", "line", "box", "circle", "ellipse", "palette", "restore", "data",
-        "err$", "er", "el", "cursor", "on", "off", "val", "scratch", "return", "rnd", "stop",
-        "bank", "ti", "do", "or", "st", "if", "el", "er", "on", "to", "pen", "get", "end",
-        "int", "not", "ds", "run", "using", "append", "atn", "auto", "backup", "bload", "boot",
-        "bsave", "bump", "bverify", "catalog", "change", "char", "cmd", "collision", "color",
-        "concat", "cont", "copy", "wpoke", "wpeek", "setbit", "dclear", "deffn", "delete", "fn",
-        "dir", "disk", "dload", "dma", "dmode", "dpat", "dsave", "dverify", "edma", "envelope",
-        "erase", "exit", "exp", "fast", "filter", "find", "go64", "header", "help", "highlight",
-        "joy", "list", "load", "locate", "lpen", "mod", "monitor", "mouse", "movspr", "new",
-        "paint", "play", "pointer", "polygon", "pos", "pot", "pudef", "rclr", "rdot", "read",
-        "record", "rem", "rename", "resume", "rgraphic", "rmouse", "rplay", "rreg", "rspcolor",
-        "rsppos", "rsprite", "save", "scnclr", "sleep", "slow", "sound", "spc", "sprcolor",
-        "sprite", "sprsav", "sys", "tab", "tempo", "troff", "tron", "type", "usr", "verify",
-        "vol", "xor", "key"];
-
     prepare_test_memory(&mut verbose);
-
-    // pf$ = type_suffix
-    let _TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
-
-    // TODO: Convert to `bin_conv` constant evaluation: https://doc.rust-lang.org/reference/const_eval.html
-    let mut bin_conv: [u16; 16] = [0; 16];
-    bin_conv[0] = 1;
-    for x in 1..16 {
-        bin_conv[x] = bin_conv[x-1] * 2;
-    }
 
     // ln%() = map_gen_line_to_orig_line[]
     let _map_gen_line_to_orig_line: [u16; 500] = [0; 500];
@@ -88,17 +268,17 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     set_lower_case();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
-    
+
     //unsafe { cputs("hello".as_ptr()); }
     println!();
-    
+
     // tl$ = tl_string
     let mut _tl_string = String::new(); //String::from("                                                                                ");
-    // bl$ = bl_string
-    //let mut bl_string: String = String::new();
-    //bl_string.push_str(&tl_string[..]);
-    //bl_string.push_str(&tl_string[..]);
-    //bl_string.push_str(&tl_string[..]);
+                                        // bl$ = bl_string
+                                        //let mut bl_string: String = String::new();
+                                        //bl_string.push_str(&tl_string[..]);
+                                        //bl_string.push_str(&tl_string[..]);
+                                        //bl_string.push_str(&tl_string[..]);
 
     // tl_string = String::new();
 
@@ -111,7 +291,9 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     let filename = get_filename(&mut verbose);
 
-    unsafe { mega65_fast(); }
+    unsafe {
+        mega65_fast();
+    }
 
     println!("{}", &filename[..]);
 
@@ -120,17 +302,17 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut _next_line_flag = false;
 
     // wh$ = whitespace_chars
-    let whitespace_chars: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
+    const WHITESPACE_CHARS: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
 
     // clean up temporary files
     // NOTE: sl/source_line_counter and rl/current_line_index serve the same purpose
     // so I will remove 'current_line_index'
-    let mut source_line_counter = 0;    // sl
+    let mut source_line_counter = 0; // sl
     let mut _post_proc_line_counter = 0; // ln
 
     // TODO: 195 clr ti: rem keep start time for timing
-    let cb_addr: u32 = 0x8010000;
-    let mut ca_addr: u32 = cb_addr;
+    const CB_ADDR: u32 = 0x8010000;
+    let mut ca_addr: u32 = CB_ADDR;
 
     println!("PASS 1 ");
 
@@ -138,29 +320,27 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // removing this one, as it's equivalent to sl/soure_line_counter
     //let mut current_line_index = 0;
     // tl = total_lines
-    let mut _total_lines: u16 = 0;
-    _total_lines = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16;
+    let mut _total_lines: u16 = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16;
 
     ca_addr += 2;
 
     pp_line = 0; // ln = index into li$ (current post-processed line)
 
     //200
-    while source_line_counter != _total_lines
-    {
+    while source_line_counter != _total_lines {
         copy_data_to_current_line(&mut ca_addr, &mut current_line);
 
         println!("l{}: {}", source_line_counter, &current_line[..]);
 
         // 340
-        current_line = String::from(trim_left(&current_line[..], &whitespace_chars[..]));
+        current_line = String::from(trim_left(&current_line[..], &WHITESPACE_CHARS[..]));
         println!("{}", &current_line[..]);
 
         single_quote_comment_trim(&mut current_line);
 
         //560-580
         if current_line.len() > 0 {
-            current_line = String::from(trim_right(&current_line[..], &whitespace_chars[..]));
+            current_line = String::from(trim_right(&current_line[..], &WHITESPACE_CHARS[..]));
             //println!("'{}'", &current_line[..]);
         }
 
@@ -169,12 +349,23 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
             // dl = delete_line_flag
             delete_line_flag = false;
             if verbose {
-                println!(">> {} {} {}", _post_proc_line_counter, source_line_counter, &current_line[..]);
+                println!(
+                    ">> {} {} {}",
+                    _post_proc_line_counter,
+                    source_line_counter,
+                    &current_line[..]
+                );
                 // 600
                 if (&current_line[..1]).eq(".") {
                     println!("dot!");
                     _next_line_flag = true;
-                    parse_label(verbose, &current_line, pp_line, &mut delete_line_flag, &mut labels);
+                    parse_label(
+                        verbose,
+                        &current_line,
+                        pp_line,
+                        &mut delete_line_flag,
+                        &mut labels,
+                    );
                 }
             }
         }
@@ -187,80 +378,96 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 }
 
 fn single_quote_comment_trim(current_line: &mut String) {
-    let mut quote_flag = false;
-    let mut _cut_tail_idx = None;
-
     //422
-    _cut_tail_idx = (*current_line).find('\'');
-    if _cut_tail_idx != None {
-        //423
-        if (*current_line).contains('"') {
-            //424
-            _cut_tail_idx = None;
-            //440
-            for (in_line_idx, c) in (*current_line).chars().enumerate() {
-                //let c = (*current_line).chars().nth(in_line_idx).unwrap();
-                match c {
-                    '"' => quote_flag = !quote_flag,
-                    '\'' => if !quote_flag {
-                        _cut_tail_idx = Some(in_line_idx);
-                        break;    
-                    },
-                    _ => (),
+    if current_line.find('\'').is_none() || current_line.find('"').is_none() {
+        return;
+    }
+    //423
+    //424
+    let mut quote_flag = false;
+    let mut cut_tail_idx = None;
+    //440
+    for (in_line_idx, c) in current_line.chars().enumerate() {
+        //let c = (*current_line).chars().nth(in_line_idx).unwrap();
+        match c {
+            '"' => quote_flag = !quote_flag,
+            '\'' => {
+                if !quote_flag {
+                    cut_tail_idx = Some(in_line_idx);
+                    break;
                 }
             }
+            _ => (),
         }
-        //540
-        if _cut_tail_idx != None {
-            *current_line = String::from(&(*current_line)[.._cut_tail_idx.unwrap()]);
-        }
+    }
+    //540
+    if cut_tail_idx.is_some() {
+        *current_line = current_line[..cut_tail_idx.unwrap()].to_string();
     }
     //println!("'{}'", &(*current_line)[..]);
 }
 
+/// @todo: skip `current_line` as argument as it is zeroed
 fn copy_data_to_current_line(ca_addr: &mut u32, current_line: &mut String) {
-    let line_length: u8 = lpeek(*ca_addr) as u8;
-    *ca_addr += 1;
     *current_line = String::new();
     let mut idx: u8 = 0;
-    while idx < line_length {
-        (*current_line).push(lpeek(*ca_addr) as char);
-        *ca_addr += 1;
-        idx += 1;
-    }
+    let line_length = lpeek(*ca_addr) as u32;
+    *ca_addr += 1;
+
+    (*ca_addr..*ca_addr + line_length)
+        .for_each(|address| (*current_line).push(lpeek(address) as char));
+
+    *ca_addr += line_length;
+
+    // while idx < line_length {
+    //     (*current_line).push(lpeek(*ca_addr) as char);
+    //     *ca_addr += 1;
+    //     idx += 1;
+    // }
 }
 
-// 1500
-fn parse_label(verbose: bool, current_line: &String, pp_line: u16, delete_line_flag: &mut bool, labels: &mut Vec<Label>)
-{
+/// Parse a single label and add it to the `labels` vector
+///
+/// ## Note
+///
+///   Original source code: 1500
+///
+/// ## Todo
+///
+/// return the label and let the caller add to `labels`.
+fn parse_label(
+    verbose: bool,
+    current_line: &str,
+    pp_line: u16,
+    delete_line_flag: &mut bool,
+    labels: &mut Vec<Label>,
+) {
     if verbose {
-        println!("label {} at pp_line {}", &(*current_line)[..], pp_line);
+        println!("label {} at pp_line {}", *current_line[..], pp_line);
     }
     *delete_line_flag = true;
-    (*labels).push(Label {name: String::from(&((*current_line)[1..])), pp_line: pp_line + 1});
+    (*labels).push(Label {
+        name: String::from(&((*current_line)[1..])),
+        pp_line: pp_line + 1,
+    });
 }
 
-
-fn trim_left<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
-{
+fn trim_left<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str {
     let mut i = 0;
-
     while i < line.len() && trim_chars.contains(&line.as_bytes()[i]) {
-        i = i + 1;
+        i += 1;
     }
-    
     &line[i..]
 }
 
-fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str
-{
-    let mut i: i16 = (line.len()-1) as i16;
+fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str {
+    let mut i = (line.len() - 1) as i16;
 
     while i >= 0 && trim_chars.contains(&line.as_bytes()[i as usize]) {
         i = i - 1;
     }
-    
-    &line[..((i+1) as usize)]
+
+    &line[..((i + 1) as usize)]
 }
 
 fn prepare_test_memory(verbose: &mut bool) {
@@ -271,19 +478,21 @@ fn prepare_test_memory(verbose: &mut bool) {
     // so for now, just hardcode the flag
     *verbose = true;
 
-    let data: [u8;97] = [
-        0x08, 0x00, 0x0f, 0x23, 0x4f, 0x55, 0x54, 0x50, 0x55, 0x54, 0x20, 0x22, 0x48, 0x45, 0x4c, 0x4c,
-        0x4f, 0x22, 0x00, 0x0a, 0x23, 0x44, 0x45, 0x43, 0x4c, 0x41, 0x52, 0x45, 0x20, 0x58, 0x00, 0x05,
-        0x2e, 0x4d, 0x41, 0x49, 0x4e, 0x11, 0x20, 0x20, 0x46, 0x4f, 0x52, 0x20, 0x58, 0x20, 0x3d, 0x20,
-        0x30, 0x20, 0x54, 0x4f, 0x20, 0x31, 0x35, 0x0b, 0x20, 0x20, 0x20, 0x20, 0x50, 0x52, 0x49, 0x4e,
-        0x54, 0x20, 0x58, 0x1d, 0x20, 0x20, 0x4e, 0x45, 0x58, 0x54, 0x20, 0x58, 0x20, 0x20, 0x20, 0x27,
-        0x20, 0x54, 0x52, 0x41, 0x49, 0x4c, 0x49, 0x4e, 0x47, 0x20, 0x43, 0x4f, 0x4d, 0x4d, 0x45, 0x4e,
-        0x54
+    const DATA: [u8; 97] = [
+        0x08, 0x00, 0x0f, 0x23, 0x4f, 0x55, 0x54, 0x50, 0x55, 0x54, 0x20, 0x22, 0x48, 0x45, 0x4c,
+        0x4c, 0x4f, 0x22, 0x00, 0x0a, 0x23, 0x44, 0x45, 0x43, 0x4c, 0x41, 0x52, 0x45, 0x20, 0x58,
+        0x00, 0x05, 0x2e, 0x4d, 0x41, 0x49, 0x4e, 0x11, 0x20, 0x20, 0x46, 0x4f, 0x52, 0x20, 0x58,
+        0x20, 0x3d, 0x20, 0x30, 0x20, 0x54, 0x4f, 0x20, 0x31, 0x35, 0x0b, 0x20, 0x20, 0x20, 0x20,
+        0x50, 0x52, 0x49, 0x4e, 0x54, 0x20, 0x58, 0x1d, 0x20, 0x20, 0x4e, 0x45, 0x58, 0x54, 0x20,
+        0x58, 0x20, 0x20, 0x20, 0x27, 0x20, 0x54, 0x52, 0x41, 0x49, 0x4c, 0x49, 0x4e, 0x47, 0x20,
+        0x43, 0x4f, 0x4d, 0x4d, 0x45, 0x4e, 0x54,
     ];
 
-    for (idx, byte) in data.iter().enumerate() {
-        unsafe { lpoke(0x8010000u32 + idx as u32, *byte); }
-    }
+    // functional style, yeah!
+    DATA.iter()
+        .copied()
+        .enumerate()
+        .for_each(|(offset, byte)| unsafe { lpoke(0x8010000u32 + offset as u32, byte) });
 }
 
 fn get_filename(verbose: &mut bool) -> String {
@@ -292,9 +501,9 @@ fn get_filename(verbose: &mut bool) -> String {
     let mut addr: u32 = 0x4ff00;
     // 7020 bank 4:ba=dec("ff00")
     // 7030 if peek(ba+0)=asc("s") and peek(ba+1)=asc("k") thenbegin
-    if lpeek(addr) == 83   /* 's' */ &&
-    lpeek(addr+1) == 75 /* 'k' */
-    {
+    const LETTER_S: u8 = 83;
+    const LETTER_K: u8 = 75;
+    if lpeek(addr) == LETTER_S && lpeek(addr + 1) == LETTER_K {
         // 7040   vb=peek(dec("ff07"))and8
         *verbose = lpeek(0x4ff07u32) & 8 == 8;
         if *verbose {
@@ -328,9 +537,8 @@ fn get_filename(verbose: &mut bool) -> String {
     // 7110 poke ba,asc("s"):poke ba+1,asc("k")
     // 7120 forr=1to16:poke ba+8+r-1,asc(mid$(a$,r,1)):nextr
     // 7130 f$=a$
-    // 7140 return   
+    // 7140 return
 }
-
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
