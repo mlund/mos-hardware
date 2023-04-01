@@ -1,6 +1,6 @@
 [package]
 name = "mos-hardware"
-version = "0.1.9"
+version = "0.2.0"
 edition = "2021"
 authors = ["Mikael Lund <lyssky@icloud.com>"]
 homepage = "https://github.com/mlund/mos-hardware"
@@ -46,7 +46,7 @@ ufmt-stdio = "0.3"
 
 [build-dependencies]
 cc = { version = "1.0", optional = true }
-bindgen = { version = "0.63.0", optional = true }
+bindgen = { version = "0.64.0", optional = true }
 
 [features]
 default = ["c64", "cx16", "mega65", "petscii", "vera", "sid", "vic2"]
