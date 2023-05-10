@@ -367,6 +367,14 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                         &mut labels,
                     );
                 }
+                // 601
+                if (&current_line[..1]).eq("#") {
+                    if (*current_line).find("ifdef") = Some(2) {
+                        let def_str = &current_line[7..];
+                        check_if_define_exists(def_str);
+                        delete_line_flag = true;
+                    }
+                }
             }
         }
 
