@@ -369,7 +369,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 }
                 // 601
                 if (&current_line[..1]).eq("#") {
-                    if (*current_line).find("ifdef") = Some(2) {
+                    let index = (*current_line).find("ifdef");
+                    if let Some(i) = index {
                         let def_str = &current_line[7..];
                         check_if_define_exists(def_str);
                         delete_line_flag = true;
@@ -383,6 +384,10 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     }
 
     0
+}
+
+fn check_if_define_exists(def_str: &str) {
+
 }
 
 fn single_quote_comment_trim(current_line: &mut String) {
@@ -451,7 +456,7 @@ fn parse_label(
     labels: &mut Vec<Label>,
 ) {
     if verbose {
-        println!("label {} at pp_line {}", *current_line[..], pp_line);
+        println!("label {} at pp_line {}", current_line[..], pp_line);
     }
     *delete_line_flag = true;
     (*labels).push(Label {
@@ -486,21 +491,38 @@ fn prepare_test_memory(verbose: &mut bool) {
     // so for now, just hardcode the flag
     *verbose = true;
 
-    const DATA: [u8; 97] = [
-        0x08, 0x00, 0x0f, 0x23, 0x4f, 0x55, 0x54, 0x50, 0x55, 0x54, 0x20, 0x22, 0x48, 0x45, 0x4c,
-        0x4c, 0x4f, 0x22, 0x00, 0x0a, 0x23, 0x44, 0x45, 0x43, 0x4c, 0x41, 0x52, 0x45, 0x20, 0x58,
-        0x00, 0x05, 0x2e, 0x4d, 0x41, 0x49, 0x4e, 0x11, 0x20, 0x20, 0x46, 0x4f, 0x52, 0x20, 0x58,
-        0x20, 0x3d, 0x20, 0x30, 0x20, 0x54, 0x4f, 0x20, 0x31, 0x35, 0x0b, 0x20, 0x20, 0x20, 0x20,
-        0x50, 0x52, 0x49, 0x4e, 0x54, 0x20, 0x58, 0x1d, 0x20, 0x20, 0x4e, 0x45, 0x58, 0x54, 0x20,
-        0x58, 0x20, 0x20, 0x20, 0x27, 0x20, 0x54, 0x52, 0x41, 0x49, 0x4c, 0x49, 0x4e, 0x47, 0x20,
-        0x43, 0x4f, 0x4d, 0x4d, 0x45, 0x4e, 0x54,
+    const STRDATA: [&str; 8] = [
+        "#output \"hello\"",
+        "",
+        "#declare x",
+        "",
+        ".main",
+        "  for x = 0 to 15",
+        "    print x",
+        "  next x   ' trailing comment"
     ];
 
+    // write number of lines
+    unsafe { lpoke(0x8010000u32, (STRDATA.len() & 0xff) as u8) }
+    unsafe { lpoke(0x8010001u32, ((STRDATA.len() >> 8) & 0xff) as u8) }
+
+    let mut offset = 2 as u32;
+
     // functional style, yeah!
-    DATA.iter()
+    STRDATA.iter()
         .copied()
         .enumerate()
-        .for_each(|(offset, byte)| unsafe { lpoke(0x8010000u32 + offset as u32, byte) });
+        .for_each(|(lineno, line)|{
+            unsafe { lpoke(0x8010000u32 + offset, line.len() as u8)};
+            offset += 1;
+            for c in line.chars() {
+                let mut cc: u8 = c as u8;
+                if (cc >= 0x41 && cc <= 0x5a) || (cc >= 0x61u8 && cc <= 0x7au8) {
+                    cc ^= 0x20; // toggle bit 5 to swap upper/lower case between ASCII and PETSCII
+                }
+                unsafe { lpoke(0x8010000u32 + offset, cc) };
+                offset += 1;
+            }});
 }
 
 fn get_filename(verbose: &mut bool) -> String {
