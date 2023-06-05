@@ -17,6 +17,8 @@ use mos_hardware::mega65::lpoke;
 
 use ufmt_stdio::*;
 
+const MAX_CAP: usize = 20;
+
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
 /// pf$ = type_suffix
@@ -261,7 +263,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut pp_line: u16 = 0;
     let mut delete_line_flag: bool = false;
     let mut inside_ifdef: bool = false;
-    let mut labels: Vec<Label> = Vec::with_capacity(200);
+    let mut labels: Vec<Label> = Vec::with_capacity(MAX_CAP);
+    let mut argument_list: Vec<String> = Vec::with_capacity(MAX_CAP);
 
     prepare_test_memory(&mut verbose);
 
@@ -269,15 +272,14 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let _map_gen_line_to_orig_line: [u16; 500] = [0; 500];
 
     set_lower_case();
-    println!("testing TESTING 1, 2, 3...");
 
     // li$() = processed_lines
     // NOTE: Seems like rust chokes if this is too large?
-    let _processed_lines: Vec<String> = Vec::with_capacity(200);
+    let _processed_lines: Vec<String> = Vec::with_capacity(MAX_CAP);
     // dim ec(4) = element_count per type
     let mut element_count: [u16; 5] = [ 0; 5 ];
     // dim vt$(4,200) = var_table per type
-    let mut var_table: [[&str; 200]; 5] = [[""; 200]; 5];
+    let mut var_table: [[&str; MAX_CAP]; 5] = [[""; MAX_CAP]; 5];
 
     set_lower_case();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
@@ -399,19 +401,84 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     0
 }
 
+fn index_of(line: &str, token: &str) -> i16 {
+    if let Some(index) = (*line).find(token) {
+        //println!("found {} at {}!", token, index);
+        return index as i16;
+    }
+    //println!("cOULDN'T FIND '{}' in '{}'", token, line);
+    return -1;
+}
+
 // 603 - 607
 fn parse_preprocessor_directive(
     current_line: &str,
     delete_line_flag: &mut bool,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: [[&str; 200]; 5]
+    var_table: [[&str; MAX_CAP]; 5]
 ) {
-    let index = (*current_line).find("ifdef");
-    if let Some(_i) = index {
+    if index_of(current_line, "IFDEF") == 1 {
+        // println!("** ifdef!");
         let def_str = &current_line[7..];
         check_if_define_exists(def_str, inside_ifdef, element_count, var_table);
         *delete_line_flag = true;
+    }
+    if index_of(current_line, "ENDIF") == 1 {
+        //println!("** endif!");
+        *inside_ifdef = false;
+        *delete_line_flag = true;
+    }
+    if index_of(current_line, "DEFINE") == 1 {
+        println!("** define!");
+        declare_var(&current_line[8..], true);
+    }
+}
+
+// line 1000 - rem declare var(s) in s$
+fn declare_var(var: &str, is_define: bool) {
+    println!("new var! {}", var);
+    parse_args(str, ",;", true);
+}
+
+// line 2100
+fn parse_args(s: &str, delimiter: &str, parse_brackets: bool) {
+    let mut argument_count = 0;
+    let mut remaining_string = s.to_string();
+    let string_length = remaining_string.len();
+    let mut inside_group = false;
+
+    if string_length == 0 {
+        argument_count = -1;
+        return (argument_list, argument_count); // no string
+    }
+    for i in 0..31 {
+        argument_list[i] = String::new();
+    }
+
+    let mut i = 0;
+    while i < string_length {
+        let b = remaining_string.chars().nth(i).unwrap().to_string();
+
+        if b == "(" && parse_brackets == true {
+            inside_group = true;
+        }
+
+        if b == ")" && parse_brackets == true {
+            inside_group = false;
+        }
+
+        if delimiter.contains(&b) && inside_group == false {
+            let mut current_arg = argument_list[argument_count as usize].clone();
+            current_arg = current_arg.trim().to_string();
+            argument_list[argument_count as usize] = current_arg;
+            argument_count += 1;
+        } else {
+            let current_arg = &mut argument_list[argument_count as usize];
+            current_arg.push_str(&b);
+        }
+
+        i += 1;
     }
 }
 
@@ -420,7 +487,7 @@ fn check_if_define_exists(
     def_str: &str,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: [[&str; 200]; 5]
+    var_table: [[&str; MAX_CAP]; 5]
 ) {
     *inside_ifdef = true;
     for k in 0..element_count[VarType::Define as usize] {
@@ -532,7 +599,7 @@ fn prepare_test_memory(verbose: &mut bool) {
     // so for now, just hardcode the flag
     *verbose = true;
 
-    const STRDATA: [&str; 12] = [
+    const STRDATA: [&str; 8] = [
         "#output \"hello\"",
         "",
         "#declare x",
@@ -541,10 +608,10 @@ fn prepare_test_memory(verbose: &mut bool) {
         "#ifdef z",
         "  print z",
         "#endif",
-        ".main",
+/*        ".main",
         "  for x = 0 to 15",
         "    print x",
-        "  next x   ' trailing comment"
+        "  next x   ' trailing comment" */
     ];
 
     // write number of lines
