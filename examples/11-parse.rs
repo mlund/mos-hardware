@@ -22,6 +22,14 @@ const RVS_OFF: &str = "\u{0092}";
 /// pf$ = type_suffix
 const _TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
 
+enum VarType {
+    Float = 0,
+    Int = 1,
+    String = 2,
+    Ref = 3,
+    Define = 4
+}
+
 /// as at writing, rust doesn't allow for-loops in compile-time evaluation, hence the while-loop
 const BIN_CONV: [u16; 16] = {
     let mut arr = [0; 16];
@@ -252,6 +260,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut verbose = true;
     let mut pp_line: u16 = 0;
     let mut delete_line_flag: bool = false;
+    let mut inside_ifdef: bool = false;
     let mut labels: Vec<Label> = Vec::with_capacity(200);
 
     prepare_test_memory(&mut verbose);
@@ -265,6 +274,10 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // li$() = processed_lines
     // NOTE: Seems like rust chokes if this is too large?
     let _processed_lines: Vec<String> = Vec::with_capacity(200);
+    // dim ec(4) = element_count per type
+    let mut element_count: [u16; 5] = [ 0; 5 ];
+    // dim vt$(4,200) = var_table per type
+    let mut var_table: [[&str; 200]; 5] = [[""; 200]; 5];
 
     set_lower_case();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
@@ -369,12 +382,12 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 }
                 // 601
                 if (&current_line[..1]).eq("#") {
-                    let index = (*current_line).find("ifdef");
-                    if let Some(i) = index {
-                        let def_str = &current_line[7..];
-                        check_if_define_exists(def_str);
-                        delete_line_flag = true;
-                    }
+                    parse_preprocessor_directive(
+                        &current_line,
+                        &mut delete_line_flag,
+                        &mut inside_ifdef,
+                        &mut element_count,
+                        var_table);
                 }
             }
         }
@@ -386,8 +399,36 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     0
 }
 
-fn check_if_define_exists(def_str: &str) {
+// 603 - 607
+fn parse_preprocessor_directive(
+    current_line: &str,
+    delete_line_flag: &mut bool,
+    inside_ifdef: &mut bool,
+    element_count: &mut [u16; 5],
+    var_table: [[&str; 200]; 5]
+) {
+    let index = (*current_line).find("ifdef");
+    if let Some(_i) = index {
+        let def_str = &current_line[7..];
+        check_if_define_exists(def_str, inside_ifdef, element_count, var_table);
+        *delete_line_flag = true;
+    }
+}
 
+// 9210
+fn check_if_define_exists(
+    def_str: &str,
+    inside_ifdef: &mut bool,
+    element_count: &mut [u16; 5],
+    var_table: [[&str; 200]; 5]
+) {
+    *inside_ifdef = true;
+    for k in 0..element_count[VarType::Define as usize] {
+        if var_table[VarType::Define as usize][k as usize] == def_str {
+            *inside_ifdef = false;
+            return;
+        }
+    }
 }
 
 fn single_quote_comment_trim(current_line: &mut String) {
@@ -491,11 +532,15 @@ fn prepare_test_memory(verbose: &mut bool) {
     // so for now, just hardcode the flag
     *verbose = true;
 
-    const STRDATA: [&str; 8] = [
+    const STRDATA: [&str; 12] = [
         "#output \"hello\"",
         "",
         "#declare x",
         "",
+        "#define z=1",
+        "#ifdef z",
+        "  print z",
+        "#endif",
         ".main",
         "  for x = 0 to 15",
         "    print x",
