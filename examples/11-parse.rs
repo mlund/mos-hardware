@@ -438,6 +438,10 @@ fn parse_preprocessor_directive(
         println!("** define!");
         declare_var(&current_line[8..], true, argument_list);
     }
+    if index_of(current_line, "DECLARE") == 1 {
+        println!("** declare!");
+        declare_var(&current_line[9..], false, argument_list);
+    }
 }
 
 // line 1000 - rem declare var(s) in s$
@@ -447,6 +451,17 @@ fn declare_var(
     argument_list: &mut Vec<String>) {
     println!("new var! {}", varline);
     parse_args(varline, ",;", true, argument_list);
+
+    if argument_list.len() == 0 {
+        println!("?DECLARE PARAMETER MISSING IN LINE ..."); // {}", source_line_counter);
+        // TODO: need to do goto 1800
+        return;
+    }
+
+    // lines 1030 - 1120
+    for arg in argument_list {
+
+    }
 }
 
 // line 2100
@@ -471,17 +486,19 @@ fn parse_args(
     let mut i = 0;
     while i < string_length {
         let b = remaining_string.chars().nth(i).unwrap().to_string();
+        println!("chr={}", b[..]);
 
         if b == "(" && parse_brackets == true {
+            println!("inside!");
             inside_group = true;
         }
 
         if b == ")" && parse_brackets == true {
+            println!("outside!");
             inside_group = false;
         }
 
         if delimiter.contains(&b) && inside_group == false {
-            
             //(*argument_list).push(String::from(trim_all(&b[..], &SPACE_CHAR_ONLY)));
             let mut current_arg = argument_list[argument_count as usize].clone();
             trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
