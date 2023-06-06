@@ -266,6 +266,9 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut labels: Vec<Label> = Vec::with_capacity(MAX_CAP);
     let mut argument_list: Vec<String> = Vec::with_capacity(MAX_CAP);
 
+    // after expanding memory via 'link.ld', I needed to print something
+    // very early, otherwise it would freeze up for some reason...
+
     prepare_test_memory(&mut verbose);
 
     // ln%() = map_gen_line_to_orig_line[]
@@ -653,6 +656,7 @@ fn prepare_test_memory(verbose: &mut bool) {
                 }
                 unsafe { lpoke(0x8010000u32 + offset, cc) };
                 offset += 1;
+                //println!("start up!");
             }});
 }
 

@@ -65,6 +65,7 @@ fn main() {
             "src/mega65/libc/conio.c",
             "src/mega65/libc/debug.c",
             "src/mega65/libc/dirent.s",
+            "src/mega65/libc/unmap-basic.S",
             "src/mega65/libc/example.c",
             "src/mega65/libc/fat32.c",
             "src/mega65/libc/fileio.s",
@@ -80,5 +81,6 @@ fn main() {
         .flag("-mcpu=mos65c02")
         .flag("-w")
         .flag("-Os")
+        .flag("-T link.ld")
         .compile("mega65libc");
 }
