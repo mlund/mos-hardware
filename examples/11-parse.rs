@@ -485,6 +485,7 @@ fn parse_args(
             //(*argument_list).push(String::from(trim_all(&b[..], &SPACE_CHAR_ONLY)));
             let mut current_arg = argument_list[argument_count as usize].clone();
             trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
+            println!("arg={}", current_arg[..]);
             argument_list[argument_count as usize] = current_arg;
             argument_count += 1;
         } else if argument_count >= argument_list.len() {
@@ -497,6 +498,11 @@ fn parse_args(
 
         i += 1;
     }
+
+    let mut last_arg: String = argument_list[argument_count as usize].clone();
+    trim_all(&mut last_arg, &SPACE_CHAR_ONLY);
+    println!("lastarg={}", last_arg[..]);
+    argument_list[argument_count as usize] = last_arg;
 }
 
 // 9210
@@ -621,7 +627,7 @@ fn prepare_test_memory(verbose: &mut bool) {
     // so for now, just hardcode the flag
     *verbose = true;
 
-    const STRDATA: [&str; 8] = [
+    const STRDATA: [&str; 9] = [
         "#output \"hello\"",
         "",
         "#declare x",
@@ -630,6 +636,7 @@ fn prepare_test_memory(verbose: &mut bool) {
         "#ifdef z",
         "  print z",
         "#endif",
+        "#declare v1$(15)"
 /*        ".main",
         "  for x = 0 to 15",
         "    print x",
@@ -656,7 +663,6 @@ fn prepare_test_memory(verbose: &mut bool) {
                 }
                 unsafe { lpoke(0x8010000u32 + offset, cc) };
                 offset += 1;
-                //println!("start up!");
             }});
 }
 
