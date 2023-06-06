@@ -389,7 +389,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                         &mut delete_line_flag,
                         &mut inside_ifdef,
                         &mut element_count,
-                        var_table);
+                        var_table,
+                        &mut argument_list);
                 }
             }
         }
@@ -416,7 +417,8 @@ fn parse_preprocessor_directive(
     delete_line_flag: &mut bool,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: [[&str; MAX_CAP]; 5]
+    var_table: [[&str; MAX_CAP]; 5],
+    argument_list: &mut Vec<String>
 ) {
     if index_of(current_line, "IFDEF") == 1 {
         // println!("** ifdef!");
@@ -431,29 +433,36 @@ fn parse_preprocessor_directive(
     }
     if index_of(current_line, "DEFINE") == 1 {
         println!("** define!");
-        declare_var(&current_line[8..], true);
+        declare_var(&current_line[8..], true, argument_list);
     }
 }
 
 // line 1000 - rem declare var(s) in s$
-fn declare_var(var: &str, is_define: bool) {
-    println!("new var! {}", var);
-    parse_args(str, ",;", true);
+fn declare_var(
+    varline: &str,
+    is_define: bool,
+    argument_list: &mut Vec<String>) {
+    println!("new var! {}", varline);
+    parse_args(varline, ",;", true, argument_list);
 }
 
 // line 2100
-fn parse_args(s: &str, delimiter: &str, parse_brackets: bool) {
-    let mut argument_count = 0;
+fn parse_args(
+    s: &str,
+    delimiter: &str,
+    parse_brackets: bool,
+    argument_list: &mut Vec<String> ) {
+
     let mut remaining_string = s.to_string();
+    let mut argument_count = 0;
     let string_length = remaining_string.len();
     let mut inside_group = false;
+    const SPACE_CHAR_ONLY: [u8; 1] = [32];
+
+    (*argument_list) = Vec::with_capacity(MAX_CAP);
 
     if string_length == 0 {
-        argument_count = -1;
-        return (argument_list, argument_count); // no string
-    }
-    for i in 0..31 {
-        argument_list[i] = String::new();
+        return; // no string
     }
 
     let mut i = 0;
@@ -469,10 +478,15 @@ fn parse_args(s: &str, delimiter: &str, parse_brackets: bool) {
         }
 
         if delimiter.contains(&b) && inside_group == false {
+            
+            //(*argument_list).push(String::from(trim_all(&b[..], &SPACE_CHAR_ONLY)));
             let mut current_arg = argument_list[argument_count as usize].clone();
-            current_arg = current_arg.trim().to_string();
+            trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
             argument_list[argument_count as usize] = current_arg;
             argument_count += 1;
+        } else if argument_count >= argument_list.len() {
+            let current_arg = String::from(b);
+            argument_list.push(current_arg);
         } else {
             let current_arg = &mut argument_list[argument_count as usize];
             current_arg.push_str(&b);
@@ -589,6 +603,11 @@ fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str {
     }
 
     &line[..((i + 1) as usize)]
+}
+
+fn trim_all(line: &mut String, trim_chars: &[u8]) {
+    *line = String::from(trim_left(&line[..], trim_chars));
+    *line = String::from(trim_right(&line[..], trim_chars));
 }
 
 fn prepare_test_memory(verbose: &mut bool) {
