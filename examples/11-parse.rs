@@ -448,7 +448,8 @@ fn parse_preprocessor_directive(
 fn declare_var(
     varline: &str,
     is_define: bool,
-    argument_list: &mut Vec<String>) {
+    argument_list: &mut Vec<String>
+) {
     println!("new var! {}", varline);
     parse_args(varline, ",;", true, argument_list);
 
@@ -460,7 +461,43 @@ fn declare_var(
 
     // lines 1030 - 1120
     for arg in argument_list {
+        let mut dimension: String = String::new();
 
+        let open_bkt_pos = arg.find('('); // b1
+        let close_bkt_pos = arg.find(')'); // b2
+        let equals_pos = arg.find('='); // eq
+
+        if let Some(eq_idx) = equals_pos {
+            // --- assignment ---
+            let mut rhs = arg.split_off(eq_idx + 1);
+            let mut lhs = arg[..eq_idx - 1]..clone();
+            trim_left(&mut lhs, WHITESPACE_CHARS);
+    
+            trim_right(&mut rhs, WHITESPACE_CHARS);
+    
+            if rhs.starts_with("$") {
+                let hx = &rhs[1..];
+                convert_hex(&mut hx.to_owned());
+                rhs = hx;
+            }
+    
+            if rhs.starts_with("%") {
+                let bi = &rhs[1..];
+                convert_binary(&mut bi.to_owned());
+                rhs = bi;
+            }
+        }
+    
+        // 1050 - 1060
+        if let (Some(opn_bkt_idx), Some(close_bkt_idx)) = (open_bkt_pos, close_bkt_pos) {
+            // --- dimension ---
+            dimension = arg[opn_bkt_idx + 1..close_bkt_idx].to_owned();
+            arg = arg[..opn_bkt_idx - 1].clone();
+    
+            replace_vars_and_labels_in_source_string(&mut dimension);
+    
+            delete_line_flag = 0;
+        }
     }
 }
 
