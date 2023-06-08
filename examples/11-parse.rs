@@ -265,6 +265,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut inside_ifdef: bool = false;
     let mut labels: Vec<Label> = Vec::with_capacity(MAX_CAP);
     let mut argument_list: Vec<String> = Vec::with_capacity(MAX_CAP);
+    let mut define_values: Vec<String> = Vec::with_capacity(MAX_CAP);
 
     // after expanding memory via 'link.ld', I needed to print something
     // very early, otherwise it would freeze up for some reason...
@@ -466,11 +467,13 @@ fn declare_var(
         let open_bkt_pos = arg.find('('); // b1
         let close_bkt_pos = arg.find(')'); // b2
         let equals_pos = arg.find('='); // eq
+        let mut rhs = String::new();    // vl$
+        let mut lhs = String::new();    // p$
 
         if let Some(eq_idx) = equals_pos {
             // --- assignment ---
-            let mut rhs = arg.split_off(eq_idx + 1);
-            let mut lhs = arg[..eq_idx - 1]..clone();
+            rhs = arg.split_off(eq_idx + 1);
+            lhs = arg[..eq_idx - 1]..clone();
             trim_left(&mut lhs, WHITESPACE_CHARS);
     
             trim_right(&mut rhs, WHITESPACE_CHARS);
@@ -498,6 +501,70 @@ fn declare_var(
     
             delete_line_flag = 0;
         }
+
+        let mut var_type = VarType::Float; // var type
+        let t = p.chars().rev().next();
+        if verbose {
+            print!("adding {rvon}");
+        }
+    
+        let mut t_str = String::new();
+        if let Some(t_char) = t {
+            t_str.push(t_char);
+        }
+    
+        if !t_str.contains(&"%&$") {
+            t_str = String::new();
+            var_type = VarType::Float;
+        }
+
+        if delete_line_flag == true {
+            var_type = VarType::Define;
+        }
+    
+        if t_str == "%" {
+            var_type = VarType::Int;
+        }
+    
+        if t_str == "$" {
+            var_type = VarType::String;
+        }
+    
+        if t_str == "&" {
+            var_type = VarType::Ref;
+        }
+            
+        // 1074
+        var_table[var_type][element_count[var_type]] = arg.clone();
+
+        let var_name: String = String::new();
+
+        if !dimension.is_empty() {
+            let id = element_count[var_type];
+            generate_varname_from_index(&mut var_name, var_type);
+            if delete_line_flag == false {
+                // nl$ = next_line
+                next_line.push_str(&format!("dim {}{}({}):", var_name, t_str, dimension));
+            }
+        }
+    
+        if !vl.is_empty() {
+            let id = element_count[var_type];
+            generate_varname_from_index(&mut var_name);
+            if delete_line_flag == false {
+                next_line.push_str(&format!("{}{}={}:", var_name, t_str, rhs));
+            }
+        }
+    
+        if delete_line_flag == true {
+            define_values[element_count[var_type]] = rhs.clone();
+        }
+    
+        if verbose {
+            print!("{}{{rvof}}: {}", arg, element_count[var_type]);
+        }
+    
+        element_count[var_type] += 1;
     }
 }
 
