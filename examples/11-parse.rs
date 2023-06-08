@@ -7,6 +7,7 @@ extern crate mos_alloc;
 
 use alloc::string::ToString;
 use alloc::{string::String, vec::Vec};
+use alloc::format;
 use core::panic::PanicInfo;
 use core::str::FromStr;
 use mos_hardware::mega65::lpeek;
@@ -43,6 +44,9 @@ const BIN_CONV: [u16; 16] = {
     }
     arr
 };
+
+// wh$ = whitespace_chars
+const WHITESPACE_CHARS: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
 
 // rw$
 const _TOKENS: [&str; 190] = [
@@ -259,6 +263,7 @@ struct Label {
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut current_line = String::new();
+    let mut next_line = String::new();
     let mut verbose = true;
     let mut pp_line: u16 = 0;
     let mut delete_line_flag: bool = false;
@@ -319,9 +324,6 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // ------------------- pass 1 ---------------
     // nl = next_line_flag
     let mut _next_line_flag = false;
-
-    // wh$ = whitespace_chars
-    const WHITESPACE_CHARS: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
 
     // clean up temporary files
     // NOTE: sl/source_line_counter and rl/current_line_index serve the same purpose
@@ -390,11 +392,14 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 if (&current_line[..1]).eq("#") {
                     parse_preprocessor_directive(
                         &current_line,
+                        &mut next_line,
                         &mut delete_line_flag,
                         &mut inside_ifdef,
                         &mut element_count,
                         var_table,
-                        &mut argument_list);
+                        &mut define_values,
+                        &mut argument_list,
+                        verbose);
                 }
             }
         }
@@ -418,11 +423,14 @@ fn index_of(line: &str, token: &str) -> i16 {
 // 603 - 607
 fn parse_preprocessor_directive(
     current_line: &str,
+    next_line: &mut String,
     delete_line_flag: &mut bool,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
     var_table: [[&str; MAX_CAP]; 5],
-    argument_list: &mut Vec<String>
+    define_values: &mut Vec<String>,
+    argument_list: &mut Vec<String>,
+    verbose: bool
 ) {
     if index_of(current_line, "IFDEF") == 1 {
         // println!("** ifdef!");
@@ -437,19 +445,36 @@ fn parse_preprocessor_directive(
     }
     if index_of(current_line, "DEFINE") == 1 {
         println!("** define!");
-        declare_var(&current_line[8..], true, argument_list);
+        declare_var(&current_line[8..], &mut var_table,
+            &mut element_count,
+            current_line, &mut next_line,
+            false, &mut define_values, 
+            argument_list,
+            &mut delete_line_flag, verbose);
     }
     if index_of(current_line, "DECLARE") == 1 {
         println!("** declare!");
-        declare_var(&current_line[9..], false, argument_list);
+        declare_var(&current_line[9..], &mut var_table,
+            &mut element_count,
+            &mut current_line, &mut next_line,
+            false, &mut define_values, 
+            argument_list,
+            &mut delete_line_flag, verbose);
     }
 }
 
 // line 1000 - rem declare var(s) in s$
 fn declare_var(
     varline: &str,
+    var_table:  &mut [[&str; MAX_CAP]; 5],
+    element_count: &mut [u16; 5],
+    current_line: &str,
+    next_line: &mut String,
     is_define: bool,
-    argument_list: &mut Vec<String>
+    define_values: &mut Vec<String>,
+    argument_list: &mut Vec<String>,
+    delete_line_flag: &mut bool,
+    verbose: bool
 ) {
     println!("new var! {}", varline);
     parse_args(varline, ",;", true, argument_list);
@@ -473,7 +498,7 @@ fn declare_var(
         if let Some(eq_idx) = equals_pos {
             // --- assignment ---
             rhs = arg.split_off(eq_idx + 1);
-            lhs = arg[..eq_idx - 1]..clone();
+            lhs = arg[..eq_idx - 1].clone();
             trim_left(&mut lhs, WHITESPACE_CHARS);
     
             trim_right(&mut rhs, WHITESPACE_CHARS);
@@ -499,13 +524,13 @@ fn declare_var(
     
             replace_vars_and_labels_in_source_string(&mut dimension);
     
-            delete_line_flag = 0;
+            *delete_line_flag = false;
         }
 
         let mut var_type = VarType::Float; // var type
-        let t = p.chars().rev().next();
+        let t = lhs.chars().rev().next();
         if verbose {
-            print!("adding {rvon}");
+            print!("adding {{rvon}}");
         }
     
         let mut t_str = String::new();
@@ -518,7 +543,7 @@ fn declare_var(
             var_type = VarType::Float;
         }
 
-        if delete_line_flag == true {
+        if *delete_line_flag == true {
             var_type = VarType::Define;
         }
     
@@ -542,21 +567,21 @@ fn declare_var(
         if !dimension.is_empty() {
             let id = element_count[var_type];
             generate_varname_from_index(&mut var_name, var_type);
-            if delete_line_flag == false {
+            if *delete_line_flag == false {
                 // nl$ = next_line
                 next_line.push_str(&format!("dim {}{}({}):", var_name, t_str, dimension));
             }
         }
     
-        if !vl.is_empty() {
+        if !rhs.is_empty() {
             let id = element_count[var_type];
             generate_varname_from_index(&mut var_name);
-            if delete_line_flag == false {
+            if *delete_line_flag == false {
                 next_line.push_str(&format!("{}{}={}:", var_name, t_str, rhs));
             }
         }
     
-        if delete_line_flag == true {
+        if *delete_line_flag == true {
             define_values[element_count[var_type]] = rhs.clone();
         }
     
@@ -566,6 +591,14 @@ fn declare_var(
     
         element_count[var_type] += 1;
     }
+
+    // 1120
+    if !next_line.is_empty() {
+        *delete_line_flag = false;
+        current_line = format!("^^{}", next_line);
+    } else {
+        *delete_line_flag = true;
+    }    
 }
 
 // line 2100
