@@ -498,20 +498,20 @@ fn declare_var(
         if let Some(eq_idx) = equals_pos {
             // --- assignment ---
             rhs = arg.split_off(eq_idx + 1);
-            lhs = arg[..eq_idx - 1].clone();
-            trim_left(&mut lhs, WHITESPACE_CHARS);
+            lhs = arg[..eq_idx - 1].to_string();
+            trim_left(&mut lhs, &WHITESPACE_CHARS);
     
-            trim_right(&mut rhs, WHITESPACE_CHARS);
+            trim_right(&mut rhs, &WHITESPACE_CHARS);
     
             if rhs.starts_with("$") {
-                let hx = &rhs[1..];
-                convert_hex(&mut hx.to_owned());
+                let hx = rhs[1..].to_string();
+                convert_hex(&mut hx);
                 rhs = hx;
             }
     
             if rhs.starts_with("%") {
-                let bi = &rhs[1..];
-                convert_binary(&mut bi.to_owned());
+                let bi = rhs[1..].to_string();
+                convert_binary(&mut bi);
                 rhs = bi;
             }
         }
@@ -519,8 +519,8 @@ fn declare_var(
         // 1050 - 1060
         if let (Some(opn_bkt_idx), Some(close_bkt_idx)) = (open_bkt_pos, close_bkt_pos) {
             // --- dimension ---
-            dimension = arg[opn_bkt_idx + 1..close_bkt_idx].to_owned();
-            arg = arg[..opn_bkt_idx - 1].clone();
+            dimension = arg[opn_bkt_idx + 1..close_bkt_idx].to_string();
+            *arg = arg[..opn_bkt_idx - 1].to_string();
     
             replace_vars_and_labels_in_source_string(&mut dimension);
     
@@ -560,12 +560,12 @@ fn declare_var(
         }
             
         // 1074
-        var_table[var_type][element_count[var_type]] = arg.clone();
+        var_table[var_type as usize][element_count[var_type as usize] as usize] = arg;
 
         let var_name: String = String::new();
 
         if !dimension.is_empty() {
-            let id = element_count[var_type];
+            let id = element_count[var_type as usize];
             generate_varname_from_index(&mut var_name, var_type);
             if *delete_line_flag == false {
                 // nl$ = next_line
@@ -599,6 +599,112 @@ fn declare_var(
     } else {
         *delete_line_flag = true;
     }    
+}
+
+fn generate_varname_from_index(id: usize) -> String {
+    let vn: String;
+    
+    if id < 26 {
+        vn = (65 + id as u8).into();
+    } else {
+        let n2 = id % 26;
+        let n1 = id / 26 - 1;
+        vn = format!("{}{}", (65 + n1 as u8).into(), (65 + n2 as u8).into());
+    }
+    
+    vn
+}
+
+fn convert_binary(bi: &str) -> u16 {
+    let mut br: u16 = 0; // result
+
+    for (b, bc) in bi.chars().rev().enumerate() {
+        let bc_str = bc.to_string();
+
+        if bc_str != "1" && bc_str != "0" {
+            // Bail out
+            bail_out();
+        }
+
+        if bc_str == "1" {
+            br += 1 << b;
+        }
+    }
+
+    let c = br.to_string()[1..].to_owned();
+    let c_num = c.parse::<u16>().unwrap();
+
+    c_num
+}
+
+fn convert_hex(hx: &str) -> u16 {
+    match u16::from_str_radix(hx, 16) {
+        Ok(vl) => vl,
+        Err(_) => {
+            bail_out(); // Call bail_out function in case of error
+            0 // Return a default value or handle the error case accordingly
+        }
+    }
+}
+
+// lines 3000-3220
+fn replace_vars_and_labels_in_source_string(s: &str) -> String {
+    if s.starts_with("^^") {
+        return s[2..].to_string();
+    }
+    
+    let mut q = false;
+    let mut a = String::new();
+    let mut c = String::new();
+    let d = "<>=+-#*/^,.:;() ";
+
+    for b in s.chars() {
+        if b.to_string() == q {
+            q = !q;
+            if q {
+                a.push_str(&assess_token(&c));
+                c = String::new();
+            } else {
+                a.push_str(&c);
+                c = String::new();
+            }
+        }
+
+        if q {
+            a.push(b);
+            continue;
+        }
+
+        if d.contains(b) {
+            a.push_str(&assess_token(&c));
+            c = String::new();
+            if b == ' ' {
+                continue;
+            }
+        }
+
+        a.push(b);
+        c.push(b);
+    }
+
+    a.push_str(&assess_token(&c));
+    let result = a + &c;
+    result
+}
+
+fn assess_token(token: &str) -> String {
+    // Logic to assess and convert the token if needed
+    // Replace this with your implementation
+    // You can return the converted token or modify it as required
+
+    // Placeholder implementation: return the original token without any modification
+    token.to_string()
+}
+
+fn bail_out() {
+    // Perform necessary actions to bail out of the program
+    // ...
+    // Your implementation here
 }
 
 // line 2100
