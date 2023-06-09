@@ -396,7 +396,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                         &mut delete_line_flag,
                         &mut inside_ifdef,
                         &mut element_count,
-                        var_table,
+                        &mut var_table,
                         &mut define_values,
                         &mut argument_list,
                         verbose);
@@ -421,21 +421,21 @@ fn index_of(line: &str, token: &str) -> i16 {
 }
 
 // 603 - 607
-fn parse_preprocessor_directive(
+fn parse_preprocessor_directive<'a>(
     current_line: &mut String,
     next_line: &mut String,
     delete_line_flag: &mut bool,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: [[&str; MAX_CAP]; 5],
+    var_table: &'a mut [[&str; MAX_CAP]; 5],
     define_values: &mut Vec<String>,
-    argument_list: &mut Vec<String>,
+    argument_list: &'a mut Vec<String>,
     verbose: bool
 ) {
     if index_of(current_line, "IFDEF") == 1 {
         // println!("** ifdef!");
         let def_str = &current_line[7..];
-        check_if_define_exists(def_str, inside_ifdef, element_count, var_table);
+        check_if_define_exists(def_str, inside_ifdef, element_count, *var_table);
         *delete_line_flag = true;
     }
     if index_of(current_line, "ENDIF") == 1 {
@@ -446,7 +446,7 @@ fn parse_preprocessor_directive(
     if index_of(current_line, "DEFINE") == 1 {
         println!("** define!");
         let line_suffix = current_line[8..].to_string();
-        declare_var(&line_suffix, &var_table,
+        declare_var(&line_suffix, var_table,
             & element_count,
             current_line, next_line,
             false, define_values, 
@@ -456,7 +456,7 @@ fn parse_preprocessor_directive(
     if index_of(current_line, "DECLARE") == 1 {
         println!("** declare!");
         let line_suffix = current_line[9..].to_string();
-        declare_var(&line_suffix, &var_table,
+        declare_var(&line_suffix, var_table,
             & element_count,
             current_line, next_line,
             false, define_values, 
@@ -466,15 +466,15 @@ fn parse_preprocessor_directive(
 }
 
 // line 1000 - rem declare var(s) in s$
-fn declare_var(
+fn declare_var<'a>(
     varline: &str,
-    var_table:  & [[&str; MAX_CAP]; 5],
+    var_table:  &mut [[&'a str; MAX_CAP]; 5],
     element_count: & [u16; 5],
     current_line: &mut String,
     next_line: &mut String,
     is_define: bool,
     define_values: &mut Vec<String>,
-    argument_list: &mut Vec<String>,
+    argument_list: &'a mut Vec<String>,
     delete_line_flag: &mut bool,
     verbose: bool
 ) {
@@ -818,7 +818,6 @@ fn single_quote_comment_trim(current_line: &mut String) {
 /// @todo: skip `current_line` as argument as it is zeroed
 fn copy_data_to_current_line(ca_addr: &mut u32, current_line: &mut String) {
     *current_line = String::new();
-    let mut idx: u8 = 0;
     let line_length = lpeek(*ca_addr) as u32;
     *ca_addr += 1;
 
@@ -826,12 +825,6 @@ fn copy_data_to_current_line(ca_addr: &mut u32, current_line: &mut String) {
         .for_each(|address| (*current_line).push(lpeek(address) as char));
 
     *ca_addr += line_length;
-
-    // while idx < line_length {
-    //     (*current_line).push(lpeek(*ca_addr) as char);
-    //     *ca_addr += 1;
-    //     idx += 1;
-    // }
 }
 
 /// Parse a single label and add it to the `labels` vector
