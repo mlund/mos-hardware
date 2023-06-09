@@ -9,7 +9,6 @@ use alloc::string::ToString;
 use alloc::{string::String, vec::Vec};
 use alloc::format;
 use core::panic::PanicInfo;
-use core::str::FromStr;
 use mos_hardware::mega65::lpeek;
 use mos_hardware::mega65::set_lower_case;
 //use mos_hardware::mega65::libc::cputs;
@@ -22,6 +21,7 @@ const MAX_CAP: usize = 20;
 
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
+const QUOTE_CHAR: &str = "\"";
 /// pf$ = type_suffix
 const _TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
 
@@ -391,7 +391,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 // 601
                 if (&current_line[..1]).eq("#") {
                     parse_preprocessor_directive(
-                        &current_line,
+                        &mut current_line,
                         &mut next_line,
                         &mut delete_line_flag,
                         &mut inside_ifdef,
@@ -422,7 +422,7 @@ fn index_of(line: &str, token: &str) -> i16 {
 
 // 603 - 607
 fn parse_preprocessor_directive(
-    current_line: &str,
+    current_line: &mut String,
     next_line: &mut String,
     delete_line_flag: &mut bool,
     inside_ifdef: &mut bool,
@@ -447,7 +447,7 @@ fn parse_preprocessor_directive(
         println!("** define!");
         declare_var(&current_line[8..], &mut var_table,
             &mut element_count,
-            current_line, &mut next_line,
+            &mut current_line, &mut next_line,
             false, &mut define_values, 
             argument_list,
             &mut delete_line_flag, verbose);
@@ -468,7 +468,7 @@ fn declare_var(
     varline: &str,
     var_table:  &mut [[&str; MAX_CAP]; 5],
     element_count: &mut [u16; 5],
-    current_line: &str,
+    current_line: &mut String,
     next_line: &mut String,
     is_define: bool,
     define_values: &mut Vec<String>,
@@ -566,7 +566,7 @@ fn declare_var(
 
         if !dimension.is_empty() {
             let id = element_count[var_type as usize];
-            generate_varname_from_index(&mut var_name, var_type);
+            var_name = generate_varname_from_index(id as usize);
             if *delete_line_flag == false {
                 // nl$ = next_line
                 next_line.push_str(&format!("dim {}{}({}):", var_name, t_str, dimension));
@@ -574,42 +574,44 @@ fn declare_var(
         }
     
         if !rhs.is_empty() {
-            let id = element_count[var_type];
-            generate_varname_from_index(&mut var_name);
+            let id = element_count[var_type as usize];
+            var_name = generate_varname_from_index(id as usize);
             if *delete_line_flag == false {
                 next_line.push_str(&format!("{}{}={}:", var_name, t_str, rhs));
             }
         }
     
         if *delete_line_flag == true {
-            define_values[element_count[var_type]] = rhs.clone();
+            define_values[element_count[var_type as usize] as usize] = rhs.clone();
         }
     
         if verbose {
-            print!("{}{{rvof}}: {}", arg, element_count[var_type]);
+            print!("{}{{rvof}}: {}", arg.as_str(), element_count[var_type as usize]);
         }
     
-        element_count[var_type] += 1;
+        element_count[var_type as usize] += 1;
     }
 
     // 1120
     if !next_line.is_empty() {
         *delete_line_flag = false;
-        current_line = format!("^^{}", next_line);
+        *current_line = format!("^^{}", next_line);
     } else {
         *delete_line_flag = true;
     }    
 }
 
+// lines 5000 - 5030
 fn generate_varname_from_index(id: usize) -> String {
     let vn: String;
     
     if id < 26 {
-        vn = (65 + id as u8).into();
+        vn = ((65 + id as u8) as char).to_string();
     } else {
         let n2 = id % 26;
         let n1 = id / 26 - 1;
-        vn = format!("{}{}", (65 + n1 as u8).into(), (65 + n2 as u8).into());
+        vn = format!("{}{}", ((65 + n1 as u8) as char).to_string(),
+            ((65 + n2 as u8) as char).to_string());
     }
     
     vn
@@ -631,7 +633,7 @@ fn convert_binary(bi: &str) -> u16 {
         }
     }
 
-    let c = br.to_string()[1..].to_owned();
+    let c = br.to_string()[1..].to_string();
     let c_num = c.parse::<u16>().unwrap();
 
     c_num
@@ -653,15 +655,15 @@ fn replace_vars_and_labels_in_source_string(s: &str) -> String {
         return s[2..].to_string();
     }
     
-    let mut q = false;
+    let mut quote_flag = false;
     let mut a = String::new();
     let mut c = String::new();
     let d = "<>=+-#*/^,.:;() ";
 
     for b in s.chars() {
-        if b.to_string() == q {
-            q = !q;
-            if q {
+        if b.to_string() == QUOTE_CHAR {
+            quote_flag = !quote_flag;
+            if quote_flag {
                 a.push_str(&assess_token(&c));
                 c = String::new();
             } else {
@@ -670,7 +672,7 @@ fn replace_vars_and_labels_in_source_string(s: &str) -> String {
             }
         }
 
-        if q {
+        if quote_flag {
             a.push(b);
             continue;
         }
