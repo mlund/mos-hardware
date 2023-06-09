@@ -445,29 +445,31 @@ fn parse_preprocessor_directive(
     }
     if index_of(current_line, "DEFINE") == 1 {
         println!("** define!");
-        declare_var(&current_line[8..], &mut var_table,
-            &mut element_count,
-            &mut current_line, &mut next_line,
-            false, &mut define_values, 
+        let line_suffix = current_line[8..].to_string();
+        declare_var(&line_suffix, &var_table,
+            & element_count,
+            current_line, next_line,
+            false, define_values, 
             argument_list,
-            &mut delete_line_flag, verbose);
+            delete_line_flag, verbose);
     }
     if index_of(current_line, "DECLARE") == 1 {
         println!("** declare!");
-        declare_var(&current_line[9..], &mut var_table,
-            &mut element_count,
-            &mut current_line, &mut next_line,
-            false, &mut define_values, 
+        let line_suffix = current_line[9..].to_string();
+        declare_var(&line_suffix, &var_table,
+            & element_count,
+            current_line, next_line,
+            false, define_values, 
             argument_list,
-            &mut delete_line_flag, verbose);
+            delete_line_flag, verbose);
     }
 }
 
 // line 1000 - rem declare var(s) in s$
 fn declare_var(
     varline: &str,
-    var_table:  &mut [[&str; MAX_CAP]; 5],
-    element_count: &mut [u16; 5],
+    var_table:  & [[&str; MAX_CAP]; 5],
+    element_count: & [u16; 5],
     current_line: &mut String,
     next_line: &mut String,
     is_define: bool,
@@ -504,13 +506,13 @@ fn declare_var(
             trim_right(&mut rhs, &WHITESPACE_CHARS);
     
             if rhs.starts_with("$") {
-                let hx = rhs[1..].to_string();
+                let mut hx = rhs[1..].to_string();
                 convert_hex(&mut hx);
                 rhs = hx;
             }
     
             if rhs.starts_with("%") {
-                let bi = rhs[1..].to_string();
+                let mut bi = rhs[1..].to_string();
                 convert_binary(&mut bi);
                 rhs = bi;
             }
