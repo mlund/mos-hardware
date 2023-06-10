@@ -376,31 +376,31 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                     source_line_counter,
                     &current_line[..]
                 );
-                // 600
-                if (&current_line[..1]).eq(".") {
-                    println!("dot!");
-                    _next_line_flag = true;
-                    parse_label(
-                        verbose,
-                        &current_line,
-                        pp_line,
-                        &mut delete_line_flag,
-                        &mut labels,
-                    );
-                }
-                // 601
-                if (&current_line[..1]).eq("#") {
-                    parse_preprocessor_directive(
-                        &mut current_line,
-                        &mut next_line,
-                        &mut delete_line_flag,
-                        &mut inside_ifdef,
-                        &mut element_count,
-                        &mut var_table,
-                        &mut define_values,
-                        &mut argument_list,
-                        verbose);
-                }
+            }
+            // 600
+            if (&current_line[..1]).eq(".") {
+                println!("dot!");
+                _next_line_flag = true;
+                parse_label(
+                    verbose,
+                    &current_line,
+                    pp_line,
+                    &mut delete_line_flag,
+                    &mut labels,
+                );
+            }
+            // 601
+            if (&current_line[..1]).eq("#") {
+                parse_preprocessor_directive(
+                    &mut current_line,
+                    &mut next_line,
+                    &mut delete_line_flag,
+                    &mut inside_ifdef,
+                    &mut element_count,
+                    &mut var_table,
+                    &mut define_values,
+                    &mut argument_list,
+                    verbose);
             }
         }
 
@@ -427,7 +427,7 @@ fn parse_preprocessor_directive<'a>(
     delete_line_flag: &mut bool,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: &'a mut [[&str; MAX_CAP]; 5],
+    var_table: &'a mut [[&'a str; MAX_CAP]; 5],
     define_values: &mut Vec<String>,
     argument_list: &'a mut Vec<String>,
     verbose: bool
@@ -564,7 +564,7 @@ fn declare_var<'a>(
         // 1074
         var_table[var_type as usize][element_count[var_type as usize] as usize] = arg;
 
-        let var_name: String = String::new();
+        let mut var_name: String = String::new();
 
         if !dimension.is_empty() {
             let id = element_count[var_type as usize];
