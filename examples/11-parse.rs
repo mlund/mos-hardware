@@ -269,6 +269,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut delete_line_flag: bool = false;
     let mut inside_ifdef: bool = false;
     let mut labels: Vec<Label> = Vec::with_capacity(MAX_CAP);
+    let mut var_table: [Vec<String>; 5] = Default::default();
     let mut argument_list: Vec<String> = Vec::with_capacity(MAX_CAP);
     let mut define_values: Vec<String> = Vec::with_capacity(MAX_CAP);
 
@@ -288,7 +289,6 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // dim ec(4) = element_count per type
     let mut element_count: [u16; 5] = [ 0; 5 ];
     // dim vt$(4,200) = var_table per type
-    let mut var_table: [[&str; MAX_CAP]; 5] = [[""; MAX_CAP]; 5];
 
     set_lower_case();
     println!("{}eleven PREPROCESSOR V0.4.7{}", RVS_ON, RVS_OFF);
@@ -421,43 +421,43 @@ fn index_of(line: &str, token: &str) -> i16 {
 }
 
 // 603 - 607
-fn parse_preprocessor_directive<'a>(
+fn parse_preprocessor_directive(
     current_line: &mut String,
     next_line: &mut String,
     delete_line_flag: &mut bool,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: &'a mut [[&'a str; MAX_CAP]; 5],
+    var_table: & mut [Vec<String>; 5],
     define_values: &mut Vec<String>,
-    argument_list: &'a mut Vec<String>,
+    argument_list: & mut Vec<String>,
     verbose: bool
 ) {
     if index_of(current_line, "IFDEF") == 1 {
         // println!("** ifdef!");
         let def_str = &current_line[7..];
-        check_if_define_exists(def_str, inside_ifdef, element_count, *var_table);
+        check_if_define_exists(def_str, inside_ifdef, element_count, var_table);
         *delete_line_flag = true;
     }
-    if index_of(current_line, "ENDIF") == 1 {
+    else if index_of(current_line, "ENDIF") == 1 {
         //println!("** endif!");
         *inside_ifdef = false;
         *delete_line_flag = true;
     }
-    if index_of(current_line, "DEFINE") == 1 {
+    else if index_of(current_line, "DEFINE") == 1 {
         println!("** define!");
         let line_suffix = current_line[8..].to_string();
         declare_var(&line_suffix, var_table,
-            & element_count,
+            element_count,
             current_line, next_line,
             false, define_values, 
             argument_list,
             delete_line_flag, verbose);
     }
-    if index_of(current_line, "DECLARE") == 1 {
+    else if index_of(current_line, "DECLARE") == 1 {
         println!("** declare!");
         let line_suffix = current_line[9..].to_string();
         declare_var(&line_suffix, var_table,
-            & element_count,
+            element_count,
             current_line, next_line,
             false, define_values, 
             argument_list,
@@ -466,15 +466,15 @@ fn parse_preprocessor_directive<'a>(
 }
 
 // line 1000 - rem declare var(s) in s$
-fn declare_var<'a>(
+fn declare_var(
     varline: &str,
-    var_table:  &mut [[&'a str; MAX_CAP]; 5],
-    element_count: & [u16; 5],
+    var_table:  &mut [Vec<String>; 5],
+    element_count: &mut [u16; 5],
     current_line: &mut String,
     next_line: &mut String,
     is_define: bool,
     define_values: &mut Vec<String>,
-    argument_list: &'a mut Vec<String>,
+    argument_list: &mut Vec<String>,
     delete_line_flag: &mut bool,
     verbose: bool
 ) {
@@ -562,7 +562,7 @@ fn declare_var<'a>(
         }
             
         // 1074
-        var_table[var_type as usize][element_count[var_type as usize] as usize] = arg;
+        var_table[var_type as usize][element_count[var_type as usize] as usize] = arg.to_string();
 
         let mut var_name: String = String::new();
 
@@ -774,7 +774,7 @@ fn check_if_define_exists(
     def_str: &str,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: [[&str; MAX_CAP]; 5]
+    var_table: &[Vec<String>; 5]
 ) {
     *inside_ifdef = true;
     for k in 0..element_count[VarType::Define as usize] {
