@@ -600,7 +600,7 @@ fn declare_var(
         *current_line = format!("^^{}", next_line);
     } else {
         *delete_line_flag = true;
-    }    
+    }
 }
 
 // lines 5000 - 5030
@@ -679,7 +679,7 @@ fn replace_vars_and_labels_in_source_string(s: &str) -> String {
             continue;
         }
 
-        if d.contains(b) {
+        if my_contains(d, b.to_string().as_str()) {
             a.push_str(&assess_token(&c));
             c = String::new();
             if b == ' ' {
@@ -711,12 +711,26 @@ fn bail_out() {
     // Your implementation here
 }
 
+fn my_contains(string1: &str, string2: &str) -> bool {
+    let mut iter1 = string1.chars().peekable();
+    let mut iter2 = string2.chars().peekable();
+
+    while let (Some(c1), Some(c2)) = (iter1.next(), iter2.peek().copied()) {
+        if c1 == c2 {
+            iter2.next();
+        }
+    }
+
+    iter2.peek().is_none()
+}
+
 // line 2100
 fn parse_args(
     s: &str,
     delimiter: &str,
     parse_brackets: bool,
-    argument_list: &mut Vec<String> ) {
+    argument_list: &mut Vec<String>
+) {
 
     let mut remaining_string = s.to_string();
     let mut argument_count = 0;
@@ -745,7 +759,7 @@ fn parse_args(
             inside_group = false;
         }
 
-        if delimiter.contains(&b) && inside_group == false {
+        if my_contains(delimiter, &b) && inside_group == false {
             //(*argument_list).push(String::from(trim_all(&b[..], &SPACE_CHAR_ONLY)));
             let mut current_arg = argument_list[argument_count as usize].clone();
             trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
