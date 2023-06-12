@@ -22,15 +22,15 @@ MEMORY {
      * As of June 2022 the $8000-$BFFF is left unmapped by
      * the SYS command.
      */
-    ram (rw) : ORIGIN = 0x2001, LENGTH = 0x7fff
+    ram (rw) : ORIGIN = 0x2001, LENGTH = 0xafff
 }
 
 INCLUDE commodore.ld
 
-/* INPUT(unmap-basic.o) */
+INPUT(unmap-basic.o)
 
 /* Set initial soft stack address to end of BASIC area. (It grows down.) */
-__stack = 0x9fff;
+__stack = 0xcfff;
 
 OUTPUT_FORMAT {
     /* Tells the LOAD command where to place the file's contents. */

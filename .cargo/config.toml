@@ -1,6 +1,6 @@
 [build]
 target = "mos-c64-none"
-rustflags = "-Clink-args=-Wl,--Map=output.map,--verbose,--error-limit=0"
+rustflags = "-Clink-args=--verbose -Cdebuginfo=1 -Clink-arg=-g -Clink-arg=-v -Clink-args=-fverbose-asm -Clink-args=-Wl,--Map=output.map,--verbose,--error-limit=0"
 
 [target.mos-c64-none]
 runner = ["x64sc", "+confirmonexit"]

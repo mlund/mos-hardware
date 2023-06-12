@@ -81,6 +81,6 @@ fn main() {
         .flag("-mcpu=mos65c02")
         .flag("-w")
         .flag("-Os")
-        // .flag("-T link.ld")
+        .flag("-T link.ld")
         .compile("mega65libc");
 }

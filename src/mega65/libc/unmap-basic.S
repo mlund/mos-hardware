@@ -11,13 +11,20 @@
         stx 0    ;
         ldx #$3E ; LORAM = 0
         stx 1    ; switch out BASIC ROM at $A000-$BFFF for RAM
-
+        
+        ldx #$44 ; unmap all ROMs except $e000-$ffff
+        stx $d030
 
 
 ; restore BASIC ROM after all other exit handlers have completed
 .section .fini.990,"axR", @progbits
         ldx #$3F ; LORAM = 1
         stx 1    ; switch in BASIC ROM at $A000-$BFFF
+
+        ; restore to as before
+        ldx #$64
+        stx $d030
+        
 	cli
 
 
