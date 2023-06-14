@@ -25,11 +25,27 @@ use core::mem::MaybeUninit;
 /// This can be used to allocate memory in 28-bit address space.
 ///
 /// # Examples
+///
+/// The allocated 28-bit region is described by a `Fat28` pointer,
+/// here called `fat` which implements the `From` trait for common
+/// types such as `Vec<u8>` and `String`.
 /// ~~~
-/// let mut alloc = Allocator::new(0xc0000);
-/// let ptr: Ptr28 = alloc.push("some large string".as_bytes()); // DMA copy to
-/// let s = String::from(ptr); // Get using DMA copy
-/// assert_eq!(s, "some large string");
+/// let mut mem = memory::Allocator::new(0x40000);
+/// let a = Vec::<u8>::from([7, 9, 13]);
+/// let fat = mem.write(a.as_slice()); // dma write
+/// let b = Vec::<u8>::from(fat); // dma read
+/// assert_eq!(a, b);
+/// ~~~
+///
+/// `Vec<Fat28>` can be traversed almost as if a vector of strings:
+/// ~~~
+/// let cnt = Vec::from([alloc.push(b"first"), mem.push(b"second")])
+///      .iter()
+///      .copied()
+///      .map(String::from)
+///      .filter(|s| s.starts_with('s'))
+///      .count();
+/// assert_eq!(cnt, 1);
 /// ~~~
 ///
 /// Subsequent calls to `push()` advances the allocator address.
@@ -44,8 +60,8 @@ impl Allocator {
         Self { address }
     }
     /// DMA copy bytes to next available 28-bit memory location
-    pub fn push(&mut self, bytes: &[u8]) -> Fat28 {
-        let len = bytes.len() as u16;
+    pub fn write(&mut self, bytes: &[u8]) -> Fat28 {
+        let len = bytes.len();
         let ptr = Fat28 {
             address: self.address,
             len,
@@ -64,7 +80,7 @@ pub struct Fat28 {
     /// Address
     pub address: u32,
     /// Length in bytes
-    pub len: u16,
+    pub len: usize,
 }
 
 impl From<Fat28> for String {
@@ -105,7 +121,7 @@ pub struct MemoryIterator {
 }
 
 impl MemoryIterator {
-    pub fn new(address: u32) -> Self {
+    pub const fn new(address: u32) -> Self {
         Self { address }
     }
 
@@ -115,10 +131,10 @@ impl MemoryIterator {
     ///
     /// - Check that the DMA copy works as expected
     #[allow(clippy::uninit_vec)]
-    pub fn get_chunk(&mut self, n: u16) -> Vec<u8> {
-        let mut dst = Vec::<u8>::with_capacity(n as usize);
+    pub fn get_chunk(&mut self, n: usize) -> Vec<u8> {
+        let mut dst = Vec::<u8>::with_capacity(n);
         unsafe {
-            dst.set_len(n as usize);
+            dst.set_len(n);
             lcopy(self.address, dst.as_mut_slice().as_ptr() as u32, n);
         }
         self.address += n as u32;
@@ -143,7 +159,7 @@ impl Iterator for MemoryIterator {
     {
         let dst: [Self::Item; N] = unsafe { MaybeUninit::uninit().assume_init() };
         unsafe {
-            lcopy(self.address, dst.as_ptr() as u32, N as u16);
+            lcopy(self.address, dst.as_ptr() as u32, N);
         }
         self.address += N as u32;
         Ok(dst)

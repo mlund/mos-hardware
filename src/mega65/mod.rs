@@ -147,14 +147,14 @@ pub unsafe fn lpoke(address: u32, value: u8) {
 ///
 /// # Safety
 /// Unsafe as it writes directly to memory
-pub unsafe fn lcopy(source: u32, destination: u32, length: u16) {
+pub unsafe fn lcopy(source: u32, destination: u32, length: usize) {
     if length == 0 {
         return;
     }
     assert!(source <= MAX_28_BIT_ADDRESS);
     assert!(destination + (length as u32) <= MAX_28_BIT_ADDRESS);
     unsafe {
-        libc::lcopy(source as i32, destination as i32, length);
+        libc::lcopy(source as i32, destination as i32, length as u16);
     }
 }
 

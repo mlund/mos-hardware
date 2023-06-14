@@ -9,7 +9,9 @@ extern crate mos_alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::mem::size_of;
 use core::str;
+use mos_hardware::mega65::memory::*;
 use mos_hardware::mega65::*;
 use ufmt_stdio::*;
 
@@ -17,37 +19,34 @@ use ufmt_stdio::*;
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     set_upper_case();
 
-    // Memory allocation in bank 5 (0x40000 - 0x4ffff)
-    let address = 0x40000;
-    let mut alloc = memory::Allocator::new(address);
+    // Integer sizes
+    println!("USIZE = {}", size_of::<usize>());
+    println!("CLONG = {}", size_of::<core::ffi::c_long>());
+    println!("CUINT = {}", size_of::<core::ffi::c_uint>());
+
+    // Memory allocation in bank 4 (0x40000 - 0x4ffff)
+    const ADDRESS: u32 = 0x40000;
+    let mut mem = Allocator::new(ADDRESS);
 
     // Copy bytes to upper mem, then back again
-    let a = Vec::<u8>::from([7, 9, 13]);
-    let ptr = alloc.push(a.as_slice());
-    let b = Vec::<u8>::from(ptr);
-    assert_eq!(a, b);
+    let ptr: Fat28 = mem.write([7, 9, 13].as_slice());
+    assert_eq!(Vec::<u8>::from(ptr), [7, 9, 13]);
     println!("ADDRESS = 0X{:x} LEN = {}", ptr.address, ptr.len);
 
     // Copy string to upper mem, then back again
-    let a = String::from("some LARGE string");
-    let ptr: memory::Fat28 = alloc.push(a.as_bytes()); // dma send
-    let b = String::from(ptr); // dma get
-    assert_eq!(a, b);
+    let ptr: Fat28 = mem.write("some LARGE string".as_bytes());
+    assert_eq!(String::from(ptr), "some LARGE string");
     println!("ADDRESS = 0X{:x} LEN = {}", ptr.address, ptr.len);
 
     // Test memory iterator; memory is already filled from above.
-    let bytes: Vec<u8> = memory::MemoryIterator::new(address)
-        .skip(3 + 5)
-        .take(5)
-        .collect();
+    let bytes: Vec<u8> = MemoryIterator::new(ADDRESS).skip(3 + 5).take(5).collect();
     let s = unsafe { str::from_utf8_unchecked(bytes.as_slice()) };
     assert_eq!(s, "LARGE");
     println!("EXTRACTED STRING = {}", s);
 
-    // Loop over vector of Fat28 pointers as if strings
+    // Loop over vector of fat pointers as if strings
     // (transparent DMA copying)
-    let v = Vec::from([alloc.push(b"first"), alloc.push(b"second")]);
-    let cnt = v
+    let cnt = Vec::from([mem.write(b"first"), mem.write(b"second")])
         .iter()
         .copied()
         .map(String::from)
