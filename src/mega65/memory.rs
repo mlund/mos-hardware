@@ -15,8 +15,69 @@
 //! Memory related tools
 
 use super::{lcopy, lpeek};
+use alloc::string::String;
 use alloc::vec::Vec;
+use core::convert::From;
 use core::mem::MaybeUninit;
+
+/// Allocator for 28-bit memory
+///
+/// This can be used to allocate memory in 28-bit address space.
+///
+/// # Examples
+/// ~~~
+/// let mut alloc = Allocator::new(0xc0000);
+/// let ptr: Ptr28 = alloc.push("some large string".as_bytes()); // DMA copy to
+/// let s = String::From(ptr); // Get using DMA copy
+/// assert_eq!(s, "some large string");
+/// ~~~
+///
+/// Subsequent calls to `push()` advances the allocator address.
+/// Several external strings can be handled with `Vec<Ptr28>`.
+pub struct Allocator {
+    /// Current 28-bit address
+    pub address: u32,
+}
+
+impl Allocator {
+    pub fn new(address: u32) -> Self {
+        Self { address }
+    }
+    /// DMA copy bytes to next available 28-bit memory location
+    pub fn push(&mut self, bytes: &[u8]) -> Ptr28 {
+        let len = bytes.len() as u16;
+        let ptr = Ptr28 {
+            address: self.address,
+            len,
+        };
+        unsafe {
+            lcopy(bytes.as_ptr() as u32, self.address, len);
+        }
+        self.address += len as u32;
+        ptr
+    }
+}
+
+/// Fat pointer to 28-bit address with an additional length
+#[derive(Clone, Copy)]
+pub struct Ptr28 {
+    /// Address
+    pub address: u32,
+    /// Length in bytes
+    pub len: u16,
+}
+
+impl From<Ptr28> for String {
+    fn from(value: Ptr28) -> Self {
+        unsafe { Self::from_utf8_unchecked(value.into()) }
+    }
+}
+
+impl From<Ptr28> for Vec<u8> {
+    fn from(value: Ptr28) -> Self {
+        MemoryIterator::new(value.address).get_chunk(value.len)
+    }
+}
 
 /// Never-ending iterator to lpeek into 28-bit memory
 ///
