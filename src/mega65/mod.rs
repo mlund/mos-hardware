@@ -31,6 +31,7 @@ use crate::{peek, petscii, poke};
 pub mod iomap;
 pub mod libc;
 pub mod math;
+pub mod memory;
 pub mod random;
 
 const MAX_28_BIT_ADDRESS: u32 = 0xFFFFFFF;

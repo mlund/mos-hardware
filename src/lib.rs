@@ -47,7 +47,10 @@
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 #![feature(error_in_core)]
+#![feature(iter_advance_by)]
+#![feature(iter_next_chunk)]
 
+extern crate alloc;
 extern crate static_assertions;
 
 #[cfg(feature = "c64")]
