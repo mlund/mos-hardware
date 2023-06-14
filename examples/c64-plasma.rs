@@ -9,6 +9,7 @@
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
+use itertools::iproduct;
 use mos_hardware::vic2::{BLACK, RED};
 use mos_hardware::*;
 use ufmt_stdio::*;
@@ -41,24 +42,24 @@ impl Plasma {
         c64::sid().start_random_generator();
 
         let generate_char = |sine| {
-            let mut char_pattern: u8 = 0;
+            let mut pattern: u8 = 0;
             [1, 2, 4, 8, 16, 32, 64, 128]
                 .iter()
                 .filter(|_| c64::sid().random_byte() > sine)
                 .for_each(|bit| {
-                    char_pattern |= bit;
+                    pattern |= bit;
                 });
-            char_pattern
+            pattern
         };
 
         repeat_element(SINETABLE.iter().copied(), 8)
+            .map(generate_char)
             .enumerate()
-            .for_each(|(offset, sine)| {
-                let character = generate_char(sine);
+            .for_each(|(i, pattern)| {
                 unsafe {
-                    charset_address.add(offset).write_volatile(character);
+                    charset_address.add(i).write_volatile(pattern);
                 }
-                if offset % 64 == 0 {
+                if i % 64 == 0 {
                     print!(".");
                 }
             });
@@ -68,6 +69,7 @@ impl Plasma {
     pub fn render(&mut self, screen_address: *mut u8) {
         let mut i = self.yindex1;
         let mut j = self.yindex2;
+
         for y in self.ybuffer.iter_mut() {
             *y = sine(i).wrapping_add(sine(j));
             i = i.wrapping_add(4);
@@ -76,8 +78,8 @@ impl Plasma {
         self.yindex1 = self.yindex1.wrapping_add(3);
         self.yindex2 = self.yindex2.wrapping_sub(5);
 
-        i = self.xindex1;
-        j = self.xindex2;
+        let mut i = self.xindex1;
+        let mut j = self.xindex2;
         for x in self.xbuffer.iter_mut() {
             *x = sine(i).wrapping_add(sine(j));
             i = i.wrapping_add(3);
@@ -86,16 +88,10 @@ impl Plasma {
         self.xindex1 = self.xindex1.wrapping_add(2);
         self.xindex2 = self.xindex2.wrapping_sub(3);
 
-        let mut offset: usize = 0; // screen memory offset
-        for y in self.ybuffer.iter().copied() {
-            for x in self.xbuffer.iter().copied() {
-                let sum = x.wrapping_add(y);
-                unsafe {
-                    screen_address.add(offset).write_volatile(sum);
-                }
-                offset += 1;
-            }
-        }
+        iproduct!(self.ybuffer.iter().copied(), self.xbuffer.iter().copied())
+            .map(|(y, x)| x.wrapping_add(y))
+            .enumerate()
+            .for_each(|(i, sum)| unsafe { screen_address.add(i).write_volatile(sum) });
     }
 }
 

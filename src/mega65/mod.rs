@@ -31,10 +31,9 @@ use crate::{peek, petscii, poke};
 pub mod iomap;
 pub mod libc;
 pub mod math;
-pub mod memory;
+mod memory;
 pub mod random;
-
-const MAX_28_BIT_ADDRESS: u32 = 0xFFFFFFF;
+pub use memory::*;
 
 pub const DEFAULT_SCREEN: *mut u8 = (0x0800) as *mut u8;
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
@@ -125,36 +124,6 @@ pub fn speed_mode40() {
         poke!(0xd031 as *mut u8, val);
         val = peek!(0xd054 as *mut u8) | 0b0100_0000; // set VFAST bit
         poke!(0xd054 as *mut u8, val);
-    }
-}
-
-/// Read into 28 bit memory
-pub fn lpeek(address: u32) -> u8 {
-    assert!(address <= MAX_28_BIT_ADDRESS);
-    unsafe { libc::lpeek(address as i32) }
-}
-
-/// Write into 28 bit memory
-///
-/// # Safety
-/// Unsafe as it writes directly to memory
-pub unsafe fn lpoke(address: u32, value: u8) {
-    assert!(address <= MAX_28_BIT_ADDRESS);
-    libc::lpoke(address as i32, value)
-}
-
-/// DMA copy in 28 bit address space
-///
-/// # Safety
-/// Unsafe as it writes directly to memory
-pub unsafe fn lcopy(source: u32, destination: u32, length: usize) {
-    if length == 0 {
-        return;
-    }
-    assert!(source <= MAX_28_BIT_ADDRESS);
-    assert!(destination + (length as u32) <= MAX_28_BIT_ADDRESS);
-    unsafe {
-        libc::lcopy(source as i32, destination as i32, length as u16);
     }
 }
 

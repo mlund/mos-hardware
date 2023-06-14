@@ -14,11 +14,35 @@
 
 //! Memory related tools
 
-use super::{lcopy, lpeek};
-use alloc::string::String;
-use alloc::vec::Vec;
-use core::convert::From;
-use core::mem::MaybeUninit;
+use super::libc;
+use alloc::{string::String, vec::Vec};
+use core::{convert::From, mem::MaybeUninit};
+
+/// Maximum value in 28-bit address space
+pub const MAX_28_BIT_ADDRESS: u32 = 0xFFFFFFF;
+
+/// Read into 28 bit memory
+pub fn lpeek(address: u32) -> u8 {
+    unsafe { libc::lpeek(address as i32) }
+}
+
+/// Write into 28 bit memory
+///
+/// # Safety
+/// Unsafe as it writes directly to memory
+pub unsafe fn lpoke(address: u32, value: u8) {
+    libc::lpoke(address as i32, value)
+}
+
+/// DMA copy in 28 bit address space
+///
+/// # Safety
+/// Unsafe as it writes directly to memory
+pub unsafe fn lcopy(source: u32, destination: u32, length: usize) {
+    if length > 0 {
+        unsafe { libc::lcopy(source as i32, destination as i32, length as u16) };
+    }
+}
 
 /// Allocator for 28-bit memory
 ///
@@ -30,7 +54,7 @@ use core::mem::MaybeUninit;
 /// here called `fat` which implements the `From` trait for common
 /// types such as `Vec<u8>` and `String`.
 /// ~~~
-/// let mut mem = memory::Allocator::new(0x40000);
+/// let mut mem = Allocator::new(0x40000);
 /// let a = Vec::<u8>::from([7, 9, 13]);
 /// let fat = mem.write(a.as_slice()); // dma write
 /// let b = Vec::<u8>::from(fat); // dma read
@@ -53,7 +77,7 @@ pub struct Allocator {
 }
 
 impl Allocator {
-    pub fn new(address: u32) -> Self {
+    pub const fn new(address: u32) -> Self {
         Self { address }
     }
     /// DMA copy bytes to next available 28-bit memory location.
@@ -102,8 +126,8 @@ impl From<Fat28> for Vec<u8> {
 /// ~~~
 /// const ADDRESS: u32 = 0x40000;
 /// let mut mem = MemoryIterator::new(ADDRESS);
-/// let single_byte: u8 = mem.next().unwrap();
-/// let byte_vector: Vec<u8> = mem.get_chunk(10);
+/// let byte: u8 = mem.next().unwrap();
+/// let v: Vec<u8> = mem.get_chunk(10);
 /// for byte in mem.take(4) {
 ///     println!("{}", byte);
 /// }

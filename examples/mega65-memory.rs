@@ -1,3 +1,17 @@
+// copyright 2022 mikael lund aka wombat
+//
+// licensed under the apache license, version 2.0 (the "license");
+// you may not use this file except in compliance with the license.
+// you may obtain a copy of the license at
+//
+//     http://www.apache.org/licenses/license-2.0
+//
+// unless required by applicable law or agreed to in writing, software
+// distributed under the license is distributed on an "as is" basis,
+// without warranties or conditions of any kind, either express or implied.
+// see the license for the specific language governing permissions and
+// limitations under the license.
+
 //! MEGA65 memory example
 //!
 //! Illustrates DMA copy etc.
@@ -11,7 +25,6 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::mem::size_of;
 use core::str;
-use mos_hardware::mega65::memory::*;
 use mos_hardware::mega65::*;
 use ufmt_stdio::*;
 
@@ -21,8 +34,12 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     // Integer sizes
     println!("USIZE = {}", size_of::<usize>());
+    println!("ISIZE = {}", size_of::<isize>());
     println!("CLONG = {}", size_of::<core::ffi::c_long>());
     println!("CUINT = {}", size_of::<core::ffi::c_uint>());
+    println!("MAX_28  = {}", MAX_28_BIT_ADDRESS);
+    println!("MAX U32 = {}", u32::MAX);
+    println!("MAX I32 = {}", i32::MAX);
 
     // Memory allocation in bank 4 (0x40000 - 0x4ffff)
     const ADDRESS: u32 = 0x40000;

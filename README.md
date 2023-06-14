@@ -100,6 +100,7 @@ be subject to significant changes.
   - [x] partial support for vic3, vic4 and other hardware registers.
   - [x] [mega65-libc](https://github.com/MEGA65/mega65-libc) bindings
   - [x] Random number traits (`RngCore`, `SeedableRng`)
+  - [x] Iterator to 28-bit address space
 - [Examples](https://github.com/mlund/mos-hardware/tree/main/examples):
   - [x] Plasma effect (c64, mega65)
   - [x] Raster IRQ (c64)
@@ -107,3 +108,4 @@ be subject to significant changes.
   - [x] Smooth x-scrooll (c64)
   - [x] Joystick read (c64)
   - [x] 10print maze (c64)
+  - [x] Memory iteration and fat pointers (mega65)
