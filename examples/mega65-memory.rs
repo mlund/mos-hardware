@@ -17,8 +17,8 @@ use ufmt_stdio::*;
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     set_upper_case();
 
-    // Memory book-keeper
-    let address = 0x10000;
+    // Memory allocation in bank 5 (0x40000 - 0x4ffff)
+    let address = 0x40000;
     let mut alloc = memory::Allocator::new(address);
 
     // Copy bytes to upper mem, then back again
@@ -46,9 +46,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     // Loop over vector of Fat28 pointers as if strings
     // (transparent DMA copying)
-    let mut v: Vec<memory::Fat28> = Vec::new();
-    v.push(alloc.push(b"first"));
-    v.push(alloc.push(b"second"));
+    let v = Vec::from([alloc.push(b"first"), alloc.push(b"second")]);
     let cnt = v
         .iter()
         .copied()
