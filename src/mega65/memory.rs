@@ -37,9 +37,9 @@ use core::mem::MaybeUninit;
 /// assert_eq!(a, b);
 /// ~~~
 ///
-/// `Vec<Fat28>` can be traversed almost as if a vector of strings:
+/// `Vec<Fat28>` can be traversed almost as if a vector of values:
 /// ~~~
-/// let cnt = Vec::from([alloc.push(b"first"), mem.push(b"second")])
+/// let cnt = Vec::from([mem.push(b"first"), mem.push(b"second")])
 ///      .iter()
 ///      .copied()
 ///      .map(String::from)
@@ -47,9 +47,6 @@ use core::mem::MaybeUninit;
 ///      .count();
 /// assert_eq!(cnt, 1);
 /// ~~~
-///
-/// Subsequent calls to `push()` advances the allocator address.
-/// Several external strings can be handled with `Vec<Ptr28>`.
 pub struct Allocator {
     /// Current 28-bit address
     pub address: u32,
@@ -59,7 +56,9 @@ impl Allocator {
     pub fn new(address: u32) -> Self {
         Self { address }
     }
-    /// DMA copy bytes to next available 28-bit memory location
+    /// DMA copy bytes to next available 28-bit memory location.
+    ///
+    /// Every call to `write` advances the address by `bytes.len()`.
     pub fn write(&mut self, bytes: &[u8]) -> Fat28 {
         let len = bytes.len();
         let ptr = Fat28 {
@@ -101,7 +100,7 @@ impl From<Fat28> for Vec<u8> {
 ///
 /// # Examples
 /// ~~~
-/// const ADDRESS: u32 = 0x8010000;
+/// const ADDRESS: u32 = 0x40000;
 /// let mut mem = MemoryIterator::new(ADDRESS);
 /// let single_byte: u8 = mem.next().unwrap();
 /// let byte_vector: Vec<u8> = mem.get_chunk(10);
