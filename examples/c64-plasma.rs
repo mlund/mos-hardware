@@ -6,6 +6,7 @@
 
 #![no_std]
 #![feature(start)]
+extern crate mos_alloc;
 
 use core::panic::PanicInfo;
 use mos_hardware::vic2::{BLACK, RED};

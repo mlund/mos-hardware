@@ -7,6 +7,7 @@
 #![no_std]
 #![feature(start)]
 
+extern crate mos_alloc;
 extern crate mos_hardware;
 
 use core::panic::PanicInfo;
