@@ -39,9 +39,9 @@ impl Plasma {
     /// Generate stochastic character set
     fn make_charset(charset_address: *mut u8) {
         let generate_char = |sine| {
-            const BITS: [u8; 8] = [1, 2, 4, 8, 16, 32, 64, 128];
             let mut char_pattern: u8 = 0;
-            BITS.iter()
+            [1, 2, 4, 8, 16, 32, 64, 128]
+                .iter()
                 .filter(|_| mega65::random::rand8(u8::MAX) > sine)
                 .for_each(|bit| {
                     char_pattern |= bit;
