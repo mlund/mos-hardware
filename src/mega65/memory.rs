@@ -28,7 +28,7 @@ use core::mem::MaybeUninit;
 /// ~~~
 /// let mut alloc = Allocator::new(0xc0000);
 /// let ptr: Ptr28 = alloc.push("some large string".as_bytes()); // DMA copy to
-/// let s = String::From(ptr); // Get using DMA copy
+/// let s = String::from(ptr); // Get using DMA copy
 /// assert_eq!(s, "some large string");
 /// ~~~
 ///
@@ -44,9 +44,9 @@ impl Allocator {
         Self { address }
     }
     /// DMA copy bytes to next available 28-bit memory location
-    pub fn push(&mut self, bytes: &[u8]) -> Ptr28 {
+    pub fn push(&mut self, bytes: &[u8]) -> Fat28 {
         let len = bytes.len() as u16;
-        let ptr = Ptr28 {
+        let ptr = Fat28 {
             address: self.address,
             len,
         };
@@ -58,23 +58,23 @@ impl Allocator {
     }
 }
 
-/// Fat pointer to 28-bit address with an additional length
+/// Fat pointer to region in 28-bit address space
 #[derive(Clone, Copy)]
-pub struct Ptr28 {
+pub struct Fat28 {
     /// Address
     pub address: u32,
     /// Length in bytes
     pub len: u16,
 }
 
-impl From<Ptr28> for String {
-    fn from(value: Ptr28) -> Self {
+impl From<Fat28> for String {
+    fn from(value: Fat28) -> Self {
         unsafe { Self::from_utf8_unchecked(value.into()) }
     }
 }
 
-impl From<Ptr28> for Vec<u8> {
-    fn from(value: Ptr28) -> Self {
+impl From<Fat28> for Vec<u8> {
+    fn from(value: Fat28) -> Self {
         MemoryIterator::new(value.address).get_chunk(value.len)
     }
 }
