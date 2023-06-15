@@ -8,8 +8,9 @@
 #![feature(start)]
 extern crate mos_alloc;
 
+use core::ops::BitOrAssign;
 use core::panic::PanicInfo;
-use itertools::iproduct;
+use itertools::{iproduct, Itertools};
 use mos_hardware::vic2::{BLACK, RED};
 use mos_hardware::*;
 use ufmt_stdio::*;
@@ -45,10 +46,8 @@ impl Plasma {
             let mut pattern: u8 = 0;
             [1, 2, 4, 8, 16, 32, 64, 128]
                 .iter()
-                .filter(|_| c64::sid().random_byte() > sine)
-                .for_each(|bit| {
-                    pattern |= bit;
-                });
+                .filter(|_| c64::sid().random_byte() < sine)
+                .for_each(|bit| pattern.bitor_assign(bit));
             pattern
         };
 
@@ -69,29 +68,29 @@ impl Plasma {
     pub fn render(&mut self, screen_address: *mut u8) {
         let mut i = self.yindex1;
         let mut j = self.yindex2;
-
         for y in self.ybuffer.iter_mut() {
             *y = sine(i).wrapping_add(sine(j));
             i = i.wrapping_add(4);
             j = j.wrapping_add(9);
         }
-        self.yindex1 = self.yindex1.wrapping_add(3);
-        self.yindex2 = self.yindex2.wrapping_sub(5);
 
-        let mut i = self.xindex1;
-        let mut j = self.xindex2;
+        i = self.xindex1;
+        j = self.xindex2;
         for x in self.xbuffer.iter_mut() {
             *x = sine(i).wrapping_add(sine(j));
             i = i.wrapping_add(3);
             j = j.wrapping_add(7);
         }
-        self.xindex1 = self.xindex1.wrapping_add(2);
-        self.xindex2 = self.xindex2.wrapping_sub(3);
 
         iproduct!(self.ybuffer.iter().copied(), self.xbuffer.iter().copied())
             .map(|(y, x)| x.wrapping_add(y))
             .enumerate()
             .for_each(|(i, sum)| unsafe { screen_address.add(i).write_volatile(sum) });
+
+        self.yindex1 = self.yindex1.wrapping_add(3);
+        self.yindex2 = self.yindex2.wrapping_sub(5);
+        self.xindex1 = self.xindex1.wrapping_add(2);
+        self.xindex2 = self.xindex2.wrapping_sub(3);
     }
 }
 
