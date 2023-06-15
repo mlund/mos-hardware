@@ -10,7 +10,7 @@ extern crate mos_alloc;
 
 use core::ops::BitOrAssign;
 use core::panic::PanicInfo;
-use itertools::{iproduct, Itertools};
+use itertools::iproduct;
 use mos_hardware::vic2::{BLACK, RED};
 use mos_hardware::*;
 use ufmt_stdio::*;
@@ -27,9 +27,9 @@ struct Plasma {
 
 impl Plasma {
     /// Create new instance and initialize character set at given address
-    pub fn new(charset_address: u16) -> Plasma {
-        Plasma::make_charset(charset_address as *mut u8);
-        Plasma {
+    pub fn new(charset_address: u16) -> Self {
+        Self::make_charset(charset_address as *mut u8);
+        Self {
             yindex1: 0,
             yindex2: 0,
             xindex1: 0,
@@ -115,7 +115,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 }
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(_: &PanicInfo) -> ! {
     loop {
         unsafe {
             c64::vic2().border_color.write(RED);

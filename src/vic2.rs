@@ -62,17 +62,17 @@ impl Sprites {
     /// ~~~
     /// const SPRITE2: Sprite = Sprites::new(2);
     /// ~~~
-    pub const fn new(index: u8) -> Sprites {
+    pub const fn new(index: u8) -> Self {
         assert!(index < 8);
         match index {
-            0 => Sprites::SPRITE0,
-            1 => Sprites::SPRITE1,
-            2 => Sprites::SPRITE2,
-            3 => Sprites::SPRITE3,
-            4 => Sprites::SPRITE4,
-            5 => Sprites::SPRITE5,
-            6 => Sprites::SPRITE6,
-            7 => Sprites::SPRITE7,
+            0 => Self::SPRITE0,
+            1 => Self::SPRITE1,
+            2 => Self::SPRITE2,
+            3 => Self::SPRITE3,
+            4 => Self::SPRITE4,
+            5 => Self::SPRITE5,
+            6 => Self::SPRITE6,
+            7 => Self::SPRITE7,
             _ => panic!(),
         }
     }
@@ -167,7 +167,7 @@ impl CharsetBank {
     /// const CHARSET: u16 = 0x2000;
     /// const BANK: u8 = vic2::ScreenBank::from(SCREEN).bits() | vic2::CharsetBank::from(CHARSET).bits();
     /// ~~~
-    pub const fn from(charset: u16) -> CharsetBank {
+    pub const fn from(charset: u16) -> Self {
         let bank = ((charset >> 10) & 0x0e) as u8;
         Self::from_bits(bank).unwrap()
     }
@@ -205,7 +205,7 @@ impl ScreenBank {
     /// const CHARSET: u16 = 0x2000;
     /// const BANK: u8 = ScreenBank::from_address(SCREEN).bits() | ScreenBank::from_address(CHARSET).bits();
     /// ~~~
-    pub const fn from_address(screen: u16) -> ScreenBank {
+    pub const fn from_address(screen: u16) -> Self {
         let bank = (screen >> 6) as u8;
         Self::from_bits(bank).unwrap()
     }

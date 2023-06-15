@@ -220,9 +220,9 @@ pub struct SIDRng {
 
 impl SIDRng {
     /// Initialize and start SID oscillator
-    pub fn new(sid_address: &'static MOSSoundInterfaceDevice) -> SIDRng {
+    pub fn new(sid_address: &'static MOSSoundInterfaceDevice) -> Self {
         sid_address.start_random_generator();
-        SIDRng { sid: sid_address }
+        Self { sid: sid_address }
     }
 }
 

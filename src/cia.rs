@@ -172,7 +172,7 @@ impl GameController {
     /// using bitflags.
     pub const fn read_joystick(&self) -> (JoystickPosition, bool) {
         let position = JoystickPosition::new(*self);
-        let fire = self.complement().contains(GameController::FIRE);
+        let fire = self.complement().contains(Self::FIRE);
         (position, fire)
     }
 }

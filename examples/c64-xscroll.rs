@@ -57,8 +57,8 @@ impl SmoothScroll {
     (scroll and sprite movement) while SID music playback is excluded. "
     );
 
-    const fn default() -> SmoothScroll {
-        SmoothScroll {
+    const fn default() -> Self {
+        Self {
             text_index: 0,
             displacement: 7,
         }
@@ -132,7 +132,7 @@ struct SpriteMove {
 
 impl SpriteMove {
     const OFFSET: u8 = 30;
-    const fn default() -> SpriteMove {
+    const fn default() -> Self {
         SpriteMove { counter_y: 0 }
     }
 }
