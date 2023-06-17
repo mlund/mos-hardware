@@ -14,6 +14,8 @@ use mos_hardware::mega65::set_lower_case;
 //use mos_hardware::mega65::libc::cputs;
 use mos_hardware::mega65::libc::mega65_fast;
 use mos_hardware::mega65::lpoke;
+use mos_hardware::mega65::Fat28;
+use mos_hardware::mega65::Allocator;
 
 use ufmt_stdio::*;
 
@@ -244,7 +246,7 @@ const _TOKENS: [&str; 190] = [
 
 struct Label {
     /// lb$ = label name
-    name: String,
+    name: Fat28,
     /// ll$ = (post-processed line)
     pp_line: u16,
 }
@@ -269,9 +271,13 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut delete_line_flag: bool = false;
     let mut inside_ifdef: bool = false;
     let mut labels: Vec<Label> = Vec::with_capacity(MAX_CAP);
-    let mut var_table: [Vec<String>; 5] = Default::default();
-    let mut argument_list: Vec<String> = Vec::with_capacity(MAX_CAP);
-    let mut define_values: Vec<String> = Vec::with_capacity(MAX_CAP);
+    let mut var_table: [Vec<Fat28>; 5] = Default::default();
+    let mut argument_list: Vec<Fat28> = Vec::with_capacity(MAX_CAP);
+    let mut define_values: Vec<Fat28> = Vec::with_capacity(MAX_CAP);
+
+    // Memory allocation in bank 4 (0x40000 - 0x4ffff)
+    const ADDRESS: u32 = 0x40000;
+    let mut mem = Allocator::new(ADDRESS);
 
     // after expanding memory via 'link.ld', I needed to print something
     // very early, otherwise it would freeze up for some reason...
@@ -382,6 +388,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 println!("dot!");
                 _next_line_flag = true;
                 parse_label(
+                    &mut mem,
                     verbose,
                     &current_line,
                     pp_line,
@@ -392,6 +399,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
             // 601
             if (&current_line[..1]).eq("#") {
                 parse_preprocessor_directive(
+                    &mut mem,
                     &mut current_line,
                     &mut next_line,
                     &mut delete_line_flag,
@@ -422,14 +430,15 @@ fn index_of(line: &str, token: &str) -> i16 {
 
 // 603 - 607
 fn parse_preprocessor_directive(
+    mem: &mut Allocator,
     current_line: &mut String,
     next_line: &mut String,
     delete_line_flag: &mut bool,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: & mut [Vec<String>; 5],
-    define_values: &mut Vec<String>,
-    argument_list: & mut Vec<String>,
+    var_table: & mut [Vec<Fat28>; 5],
+    define_values: &mut Vec<Fat28>,
+    argument_list: & mut Vec<Fat28>,
     verbose: bool
 ) {
     if index_of(current_line, "IFDEF") == 1 {
@@ -446,7 +455,7 @@ fn parse_preprocessor_directive(
     else if index_of(current_line, "DEFINE") == 1 {
         println!("** define!");
         let line_suffix = current_line[8..].to_string();
-        declare_var(&line_suffix, var_table,
+        declare_var(mem, &line_suffix, var_table,
             element_count,
             current_line, next_line,
             false, define_values, 
@@ -456,7 +465,7 @@ fn parse_preprocessor_directive(
     else if index_of(current_line, "DECLARE") == 1 {
         println!("** declare!");
         let line_suffix = current_line[9..].to_string();
-        declare_var(&line_suffix, var_table,
+        declare_var(mem, &line_suffix, var_table,
             element_count,
             current_line, next_line,
             false, define_values, 
@@ -467,19 +476,20 @@ fn parse_preprocessor_directive(
 
 // line 1000 - rem declare var(s) in s$
 fn declare_var(
+    mem: &mut Allocator,
     varline: &str,
-    var_table:  &mut [Vec<String>; 5],
+    var_table:  &mut [Vec<Fat28>; 5],
     element_count: &mut [u16; 5],
     current_line: &mut String,
     next_line: &mut String,
     is_define: bool,
-    define_values: &mut Vec<String>,
-    argument_list: &mut Vec<String>,
+    define_values: &mut Vec<Fat28>,
+    argument_list: &mut Vec<Fat28>,
     delete_line_flag: &mut bool,
     verbose: bool
 ) {
     println!("new var! {}", varline);
-    parse_args(varline, ",;", true, argument_list);
+    parse_args(mem, varline, ",;", true, argument_list);
 
     if argument_list.len() == 0 {
         println!("?DECLARE PARAMETER MISSING IN LINE ..."); // {}", source_line_counter);
@@ -488,9 +498,10 @@ fn declare_var(
     }
 
     // lines 1030 - 1120
-    for arg in argument_list {
+    for ptr in argument_list {
         let mut dimension: String = String::new();
 
+        let mut arg = String::from(*ptr);
         let open_bkt_pos = arg.find('('); // b1
         let close_bkt_pos = arg.find(')'); // b2
         let equals_pos = arg.find('='); // eq
@@ -522,7 +533,7 @@ fn declare_var(
         if let (Some(opn_bkt_idx), Some(close_bkt_idx)) = (open_bkt_pos, close_bkt_pos) {
             // --- dimension ---
             dimension = arg[opn_bkt_idx + 1..close_bkt_idx].to_string();
-            *arg = arg[..opn_bkt_idx - 1].to_string();
+            arg = arg[..opn_bkt_idx - 1].to_string();
     
             replace_vars_and_labels_in_source_string(&mut dimension);
     
@@ -562,7 +573,7 @@ fn declare_var(
         }
             
         // 1074
-        var_table[var_type as usize][element_count[var_type as usize] as usize] = arg.to_string();
+        var_table[var_type as usize][element_count[var_type as usize] as usize] = mem.write(arg.as_bytes());
 
         let mut var_name: String = String::new();
 
@@ -584,7 +595,7 @@ fn declare_var(
         }
     
         if *delete_line_flag == true {
-            define_values[element_count[var_type as usize] as usize] = rhs.clone();
+            define_values[element_count[var_type as usize] as usize] = mem.write(rhs.as_bytes());
         }
     
         if verbose {
@@ -726,10 +737,11 @@ fn my_contains(string1: &str, string2: &str) -> bool {
 
 // line 2100
 fn parse_args(
+    mem: &mut Allocator,
     s: &str,
     delimiter: &str,
     parse_brackets: bool,
-    argument_list: &mut Vec<String>
+    argument_list: &mut Vec<Fat28>
 ) {
 
     let mut remaining_string = s.to_string();
@@ -745,6 +757,8 @@ fn parse_args(
     }
 
     let mut i = 0;
+    let mut current_arg = String::new();
+
     while i < string_length {
         let b = remaining_string.chars().nth(i).unwrap().to_string();
         println!("chr={}", b[..]);
@@ -761,26 +775,21 @@ fn parse_args(
 
         if my_contains(delimiter, &b) && inside_group == false {
             //(*argument_list).push(String::from(trim_all(&b[..], &SPACE_CHAR_ONLY)));
-            let mut current_arg = argument_list[argument_count as usize].clone();
             trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
             println!("arg={}", current_arg[..]);
-            argument_list[argument_count as usize] = current_arg;
+            argument_list.push(mem.write(current_arg.as_bytes()));
             argument_count += 1;
-        } else if argument_count >= argument_list.len() {
-            let current_arg = String::from(b);
-            argument_list.push(current_arg);
+            current_arg = String::new();
         } else {
-            let current_arg = &mut argument_list[argument_count as usize];
             current_arg.push_str(&b);
         }
 
         i += 1;
     }
 
-    let mut last_arg: String = argument_list[argument_count as usize].clone();
-    trim_all(&mut last_arg, &SPACE_CHAR_ONLY);
-    println!("lastarg={}", last_arg[..]);
-    argument_list[argument_count as usize] = last_arg;
+    trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
+    println!("lastarg={}", current_arg[..]);
+    argument_list.push(mem.write(current_arg.as_bytes()));
 }
 
 // 9210
@@ -788,11 +797,11 @@ fn check_if_define_exists(
     def_str: &str,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: &[Vec<String>; 5]
+    var_table: &[Vec<Fat28>; 5]
 ) {
     *inside_ifdef = true;
     for k in 0..element_count[VarType::Define as usize] {
-        if var_table[VarType::Define as usize][k as usize] == def_str {
+        if String::from(var_table[VarType::Define as usize][k as usize]) == def_str {
             *inside_ifdef = false;
             return;
         }
@@ -851,6 +860,7 @@ fn copy_data_to_current_line(ca_addr: &mut u32, current_line: &mut String) {
 ///
 /// return the label and let the caller add to `labels`.
 fn parse_label(
+    mem: &mut Allocator,
     verbose: bool,
     current_line: &str,
     pp_line: u16,
@@ -862,7 +872,7 @@ fn parse_label(
     }
     *delete_line_flag = true;
     (*labels).push(Label {
-        name: String::from(&((*current_line)[1..])),
+        name: mem.write(String::from(&((*current_line)[1..])).as_bytes()),
         pp_line: pp_line + 1,
     });
 }
