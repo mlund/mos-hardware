@@ -29,10 +29,15 @@ const _TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
 
 #[derive(Clone, Copy)]
 enum VarType {
+    /// Floating point number
     Float = 0,
+    /// Integer
     Int = 1,
+    /// String
     String = 2,
+    /// Reference
     Ref = 3,
+    /// # todo what is this?
     Define = 4,
 }
 
@@ -53,7 +58,6 @@ const WHITESPACE_CHARS: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right
 
 // rw$
 
-/*
 const _TOKENS: [&str; 190] = [
     "print",
     "input",
@@ -246,7 +250,6 @@ const _TOKENS: [&str; 190] = [
     "xor",
     "key",
 ];
- */
 struct Label {
     /// lb$ = label name
     pub name: Fat28,
@@ -518,8 +521,6 @@ fn declare_var(
         let mut dimension: String = String::new();
 
         let mut arg = String::from(*ptr);
-        let open_bkt_pos = arg.find('('); // b1
-        let close_bkt_pos = arg.find(')'); // b2
         let equals_pos = arg.find('='); // eq
         let mut rhs = String::new(); // vl$
         let mut lhs = String::new(); // p$
@@ -527,49 +528,52 @@ fn declare_var(
         if let Some(eq_idx) = equals_pos {
             // --- assignment ---
             rhs = arg.split_off(eq_idx + 1);
-            lhs = arg[..eq_idx - 1].to_string();
+            lhs = arg[..eq_idx - 1].into();
             lhs = trim_left(&lhs, &WHITESPACE_CHARS).into();
             rhs = trim_right(&rhs, &WHITESPACE_CHARS).into();
 
             if rhs.starts_with('$') {
-                let hx = rhs[1..].to_string();
+                let hx = &rhs[1..];
                 // @todo return value never used...
-                convert_hex(&hx);
-                rhs = hx;
+                convert_hex(hx);
+                rhs = hx.into();
             }
 
             if rhs.starts_with('%') {
-                let bi = rhs[1..].to_string();
+                let bi = &rhs[1..];
                 // @todo the return value never used...
-                convert_binary(&bi);
-                rhs = bi;
+                convert_binary(bi);
+                rhs = bi.into();
             }
         }
 
         // 1050 - 1060
+        let open_bkt_pos = arg.find('('); // b1
+        let close_bkt_pos = arg.find(')'); // b2
         if let (Some(opn_bkt_idx), Some(close_bkt_idx)) = (open_bkt_pos, close_bkt_pos) {
             // --- dimension ---
-            dimension = arg[opn_bkt_idx + 1..close_bkt_idx].to_string();
-            arg = arg[..opn_bkt_idx - 1].to_string();
+            dimension = arg[opn_bkt_idx + 1..close_bkt_idx].into();
+            arg = arg[..opn_bkt_idx - 1].into();
+            arg.shrink_to_fit();
 
+            // @todo return value never used
             replace_vars_and_labels_in_source_string(&dimension);
 
             *delete_line_flag = false;
         }
 
         let mut var_type = VarType::Float; // var type
-        let t = lhs.chars().rev().next();
         if verbose {
             print!("adding {{rvon}}");
         }
 
+        // @todo Why is this a String and not a char? Only one character...
         let mut t_str = String::new();
-        if let Some(t_char) = t {
+        if let Some(t_char) = lhs.chars().rev().next() {
             t_str.push(t_char);
         }
 
-        // @todo is this pattern correct or does it match "%&$"?
-        if !t_str.contains("%&$") {
+        if !t_str.contains(['%', '&', '$']) {
             t_str.clear();
             var_type = VarType::Float;
         }
@@ -578,6 +582,7 @@ fn declare_var(
             var_type = VarType::Define;
         }
 
+        // @todo Move responsibility? I.e. `impl Vartype {...}`
         var_type = match t_str.as_str() {
             "%" => VarType::Int,
             "$" => VarType::String,
@@ -601,7 +606,7 @@ fn declare_var(
         if !rhs.is_empty() {
             let id = element_count[var_type as usize];
             let var_name = generate_varname_from_index(id as usize);
-            if !(*delete_line_flag) {
+            if !*delete_line_flag {
                 next_line.push_str(&format!("{var_name}{t_str}={rhs}:"));
             }
         }
@@ -645,8 +650,8 @@ fn convert_binary(bi: &str) -> u16 {
     let mut val: u16 = 0; // result
     for (b, letter) in bi.chars().rev().enumerate() {
         match letter {
-            '1' => val += (1 << b),
             '0' => continue,
+            '1' => val += 1 << b,
             _ => bail_out(),
         }
     }
@@ -665,17 +670,16 @@ fn convert_hex(hx: &str) -> u16 {
 
 // lines 3000-3220
 fn replace_vars_and_labels_in_source_string(s: &str) -> String {
-    if s.starts_with("^^") {
-        return s[2..].to_string();
+    if let Some(stripped) = s.strip_prefix("^^") {
+        return stripped.to_string();
     }
-
     let mut quote_flag = false;
     let mut a = String::with_capacity(s.len());
     let mut c = String::with_capacity(s.len());
     let d = "<>=+-#*/^,.:;() ";
 
-    for b in s.chars() {
-        if b == QUOTE_CHAR {
+    for letter in s.chars() {
+        if letter == QUOTE_CHAR {
             quote_flag = !quote_flag;
             if quote_flag {
                 a.push_str(&assess_token(&c));
@@ -686,20 +690,20 @@ fn replace_vars_and_labels_in_source_string(s: &str) -> String {
         }
 
         if quote_flag {
-            a.push(b);
+            a.push(letter);
             continue;
         }
 
         // if my_contains(d, b.to_string().as_str()) {
-        if d.contains(b) {
+        if d.contains(letter) {
             a.push_str(&assess_token(&c));
             c.clear();
-            if b == ' ' {
+            if letter == ' ' {
                 continue;
             }
         }
-        a.push(b);
-        c.push(b);
+        a.push(letter);
+        c.push(letter);
     }
 
     a.push_str(&assess_token(&c));
@@ -725,7 +729,7 @@ fn bail_out() {
 // and a compare(&str, char) would seem more efficient. Is the
 // built in contains too large? I supposed it has fancy pattern
 // matching that we often do not use.
-fn my_contains(string1: &str, string2: &str) -> bool {
+fn _my_contains(string1: &str, string2: &str) -> bool {
     for a in string1.chars() {
         for b in string2.chars() {
             if a == b {
@@ -770,9 +774,9 @@ fn parse_args(
             }
         }
 
-        if delimiter.contains(letter) && !inside_group {
+        if !inside_group && delimiter.contains(letter) {
             //(*argument_list).push(String::from(trim_all(&b[..], &SPACE_CHAR_ONLY)));
-            trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
+            current_arg = trim_all(&current_arg, &SPACE_CHAR_ONLY).into();
             println!("arg={}", current_arg[..]);
             argument_list.push(mem.write(current_arg.as_bytes()));
             _argument_count += 1;
@@ -781,8 +785,8 @@ fn parse_args(
             current_arg.push(letter);
         }
     }
-    trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
-    println!("lastarg={}", current_arg[..]);
+    current_arg = trim_all(current_arg.as_str(), &SPACE_CHAR_ONLY).into();
+    println!("lastarg={}", current_arg.as_str());
     argument_list.push(mem.write(current_arg.as_bytes()));
 }
 
@@ -802,9 +806,10 @@ fn check_if_define_exists(
     }
 }
 
+// @todo Take instead a &str and return a &str?
 fn single_quote_comment_trim(current_line: &mut String) {
     //422
-    if current_line.find('\'').is_none() || current_line.find('"').is_none() {
+    if !current_line.contains('\'') || !current_line.contains('"') {
         return;
     }
     //423
@@ -812,9 +817,9 @@ fn single_quote_comment_trim(current_line: &mut String) {
     let mut quote_flag = false;
     let mut cut_tail_idx = None;
     //440
-    for (in_line_idx, c) in current_line.chars().enumerate() {
+    for (in_line_idx, letter) in current_line.chars().enumerate() {
         //let c = (*current_line).chars().nth(in_line_idx).unwrap();
-        match c {
+        match letter {
             '"' => quote_flag = !quote_flag,
             '\'' => {
                 if !quote_flag {
@@ -832,15 +837,16 @@ fn single_quote_comment_trim(current_line: &mut String) {
     //println!("'{}'", &(*current_line)[..]);
 }
 
-/// @todo: skip `current_line` as argument as it is zeroed
-fn copy_data_to_current_line(ca_addr: &mut u32, current_line: &mut String) {
-    current_line.clear();
+/// @todo: skip `current_line` as argument as it is zeroed.
+/// @todo: we could use the mos-hardware memory iterator
+fn copy_data_to_current_line(ca_addr: &mut u32, destination: &mut String) {
     let line_length = lpeek(*ca_addr) as u32;
+    destination.clear();
+    destination.reserve(line_length as usize);
     *ca_addr += 1;
 
-    (*ca_addr..*ca_addr + line_length)
-        .for_each(|address| (*current_line).push(lpeek(address) as char));
-
+    // @todo copy chunk instead iterating over individual bytes
+    (*ca_addr..*ca_addr + line_length).for_each(|address| destination.push(lpeek(address) as char));
     *ca_addr += line_length;
 }
 
@@ -862,7 +868,7 @@ fn parse_label(
     labels: &mut Vec<Label>,
 ) {
     if verbose {
-        println!("label {} at pp_line {}", current_line[..], pp_line);
+        println!("label {} at pp_line {}", current_line, pp_line);
     }
     *delete_line_flag = true;
     (*labels).push(Label {
@@ -889,9 +895,9 @@ fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str {
     &line[..((i + 1) as usize)]
 }
 
-fn trim_all(line: &mut String, trim_chars: &[u8]) {
-    *line = String::from(trim_left(&line[..], trim_chars));
-    *line = String::from(trim_right(&line[..], trim_chars));
+fn trim_all<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str {
+    let s = trim_left(line, trim_chars);
+    trim_right(s, trim_chars)
 }
 
 fn prepare_test_memory(verbose: &mut bool) {
@@ -954,10 +960,16 @@ fn get_filename(verbose: &mut bool) -> String {
         }
         // 7050   f$="":a=ba+16:dowhilepeek(a)<>0:f$=f$+chr$(peek(a)):a=a+1:loop:
         addr += 16;
-        while lpeek(addr) != 0 {
-            filename.push(lpeek(addr) as char);
+        loop {
+            let byte = lpeek(addr);
             addr += 1;
+            if byte != 0 {
+                filename.push(byte as char);
+            } else {
+                break;
+            }
         }
+        filename.shrink_to_fit();
 
         // 7060   if peek(dec("ff07"))and1 thenreturn
         if lpeek(0x4ff07u32) & 1 == 1 {
@@ -967,7 +979,7 @@ fn get_filename(verbose: &mut bool) -> String {
         }
 
         // 7070   print "filename? "+f$:print"{up}";
-        println!("FILENAME? {}", &filename[..]);
+        println!("FILENAME? {}", &filename.as_str());
         // 7080 bend
     }
 
@@ -985,7 +997,6 @@ fn get_filename(verbose: &mut bool) -> String {
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    #[cfg(not(target_vendor = "nes-nrom-128"))]
     print!("!");
     loop {}
 }
