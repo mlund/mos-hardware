@@ -23,7 +23,7 @@ const MAX_CAP: usize = 20;
 
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
-const QUOTE_CHAR: &str = "\"";
+const QUOTE_CHAR: char = '\"';
 /// pf$ = type_suffix
 const _TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
 
@@ -567,6 +567,7 @@ fn declare_var(
             t_str.push(t_char);
         }
 
+        // @todo is this pattern correct or does it match "%&$"?
         if !t_str.contains("%&$") {
             t_str.clear();
             var_type = VarType::Float;
@@ -576,17 +577,12 @@ fn declare_var(
             var_type = VarType::Define;
         }
 
-        if t_str == "%" {
-            var_type = VarType::Int;
-        }
-
-        if t_str == "$" {
-            var_type = VarType::String;
-        }
-
-        if t_str == "&" {
-            var_type = VarType::Ref;
-        }
+        var_type = match t_str.as_str() {
+            "%" => VarType::Int,
+            "$" => VarType::String,
+            "&" => VarType::Ref,
+            _ => var_type,
+        };
 
         // 1074
         var_table[var_type as usize][element_count[var_type as usize] as usize] =
@@ -681,20 +677,19 @@ fn replace_vars_and_labels_in_source_string(s: &str) -> String {
     }
 
     let mut quote_flag = false;
-    let mut a = String::new();
-    let mut c = String::new();
+    let mut a = String::with_capacity(s.len());
+    let mut c = String::with_capacity(s.len());
     let d = "<>=+-#*/^,.:;() ";
 
     for b in s.chars() {
-        if b.to_string() == QUOTE_CHAR {
+        if b == QUOTE_CHAR {
             quote_flag = !quote_flag;
             if quote_flag {
                 a.push_str(&assess_token(&c));
-                c = String::new();
             } else {
                 a.push_str(&c);
-                c = String::new();
             }
+            c.clear();
         }
 
         if quote_flag {
@@ -702,14 +697,14 @@ fn replace_vars_and_labels_in_source_string(s: &str) -> String {
             continue;
         }
 
-        if my_contains(d, b.to_string().as_str()) {
+        // if my_contains(d, b.to_string().as_str()) {
+        if d.contains(b) {
             a.push_str(&assess_token(&c));
-            c = String::new();
+            c.clear();
             if b == ' ' {
                 continue;
             }
         }
-
         a.push(b);
         c.push(b);
     }
@@ -733,17 +728,19 @@ fn bail_out() {
     // Your implementation here
 }
 
+// @todo this seem to be often used with a single char str
+// and a compare(&str, char) would seem more efficient. Is the
+// built in contains too large? I supposed it has fancy pattern
+// matching that we often do not use.
 fn my_contains(string1: &str, string2: &str) -> bool {
-    let mut iter1 = string1.chars().peekable();
-    let mut iter2 = string2.chars().peekable();
-
-    while let (Some(c1), Some(c2)) = (iter1.next(), iter2.peek().copied()) {
-        if c1 == c2 {
-            iter2.next();
+    for a in string1.chars() {
+        for b in string2.chars() {
+            if a == b {
+                return true;
+            }
         }
     }
-
-    iter2.peek().is_none()
+    return false;
 }
 
 // line 2100

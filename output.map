@@ -46,9 +46,9 @@
       22       22        0     1 .zp.bss
       22       22        0     1         __zp_bss_start = .
       22       22        0     1 __zp_bss_size = SIZEOF ( .zp.bss )
-      22       22       14     1 .zp
-      22       22       14     1         lto.tmp:(.zp.noinit..Lzp_stack)
-    203a     203a     f6b5     2 .text
+      22       22       13     1 .zp
+      22       22       13     1         lto.tmp:(.zp.noinit..Lzp_stack)
+    203a     203a     e916     2 .text
     203a     203a        0     1         _init = .
     203a     203a        0     1         _start = .
     203a     203a        e     1         unmap-basic.o:(.init.010)
@@ -65,305 +65,307 @@
     2067     2067        1     1         /usr/local/bin/../mos-platform/common/lib/crt0.o:(.fini_rts)
     2068     2068      2ab     2         lto.tmp:(.text._ZN12_GLOBAL__N_19blocklist11split_blockEPNS_5blockEt)
     2068     2068      2ab     1                 (anonymous namespace)::blocklist::split_block((anonymous namespace)::block*, unsigned short)
-    2313     2313       2b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3ptr42drop_in_place$LT$alloc..string..String$GT$17hd1262e1563a44d4cE)
+    2313     2313       2b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3ptr42drop_in_place$LT$alloc..string..String$GT$17hd1262e1563a44d4cE)
     2313     2313       2b     1                 core::ptr::drop_in_place$LT$alloc..string..String$GT$::hd1262e1563a44d4c
-    233e     233e      200     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3str21_$LT$impl$u20$str$GT$4find17h9ab6664d6267063fE)
+    233e     233e      200     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3str21_$LT$impl$u20$str$GT$4find17h9ab6664d6267063fE)
     233e     233e      200     1                 core::str::_$LT$impl$u20$str$GT$::find::h9ab6664d6267063f
-    253e     253e      2e2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN58_$LT$alloc..string..String$u20$as$u20$core..fmt..Write$GT$10write_char17hc8c4ee40e93de0a7E)
-    253e     253e      2e2     1                 _$LT$alloc..string..String$u20$as$u20$core..fmt..Write$GT$::write_char::hc8c4ee40e93de0a7
-    2820     2820        6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN58_$LT$alloc..string..String$u20$as$u20$core..fmt..Write$GT$9write_str17hd39734bf34ac08a7E)
-    2820     2820        6     1                 _$LT$alloc..string..String$u20$as$u20$core..fmt..Write$GT$::write_str::hd39734bf34ac08a7
-    2826     2826       45     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN60_$LT$alloc..string..String$u20$as$u20$core..fmt..Display$GT$3fmt17hdb0ffdfa34e0c20cE)
-    2826     2826       45     1                 _$LT$alloc..string..String$u20$as$u20$core..fmt..Display$GT$::fmt::hdb0ffdfa34e0c20c
-    286b     286b      f88     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN80_$LT$core..str..pattern..StrSearcher$u20$as$u20$core..str..pattern..Searcher$GT$10next_match17hc047e3607eaefb4bE)
-    286b     286b      f88     1                 _$LT$core..str..pattern..StrSearcher$u20$as$u20$core..str..pattern..Searcher$GT$::next_match::hc047e3607eaefb4b
-    37f3     37f3       c7     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN9_11_parse8index_of17h7e979aef125d04e1E)
-    37f3     37f3       c7     1                 _11_parse::index_of::h7e979aef125d04e1
-    38ba     38ba     6157     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN9_11_parse11declare_var17hc7e6dd8fdf7b5e07E)
-    38ba     38ba     6157     1                 _11_parse::declare_var::hc7e6dd8fdf7b5e07
-    9a11     9a11      224     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN9_11_parse27generate_varname_from_index17h0519a1a3650d031bE)
-    9a11     9a11      224     1                 _11_parse::generate_varname_from_index::h0519a1a3650d031b
-    9c35     9c35      231     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN9_11_parse9trim_left17ha6f9ec912684bde4E)
-    9c35     9c35      231     1                 _11_parse::trim_left::ha6f9ec912684bde4
-    9e66     9e66      1f7     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN9_11_parse10trim_right17h0f23ef98ad92fd1bE)
-    9e66     9e66      1f7     1                 _11_parse::trim_right::h0f23ef98ad92fd1b
-    a05d     a05d      1f6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN9_11_parse8trim_all17h5746e5c5dfc05afbE)
-    a05d     a05d      1f6     1                 _11_parse::trim_all::h5746e5c5dfc05afb
-    a253     a253     23bf     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.main)
-    a253     a253     23bf     1                 main
-    c612     c612       78     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$11allocate_in17hbdaa075b71fa7663E)
-    c612     c612       78     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::allocate_in::hbdaa075b71fa7663
-    c68a     c68a      231     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$16reserve_for_push17h1cb7bfa9d6ef4fbeE)
-    c68a     c68a      231     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::reserve_for_push::h1cb7bfa9d6ef4fbe
-    c8bb     c8bb      25b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$16reserve_for_push17hb7524b0ec6842032E)
-    c8bb     c8bb      25b     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::reserve_for_push::hb7524b0ec6842032
-    cb16     cb16       50     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN52_$LT$$RF$mut$u20$T$u20$as$u20$core..fmt..Display$GT$3fmt17h10704d7fede48856E)
-    cb16     cb16       50     1                 _$LT$$RF$mut$u20$T$u20$as$u20$core..fmt..Display$GT$::fmt::h10704d7fede48856
-    cb66     cb66       1f     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN49_$LT$W$u20$as$u20$ufmt..UnstableDoAsFormatter$GT$15do_as_formatter17hd29e293753a876d1E)
-    cb66     cb66       1f     1                 _$LT$W$u20$as$u20$ufmt..UnstableDoAsFormatter$GT$::do_as_formatter::hd29e293753a876d1
-    cb85     cb85      165     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4ufmt5impls3uxx46_$LT$impl$u20$ufmt..uDebug$u20$for$u20$u16$GT$3fmt17he58d79e332e4f152E)
-    cb85     cb85      165     1                 ufmt::impls::uxx::_$LT$impl$u20$ufmt..uDebug$u20$for$u20$u16$GT$::fmt::he58d79e332e4f152
-    ccea     ccea        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rust_alloc)
-    ccea     ccea        3     1                 __rust_alloc
-    cced     cced        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rust_dealloc)
-    cced     cced        3     1                 __rust_dealloc
-    ccf0     ccf0        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rust_realloc)
-    ccf0     ccf0        3     1                 __rust_realloc
-    ccf3     ccf3        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rust_alloc_zeroed)
-    ccf3     ccf3        3     1                 __rust_alloc_zeroed
-    ccf6     ccf6        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rust_alloc_error_handler)
-    ccf6     ccf6        3     1                 __rust_alloc_error_handler
-    ccf9     ccf9       4d     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$11allocate_in17h9b09c0497885e2c7E)
-    ccf9     ccf9       4d     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::allocate_in::h9b09c0497885e2c7
-    cd46     cd46       19     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.unlikely._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$7reserve21do_reserve_and_handle17h3bfb9ed68e7d5ae7E)
-    cd46     cd46       19     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::reserve::do_reserve_and_handle::h3bfb9ed68e7d5ae7
-    cd5f     cd5f      20f     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$14grow_amortized17h686c46671d9f6298E)
-    cd5f     cd5f      20f     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::grow_amortized::h686c46671d9f6298
-    cf6e     cf6e      191     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc7raw_vec11finish_grow17h46ecc1abb9501a0cE)
-    cf6e     cf6e      191     1                 alloc::raw_vec::finish_grow::h46ecc1abb9501a0c
-    d0ff     d0ff       20     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$16reserve_for_push17h65e6a0089deb0158E)
-    d0ff     d0ff       20     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::reserve_for_push::h65e6a0089deb0158
-    d11f     d11f       3c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3fmt5Write9write_fmt17hcf1acc597f1ba98cE)
-    d11f     d11f       3c     1                 core::fmt::Write::write_fmt::hcf1acc597f1ba98c
-    d15b     d15b        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3ptr28drop_in_place$LT$$RF$str$GT$17hff0dd0bece028762E)
-    d15b     d15b        1     1                 core::ptr::drop_in_place$LT$$RF$str$GT$::hff0dd0bece028762
-    d15c     d15c       1b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN50_$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$9write_str17h46ee456603265e7cE)
-    d15c     d15c       1b     1                 _$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$::write_str::h46ee456603265e7c
-    d177     d177      31c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN50_$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$10write_char17hb61f365fca73f24aE)
-    d177     d177      31c     1                 _$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$::write_char::hb61f365fca73f24a
-    d493     d493       3a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN50_$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$9write_fmt17h4f373409888f3452E)
-    d493     d493       3a     1                 _$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$::write_fmt::h4f373409888f3452
-    d4cd     d4cd        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rdl_oom)
-    d4cd     d4cd        3     1                 __rdl_oom
-    d4d0     d4d0        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.unlikely._ZN5alloc5alloc18handle_alloc_error17h4993b15968b72dc6E)
-    d4d0     d4d0        3     1                 alloc::alloc::handle_alloc_error::h4993b15968b72dc6
-    d4d3     d4d3        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc5alloc18handle_alloc_error8rt_error17h587c476291a26130E)
-    d4d3     d4d3        3     1                 alloc::alloc::handle_alloc_error::rt_error::h587c476291a26130
-    d4d6     d4d6      1b1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc3fmt6format12format_inner17heec0716ee257a0b2E)
-    d4d6     d4d6      1b1     1                 alloc::fmt::format::format_inner::heec0716ee257a0b2
-    d687     d687        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.unlikely._ZN5alloc3vec16Vec$LT$T$C$A$GT$11swap_remove13assert_failed17heec53cb70d6a597eE)
-    d687     d687        3     1                 alloc::vec::Vec$LT$T$C$A$GT$::swap_remove::assert_failed::heec53cb70d6a597e
-    d68a     d68a      145     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN5alloc3vec16Vec$LT$T$C$A$GT$17extend_from_slice17h9942a62bba4a74d9E)
-    d68a     d68a      145     1                 alloc::vec::Vec$LT$T$C$A$GT$::extend_from_slice::h9942a62bba4a74d9
-    d7cf     d7cf      5e1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3num14from_str_radix17h48005c50ecb6cc24E)
-    d7cf     d7cf      5e1     1                 core::num::from_str_radix::h48005c50ecb6cc24
-    ddb0     ddb0      9a1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3str7pattern11StrSearcher3new17h8a2483ab1579110cE)
-    ddb0     ddb0      9a1     1                 core::str::pattern::StrSearcher::new::h8a2483ab1579110c
-    e751     e751      24c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3str7pattern14TwoWaySearcher22reverse_maximal_suffix17h4e115f701eb8b6b8E)
-    e751     e751      24c     1                 core::str::pattern::TwoWaySearcher::reverse_maximal_suffix::h4e115f701eb8b6b8
-    e99d     e99d      337     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core5slice6memchr14memchr_aligned17h4480028e2b6c0453E)
-    e99d     e99d      337     1                 core::slice::memchr::memchr_aligned::h4480028e2b6c0453
-    ecd4     ecd4        a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3ops8function6FnOnce9call_once17hbf8bdf461853b1c3E)
-    ecd4     ecd4        a     1                 core::ops::function::FnOnce::call_once::hbf8bdf461853b1c3
-    ecde     ecde      6fd     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3fmt5write17hbc0672d435217c8eE)
-    ecde     ecde      6fd     1                 core::fmt::write::hbc0672d435217c8e
-    f3db     f3db       9a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3fmt8getcount17h0a5ca40650f06314E)
-    f3db     f3db       9a     1                 core::fmt::getcount::h0a5ca40650f06314
-    f475     f475      119     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3fmt9Formatter12pad_integral12write_prefix17h3b1a133e7abfd815E)
-    f475     f475      119     1                 core::fmt::Formatter::pad_integral::write_prefix::h3b1a133e7abfd815
-    f58e     f58e      1d8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3fmt9Formatter7padding17he04b98ed39a470ccE)
-    f58e     f58e      1d8     1                 core::fmt::Formatter::padding::he04b98ed39a470cc
-    f766     f766      af8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3fmt9Formatter3pad17h8e51580810c7a6d7E)
-    f766     f766      af8     1                 core::fmt::Formatter::pad::h8e51580810c7a6d7
-   1025e    1025e      261     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN43_$LT$char$u20$as$u20$core..fmt..Display$GT$3fmt17h80caeb83e1675e5dE)
-   1025e    1025e      261     1                 _$LT$char$u20$as$u20$core..fmt..Display$GT$::fmt::h80caeb83e1675e5d
-   104bf    104bf        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.unlikely._ZN4core3str16slice_error_fail17h20678929a3935673E)
-   104bf    104bf        3     1                 core::str::slice_error_fail::h20678929a3935673
-   104c2    104c2      37d     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN4core3str19slice_error_fail_rt17he570be6063af8ce8E)
-   104c2    104c2      37d     1                 core::str::slice_error_fail_rt::he570be6063af8ce8
-   1083f    1083f        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rg_alloc)
-   1083f    1083f        3     1                 __rg_alloc
-   10842    10842        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rg_dealloc)
-   10842    10842        3     1                 __rg_dealloc
-   10845    10845        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rg_realloc)
-   10845    10845        3     1                 __rg_realloc
-   10848    10848       5b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text.__rg_alloc_zeroed)
-   10848    10848       5b     1                 __rg_alloc_zeroed
-   108a3    108a3       e8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN12mos_hardware6mega656memory114_$LT$impl$u20$core..convert..From$LT$mos_hardware..mega65..memory..Fat28$GT$$u20$for$u20$alloc..string..String$GT$4from17h7141c0fe56d0363fE)
-   108a3    108a3       e8     1                 mos_hardware::mega65::memory::_$LT$impl$u20$core..convert..From$LT$mos_hardware..mega65..memory..Fat28$GT$$u20$for$u20$alloc..string..String$GT$::from::h7141c0fe56d0363f
-   1098b    1098b       51     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.text._ZN67_$LT$ufmt_stdio..imp..mos..Stderr$u20$as$u20$ufmt_write..uWrite$GT$9write_str17h624aa37545f53580E)
-   1098b    1098b       51     1                 _$LT$ufmt_stdio..imp..mos..Stderr$u20$as$u20$ufmt_write..uWrite$GT$::write_str::h624aa37545f53580
-   109dc    109dc        a     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(exit-return.c.obj):(.text)
-   109dc    109dc        a     1                 __exit_return
-   109e6    109e6        3     1         /usr/local/bin/../mos-platform/common/lib/libcrt.a(call-indir.S.obj):(.text)
-   109e6    109e6        0     1                 __call_indir
-   109e9    109e9       12     1         /usr/local/bin/../mos-platform/mega65/lib/libc.a(abort.c.obj):(.text)
-   109e9    109e9       12     1                 abort
-   109fb    109fb        9     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(_exit.S.obj):(.text)
-   109fb    109fb        0     1                 _exit
-   109fb    109fb        0     1                 _Exit
-   10a04    10a04       13     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(zero-bss.c.obj):(.text)
-   10a04    10a04       13     1                 __zero_bss
-   10a17    10a17        e     1         lto.tmp:(.text.setlowercase)
-   10a17    10a17        e     1                 setlowercase
-   10a25    10a25       95     1         lto.tmp:(.text.lpeek)
-   10a25    10a25       95     1                 lpeek
-   10aba    10aba       9b     1         lto.tmp:(.text.lpoke)
-   10aba    10aba       9b     1                 lpoke
-   10b55    10b55       e5     1         lto.tmp:(.text.lcopy)
-   10b55    10b55       e5     1                 lcopy
-   10c3a    10c3a        5     1         lto.tmp:(.text.mega65_fast)
-   10c3a    10c3a        5     1                 mega65_fast
-   10c3f    10c3f       f7     1         lto.tmp:(.text.__udivhi3)
-   10c3f    10c3f       f7     1                 __udivhi3
-   10d36    10d36       a0     1         lto.tmp:(.text.__umodhi3)
-   10d36    10d36       a0     1                 __umodhi3
-   10dd6    10dd6      11e     1         lto.tmp:(.text.__udivmodhi4)
-   10dd6    10dd6      11e     1                 __udivmodhi4
-   10ef4    10ef4       32     1         lto.tmp:(.text.__mulhi3)
-   10ef4    10ef4       32     1                 __mulhi3
-   10f26    10f26       70     1         lto.tmp:(.text.__mulsi3)
-   10f26    10f26       70     1                 __mulsi3
-   10f96    10f96       13     1         lto.tmp:(.text.__ashlhi3)
-   10f96    10f96       13     1                 __ashlhi3
-   10fa9    10fa9       1f     1         lto.tmp:(.text.__ashldi3)
-   10fa9    10fa9       1f     1                 __ashldi3
-   10fc8    10fc8        e     1         lto.tmp:(.text.putchar)
-   10fc8    10fc8        e     1                 putchar
-   10fd6    10fd6       37     1         lto.tmp:(.text.puts)
-   10fd6    10fd6       37     1                 puts
-   1100d    1100d       75     1         lto.tmp:(.text.malloc)
-   1100d    1100d       75     1                 malloc
-   11082    11082       69     1         lto.tmp:(.text._ZN12_GLOBAL__N_113get_free_listEv)
-   11082    11082       69     1                 (anonymous namespace)::get_free_list()
-   110eb    110eb      20a     1         lto.tmp:(.text.realloc)
-   110eb    110eb      20a     1                 realloc
-   112f5    112f5      2c2     1         lto.tmp:(.text.free)
-   112f5    112f5      2c2     1                 free
-   115b7    115b7       46     1         lto.tmp:(.text.memcmp)
-   115b7    115b7       46     1                 memcmp
-   115fd    115fd       34     1         lto.tmp:(.text.memcpy)
-   115fd    115fd       34     1                 memcpy
-   11631    11631       23     1         lto.tmp:(.text.__memset)
-   11631    11631       23     1                 __memset
-   11654    11654       9b     1         lto.tmp:(.text.memmove)
-   11654    11654       9b     1                 memmove
-   116ef    116ef        0     1         __init_array_start = .
-   116ef    116ef        0     1         __init_array_end = .
-   116ef    116ef        0     1         __fini_array_start = .
-   116ef    116ef        0     1         __fini_array_end = .
-   116ef    116ef      23f     1 .rodata
-   116ef    116ef        8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata._ZN4core3fmt9Formatter7padding17he04b98ed39a470ccE)
-   116f7    116f7        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.4)
-   116f8    116f8        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.6)
-   116fa    116fa       10     1         <internal>:(.rodata)
-   1170a    1170a        5     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.14)
-   1170f    1170f        5     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.15)
-   11714    11714        6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.16)
-   1171a    1171a        7     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.17)
-   11721    11721        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.21)
-   11723    11723        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.27)
-   11726    11726        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.32)
-   11727    11727        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.33)
-   11729    11729        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.35)
-   1172a    1172a        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.36)
-   1172b    1172b        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.38)
-   1172d    1172d       20     1         <internal>:(.rodata)
-   1174d    1174d        f     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.52)
-   1175c    1175c        a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.53)
-   11766    11766        b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.54)
-   11771    11771       30     1         <internal>:(.rodata)
-   117a1    117a1        9     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.56)
-   117aa    117aa        6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.57)
-   117b0    117b0       1a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.0)
-   117ca    117ca        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.1)
-   117cb    117cb        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.3)
-   117cc    117cc        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.4)
-   117ce    117ce        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.5)
-   117d1    117d1        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.6)
-   117d2    117d2        5     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.7)
-   117d7    117d7        b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.8)
-   117e2    117e2        c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.9)
-   117ee    117ee        9     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.10)
-   117f7    117f7       27     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.11)
-   1181e    1181e        d     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.12)
-   1182b    1182b        9     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.16)
-   11834    11834        6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.19)
-   1183a    1183a        c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.20)
-   11846    11846        d     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.21)
-   11853    11853        a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.23)
-   1185d    1185d       c8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.a5d1b07e75b5814c1eb7428e43e6d52c.4)
-   11925    11925        0     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.rodata..Lanon.37f389c23e26d7ca7e151838a857d14c.0)
-   11925    11925        1     1         /usr/local/bin/../mos-platform/common/lib/libcrt.a(const.S.obj):(.rodata)
-   11925    11925        0     1                 __set_v
-   11926    11926        8     1         <internal>:(.rodata)
-   1192e    1192e       6a     2 .data
-   1192e    1192e        0     1         __data_start = .
-   1192e    1192e        2     2         lto.tmp:(.data._ZN12_GLOBAL__N_19blocklist12m_heap_limitE)
-   1192e    1192e        2     1                 (anonymous namespace)::blocklist::m_heap_limit
-   11930    11930        c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.0)
-   1193c    1193c       10     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.34)
-   1194c    1194c       10     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.37)
-   1195c    1195c        4     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.39)
-   11960    11960        8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.40)
-   11968    11968       24     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.59)
-   1198c    1198c        c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.data.rel.ro..Lanon.1b0e8a737bfa5a1b7a92dc32b054df69.0)
-   11998    11998        0     1         __data_end = .
-   11998    11998        0     1 __data_load_start = LOADADDR ( .data )
-   11998    11998        0     1 __data_size = SIZEOF ( .data )
-   11998    11998       23     2 .bss
-   11998    11998        0     1         __bss_start = .
-   11998    11998        6     2         lto.tmp:(.bss._ZZN12_GLOBAL__N_113get_free_listEvE9free_list)
-   11998    11998        6     1                 (anonymous namespace)::get_free_list()::free_list
-   1199e    1199e       14     1         lto.tmp:(.bss.dmalist)
-   1199e    1199e       14     1                 dmalist
-   119b2    119b2        1     1         lto.tmp:(.bss.dma_byte)
-   119b2    119b2        1     1                 dma_byte
-   119b3    119b3        8     1         lto.tmp:(.bss._ZGVZN12_GLOBAL__N_113get_free_listEvE9free_list)
-   119b3    119b3        8     1                 guard variable for (anonymous namespace)::get_free_list()::free_list
-   119bb    119bb        0     1         __bss_end = .
-   119bb    119bb        0     1 __bss_size = SIZEOF ( .bss )
-   119bb    119bb       2b     1 .noinit
-   119bb    119bb       29     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.noinit..Lstatic_stack)
-   119e4    119e4        1     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(exit-return.c.obj):(.noinit)
-   119e5    119e5        1     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(_exit.S.obj):(.noinit)
-   119e5    119e5        0     1                 __save_s
-   119e6    119e6        0     1         __heap_start = .
-   119e6    119e6        0     1 __stack = 0xcfff
+    253e     253e      39c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3str21_$LT$impl$u20$str$GT$8contains17h81ca55964aa8b8c3E)
+    253e     253e      39c     1                 core::str::_$LT$impl$u20$str$GT$::contains::h81ca55964aa8b8c3
+    28da     28da      2e2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN58_$LT$alloc..string..String$u20$as$u20$core..fmt..Write$GT$10write_char17hc8c4ee40e93de0a7E)
+    28da     28da      2e2     1                 _$LT$alloc..string..String$u20$as$u20$core..fmt..Write$GT$::write_char::hc8c4ee40e93de0a7
+    2bbc     2bbc        6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN58_$LT$alloc..string..String$u20$as$u20$core..fmt..Write$GT$9write_str17hd39734bf34ac08a7E)
+    2bbc     2bbc        6     1                 _$LT$alloc..string..String$u20$as$u20$core..fmt..Write$GT$::write_str::hd39734bf34ac08a7
+    2bc2     2bc2       45     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN60_$LT$alloc..string..String$u20$as$u20$core..fmt..Display$GT$3fmt17hdb0ffdfa34e0c20cE)
+    2bc2     2bc2       45     1                 _$LT$alloc..string..String$u20$as$u20$core..fmt..Display$GT$::fmt::hdb0ffdfa34e0c20c
+    2c07     2c07      f88     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN80_$LT$core..str..pattern..StrSearcher$u20$as$u20$core..str..pattern..Searcher$GT$10next_match17hc047e3607eaefb4bE)
+    2c07     2c07      f88     1                 _$LT$core..str..pattern..StrSearcher$u20$as$u20$core..str..pattern..Searcher$GT$::next_match::hc047e3607eaefb4b
+    3b8f     3b8f       c7     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN9_11_parse8index_of17h7e979aef125d04e1E)
+    3b8f     3b8f       c7     1                 _11_parse::index_of::h7e979aef125d04e1
+    3c56     3c56     5096     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN9_11_parse11declare_var17hc7e6dd8fdf7b5e07E)
+    3c56     3c56     5096     1                 _11_parse::declare_var::hc7e6dd8fdf7b5e07
+    8cec     8cec      224     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN9_11_parse27generate_varname_from_index17h0519a1a3650d031bE)
+    8cec     8cec      224     1                 _11_parse::generate_varname_from_index::h0519a1a3650d031b
+    8f10     8f10      231     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN9_11_parse9trim_left17ha6f9ec912684bde4E)
+    8f10     8f10      231     1                 _11_parse::trim_left::ha6f9ec912684bde4
+    9141     9141      1f7     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN9_11_parse10trim_right17h0f23ef98ad92fd1bE)
+    9141     9141      1f7     1                 _11_parse::trim_right::h0f23ef98ad92fd1b
+    9338     9338      1f6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN9_11_parse8trim_all17h5746e5c5dfc05afbE)
+    9338     9338      1f6     1                 _11_parse::trim_all::h5746e5c5dfc05afb
+    952e     952e     2345     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.main)
+    952e     952e     2345     1                 main
+    b873     b873       1f     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN49_$LT$W$u20$as$u20$ufmt..UnstableDoAsFormatter$GT$15do_as_formatter17hd29e293753a876d1E)
+    b873     b873       1f     1                 _$LT$W$u20$as$u20$ufmt..UnstableDoAsFormatter$GT$::do_as_formatter::hd29e293753a876d1
+    b892     b892      165     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4ufmt5impls3uxx46_$LT$impl$u20$ufmt..uDebug$u20$for$u20$u16$GT$3fmt17he58d79e332e4f152E)
+    b892     b892      165     1                 ufmt::impls::uxx::_$LT$impl$u20$ufmt..uDebug$u20$for$u20$u16$GT$::fmt::he58d79e332e4f152
+    b9f7     b9f7       50     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN52_$LT$$RF$mut$u20$T$u20$as$u20$core..fmt..Display$GT$3fmt17h10704d7fede48856E)
+    b9f7     b9f7       50     1                 _$LT$$RF$mut$u20$T$u20$as$u20$core..fmt..Display$GT$::fmt::h10704d7fede48856
+    ba47     ba47       78     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$11allocate_in17hbdaa075b71fa7663E)
+    ba47     ba47       78     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::allocate_in::hbdaa075b71fa7663
+    babf     babf      25b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$16reserve_for_push17hb7524b0ec6842032E)
+    babf     babf      25b     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::reserve_for_push::hb7524b0ec6842032
+    bd1a     bd1a      231     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$16reserve_for_push17hc6e1018d7a8db629E)
+    bd1a     bd1a      231     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::reserve_for_push::hc6e1018d7a8db629
+    bf4b     bf4b        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rust_alloc)
+    bf4b     bf4b        3     1                 __rust_alloc
+    bf4e     bf4e        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rust_dealloc)
+    bf4e     bf4e        3     1                 __rust_dealloc
+    bf51     bf51        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rust_realloc)
+    bf51     bf51        3     1                 __rust_realloc
+    bf54     bf54        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rust_alloc_zeroed)
+    bf54     bf54        3     1                 __rust_alloc_zeroed
+    bf57     bf57        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rust_alloc_error_handler)
+    bf57     bf57        3     1                 __rust_alloc_error_handler
+    bf5a     bf5a       4d     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$11allocate_in17h9b09c0497885e2c7E)
+    bf5a     bf5a       4d     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::allocate_in::h9b09c0497885e2c7
+    bfa7     bfa7       19     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.unlikely._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$7reserve21do_reserve_and_handle17h3bfb9ed68e7d5ae7E)
+    bfa7     bfa7       19     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::reserve::do_reserve_and_handle::h3bfb9ed68e7d5ae7
+    bfc0     bfc0      20f     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$14grow_amortized17h686c46671d9f6298E)
+    bfc0     bfc0      20f     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::grow_amortized::h686c46671d9f6298
+    c1cf     c1cf      191     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc7raw_vec11finish_grow17h46ecc1abb9501a0cE)
+    c1cf     c1cf      191     1                 alloc::raw_vec::finish_grow::h46ecc1abb9501a0c
+    c360     c360       20     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc7raw_vec19RawVec$LT$T$C$A$GT$16reserve_for_push17h65e6a0089deb0158E)
+    c360     c360       20     1                 alloc::raw_vec::RawVec$LT$T$C$A$GT$::reserve_for_push::h65e6a0089deb0158
+    c380     c380       3c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3fmt5Write9write_fmt17hcf1acc597f1ba98cE)
+    c380     c380       3c     1                 core::fmt::Write::write_fmt::hcf1acc597f1ba98c
+    c3bc     c3bc        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3ptr28drop_in_place$LT$$RF$str$GT$17hff0dd0bece028762E)
+    c3bc     c3bc        1     1                 core::ptr::drop_in_place$LT$$RF$str$GT$::hff0dd0bece028762
+    c3bd     c3bd       1b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN50_$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$9write_str17h46ee456603265e7cE)
+    c3bd     c3bd       1b     1                 _$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$::write_str::h46ee456603265e7c
+    c3d8     c3d8      31c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN50_$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$10write_char17hb61f365fca73f24aE)
+    c3d8     c3d8      31c     1                 _$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$::write_char::hb61f365fca73f24a
+    c6f4     c6f4       3a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN50_$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$9write_fmt17h4f373409888f3452E)
+    c6f4     c6f4       3a     1                 _$LT$$RF$mut$u20$W$u20$as$u20$core..fmt..Write$GT$::write_fmt::h4f373409888f3452
+    c72e     c72e        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rdl_oom)
+    c72e     c72e        3     1                 __rdl_oom
+    c731     c731        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.unlikely._ZN5alloc5alloc18handle_alloc_error17h4993b15968b72dc6E)
+    c731     c731        3     1                 alloc::alloc::handle_alloc_error::h4993b15968b72dc6
+    c734     c734        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc5alloc18handle_alloc_error8rt_error17h587c476291a26130E)
+    c734     c734        3     1                 alloc::alloc::handle_alloc_error::rt_error::h587c476291a26130
+    c737     c737      1b1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc3fmt6format12format_inner17heec0716ee257a0b2E)
+    c737     c737      1b1     1                 alloc::fmt::format::format_inner::heec0716ee257a0b2
+    c8e8     c8e8        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.unlikely._ZN5alloc3vec16Vec$LT$T$C$A$GT$11swap_remove13assert_failed17heec53cb70d6a597eE)
+    c8e8     c8e8        3     1                 alloc::vec::Vec$LT$T$C$A$GT$::swap_remove::assert_failed::heec53cb70d6a597e
+    c8eb     c8eb      145     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN5alloc3vec16Vec$LT$T$C$A$GT$17extend_from_slice17h9942a62bba4a74d9E)
+    c8eb     c8eb      145     1                 alloc::vec::Vec$LT$T$C$A$GT$::extend_from_slice::h9942a62bba4a74d9
+    ca30     ca30      5e1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3num14from_str_radix17h48005c50ecb6cc24E)
+    ca30     ca30      5e1     1                 core::num::from_str_radix::h48005c50ecb6cc24
+    d011     d011      9a1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3str7pattern11StrSearcher3new17h8a2483ab1579110cE)
+    d011     d011      9a1     1                 core::str::pattern::StrSearcher::new::h8a2483ab1579110c
+    d9b2     d9b2      24c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3str7pattern14TwoWaySearcher22reverse_maximal_suffix17h4e115f701eb8b6b8E)
+    d9b2     d9b2      24c     1                 core::str::pattern::TwoWaySearcher::reverse_maximal_suffix::h4e115f701eb8b6b8
+    dbfe     dbfe      337     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core5slice6memchr14memchr_aligned17h4480028e2b6c0453E)
+    dbfe     dbfe      337     1                 core::slice::memchr::memchr_aligned::h4480028e2b6c0453
+    df35     df35        a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3ops8function6FnOnce9call_once17hbf8bdf461853b1c3E)
+    df35     df35        a     1                 core::ops::function::FnOnce::call_once::hbf8bdf461853b1c3
+    df3f     df3f      6fd     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3fmt5write17hbc0672d435217c8eE)
+    df3f     df3f      6fd     1                 core::fmt::write::hbc0672d435217c8e
+    e63c     e63c       9a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3fmt8getcount17h0a5ca40650f06314E)
+    e63c     e63c       9a     1                 core::fmt::getcount::h0a5ca40650f06314
+    e6d6     e6d6      119     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3fmt9Formatter12pad_integral12write_prefix17h3b1a133e7abfd815E)
+    e6d6     e6d6      119     1                 core::fmt::Formatter::pad_integral::write_prefix::h3b1a133e7abfd815
+    e7ef     e7ef      1d8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3fmt9Formatter7padding17he04b98ed39a470ccE)
+    e7ef     e7ef      1d8     1                 core::fmt::Formatter::padding::he04b98ed39a470cc
+    e9c7     e9c7      af8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3fmt9Formatter3pad17h8e51580810c7a6d7E)
+    e9c7     e9c7      af8     1                 core::fmt::Formatter::pad::h8e51580810c7a6d7
+    f4bf     f4bf      261     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN43_$LT$char$u20$as$u20$core..fmt..Display$GT$3fmt17h80caeb83e1675e5dE)
+    f4bf     f4bf      261     1                 _$LT$char$u20$as$u20$core..fmt..Display$GT$::fmt::h80caeb83e1675e5d
+    f720     f720        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.unlikely._ZN4core3str16slice_error_fail17h20678929a3935673E)
+    f720     f720        3     1                 core::str::slice_error_fail::h20678929a3935673
+    f723     f723      37d     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN4core3str19slice_error_fail_rt17he570be6063af8ce8E)
+    f723     f723      37d     1                 core::str::slice_error_fail_rt::he570be6063af8ce8
+    faa0     faa0        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rg_alloc)
+    faa0     faa0        3     1                 __rg_alloc
+    faa3     faa3        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rg_dealloc)
+    faa3     faa3        3     1                 __rg_dealloc
+    faa6     faa6        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rg_realloc)
+    faa6     faa6        3     1                 __rg_realloc
+    faa9     faa9       5b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text.__rg_alloc_zeroed)
+    faa9     faa9       5b     1                 __rg_alloc_zeroed
+    fb04     fb04       e8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN12mos_hardware6mega656memory114_$LT$impl$u20$core..convert..From$LT$mos_hardware..mega65..memory..Fat28$GT$$u20$for$u20$alloc..string..String$GT$4from17h7141c0fe56d0363fE)
+    fb04     fb04       e8     1                 mos_hardware::mega65::memory::_$LT$impl$u20$core..convert..From$LT$mos_hardware..mega65..memory..Fat28$GT$$u20$for$u20$alloc..string..String$GT$::from::h7141c0fe56d0363f
+    fbec     fbec       51     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.text._ZN67_$LT$ufmt_stdio..imp..mos..Stderr$u20$as$u20$ufmt_write..uWrite$GT$9write_str17h624aa37545f53580E)
+    fbec     fbec       51     1                 _$LT$ufmt_stdio..imp..mos..Stderr$u20$as$u20$ufmt_write..uWrite$GT$::write_str::h624aa37545f53580
+    fc3d     fc3d        a     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(exit-return.c.obj):(.text)
+    fc3d     fc3d        a     1                 __exit_return
+    fc47     fc47        3     1         /usr/local/bin/../mos-platform/common/lib/libcrt.a(call-indir.S.obj):(.text)
+    fc47     fc47        0     1                 __call_indir
+    fc4a     fc4a       12     1         /usr/local/bin/../mos-platform/mega65/lib/libc.a(abort.c.obj):(.text)
+    fc4a     fc4a       12     1                 abort
+    fc5c     fc5c        9     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(_exit.S.obj):(.text)
+    fc5c     fc5c        0     1                 _exit
+    fc5c     fc5c        0     1                 _Exit
+    fc65     fc65       13     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(zero-bss.c.obj):(.text)
+    fc65     fc65       13     1                 __zero_bss
+    fc78     fc78        e     1         lto.tmp:(.text.setlowercase)
+    fc78     fc78        e     1                 setlowercase
+    fc86     fc86       95     1         lto.tmp:(.text.lpeek)
+    fc86     fc86       95     1                 lpeek
+    fd1b     fd1b       9b     1         lto.tmp:(.text.lpoke)
+    fd1b     fd1b       9b     1                 lpoke
+    fdb6     fdb6       e5     1         lto.tmp:(.text.lcopy)
+    fdb6     fdb6       e5     1                 lcopy
+    fe9b     fe9b        5     1         lto.tmp:(.text.mega65_fast)
+    fe9b     fe9b        5     1                 mega65_fast
+    fea0     fea0       f7     1         lto.tmp:(.text.__udivhi3)
+    fea0     fea0       f7     1                 __udivhi3
+    ff97     ff97       a0     1         lto.tmp:(.text.__umodhi3)
+    ff97     ff97       a0     1                 __umodhi3
+   10037    10037      11e     1         lto.tmp:(.text.__udivmodhi4)
+   10037    10037      11e     1                 __udivmodhi4
+   10155    10155       32     1         lto.tmp:(.text.__mulhi3)
+   10155    10155       32     1                 __mulhi3
+   10187    10187       70     1         lto.tmp:(.text.__mulsi3)
+   10187    10187       70     1                 __mulsi3
+   101f7    101f7       13     1         lto.tmp:(.text.__ashlhi3)
+   101f7    101f7       13     1                 __ashlhi3
+   1020a    1020a       1f     1         lto.tmp:(.text.__ashldi3)
+   1020a    1020a       1f     1                 __ashldi3
+   10229    10229        e     1         lto.tmp:(.text.putchar)
+   10229    10229        e     1                 putchar
+   10237    10237       37     1         lto.tmp:(.text.puts)
+   10237    10237       37     1                 puts
+   1026e    1026e       75     1         lto.tmp:(.text.malloc)
+   1026e    1026e       75     1                 malloc
+   102e3    102e3       69     1         lto.tmp:(.text._ZN12_GLOBAL__N_113get_free_listEv)
+   102e3    102e3       69     1                 (anonymous namespace)::get_free_list()
+   1034c    1034c      20a     1         lto.tmp:(.text.realloc)
+   1034c    1034c      20a     1                 realloc
+   10556    10556      2c2     1         lto.tmp:(.text.free)
+   10556    10556      2c2     1                 free
+   10818    10818       46     1         lto.tmp:(.text.memcmp)
+   10818    10818       46     1                 memcmp
+   1085e    1085e       34     1         lto.tmp:(.text.memcpy)
+   1085e    1085e       34     1                 memcpy
+   10892    10892       23     1         lto.tmp:(.text.__memset)
+   10892    10892       23     1                 __memset
+   108b5    108b5       9b     1         lto.tmp:(.text.memmove)
+   108b5    108b5       9b     1                 memmove
+   10950    10950        0     1         __init_array_start = .
+   10950    10950        0     1         __init_array_end = .
+   10950    10950        0     1         __fini_array_start = .
+   10950    10950        0     1         __fini_array_end = .
+   10950    10950      23f     1 .rodata
+   10950    10950        8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata._ZN4core3fmt9Formatter7padding17he04b98ed39a470ccE)
+   10958    10958        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.4)
+   10959    10959        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.6)
+   1095b    1095b       10     1         <internal>:(.rodata)
+   1096b    1096b        5     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.14)
+   10970    10970        5     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.15)
+   10975    10975        6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.16)
+   1097b    1097b        7     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.17)
+   10982    10982        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.21)
+   10984    10984        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.27)
+   10987    10987        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.32)
+   10988    10988        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.33)
+   1098a    1098a        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.35)
+   1098b    1098b        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.36)
+   1098c    1098c        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.38)
+   1098e    1098e       20     1         <internal>:(.rodata)
+   109ae    109ae        f     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.51)
+   109bd    109bd        a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.52)
+   109c7    109c7        b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.53)
+   109d2    109d2       30     1         <internal>:(.rodata)
+   10a02    10a02        9     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.55)
+   10a0b    10a0b        6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.82585a2cba6af83290cfbb5e2bd36c75.56)
+   10a11    10a11       1a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.0)
+   10a2b    10a2b        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.1)
+   10a2c    10a2c        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.3)
+   10a2d    10a2d        2     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.4)
+   10a2f    10a2f        3     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.5)
+   10a32    10a32        1     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.6)
+   10a33    10a33        5     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.7)
+   10a38    10a38        b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.8)
+   10a43    10a43        c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.9)
+   10a4f    10a4f        9     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.10)
+   10a58    10a58       27     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.11)
+   10a7f    10a7f        d     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.12)
+   10a8c    10a8c        9     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.16)
+   10a95    10a95        6     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.19)
+   10a9b    10a9b        c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.20)
+   10aa7    10aa7        d     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.21)
+   10ab4    10ab4        a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.4cd6a0e3c685f51fc551694b6f6d3565.23)
+   10abe    10abe       c8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.a5d1b07e75b5814c1eb7428e43e6d52c.4)
+   10b86    10b86        0     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.rodata..Lanon.37f389c23e26d7ca7e151838a857d14c.0)
+   10b86    10b86        1     1         /usr/local/bin/../mos-platform/common/lib/libcrt.a(const.S.obj):(.rodata)
+   10b86    10b86        0     1                 __set_v
+   10b87    10b87        8     1         <internal>:(.rodata)
+   10b90    10b90       6a     2 .data
+   10b90    10b90        0     1         __data_start = .
+   10b90    10b90        2     2         lto.tmp:(.data._ZN12_GLOBAL__N_19blocklist12m_heap_limitE)
+   10b90    10b90        2     1                 (anonymous namespace)::blocklist::m_heap_limit
+   10b92    10b92        c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.0)
+   10b9e    10b9e       10     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.34)
+   10bae    10bae       10     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.37)
+   10bbe    10bbe        4     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.39)
+   10bc2    10bc2        8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.40)
+   10bca    10bca       24     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.data.rel.ro..Lanon.82585a2cba6af83290cfbb5e2bd36c75.58)
+   10bee    10bee        c     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.data.rel.ro..Lanon.1b0e8a737bfa5a1b7a92dc32b054df69.0)
+   10bfa    10bfa        0     1         __data_end = .
+   10bfa    10bfa        0     1 __data_load_start = LOADADDR ( .data )
+   10bfa    10bfa        0     1 __data_size = SIZEOF ( .data )
+   10bfa    10bfa       23     2 .bss
+   10bfa    10bfa        0     1         __bss_start = .
+   10bfa    10bfa        6     2         lto.tmp:(.bss._ZZN12_GLOBAL__N_113get_free_listEvE9free_list)
+   10bfa    10bfa        6     1                 (anonymous namespace)::get_free_list()::free_list
+   10c00    10c00       14     1         lto.tmp:(.bss.dmalist)
+   10c00    10c00       14     1                 dmalist
+   10c14    10c14        1     1         lto.tmp:(.bss.dma_byte)
+   10c14    10c14        1     1                 dma_byte
+   10c15    10c15        8     1         lto.tmp:(.bss._ZGVZN12_GLOBAL__N_113get_free_listEvE9free_list)
+   10c15    10c15        8     1                 guard variable for (anonymous namespace)::get_free_list()::free_list
+   10c1d    10c1d        0     1         __bss_end = .
+   10c1d    10c1d        0     1 __bss_size = SIZEOF ( .bss )
+   10c1d    10c1d       2b     1 .noinit
+   10c1d    10c1d       29     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.noinit..Lstatic_stack)
+   10c46    10c46        1     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(exit-return.c.obj):(.noinit)
+   10c47    10c47        1     1         /usr/local/bin/../mos-platform/commodore/lib/libcrt0.a(_exit.S.obj):(.noinit)
+   10c47    10c47        0     1                 __save_s
+   10c48    10c48        0     1         __heap_start = .
+   10c48    10c48        0     1 __stack = 0xcfff
        0        0      699     1 .debug_abbrev
-       0        0      323     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.debug_abbrev)
+       0        0      323     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.debug_abbrev)
      323      323       31     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_abbrev)
      354      354       c8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_abbrev)
      41c      41c       31     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_abbrev)
      44d      44d       31     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_abbrev)
      47e      47e      21b     1         lto.tmp:(.debug_abbrev)
-       0        0     a058     1 .debug_info
-       0        0     935b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.debug_info)
-    935b     935b       49     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_info)
-    93a4     93a4      84a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_info)
-    9bee     9bee       49     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_info)
-    9c37     9c37       49     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_info)
-    9c80     9c80      3d8     1         lto.tmp:(.debug_info)
-       0        0      264     1 .debug_aranges
-       0        0      1f4     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.debug_aranges)
-     1f4      1f4       14     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_aranges)
-     208      208       34     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_aranges)
-     23c      23c       14     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_aranges)
-     250      250       14     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_aranges)
-       0        0     1788     1 .debug_ranges
-       0        0     1714     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.debug_ranges)
-    1714     1714       74     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_ranges)
-       0        0     f180     1 .debug_str
-       0        0     f180     1         <internal>:(.debug_str)
-       0        0     6700     1 .debug_pubnames
-       0        0     62c8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.debug_pubnames)
-    62c8     62c8       3b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_pubnames)
-    6303     6303      387     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_pubnames)
-    668a     668a       3b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_pubnames)
-    66c5     66c5       3b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_pubnames)
-       0        0      29a     1 .debug_pubtypes
-       0        0      252     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.debug_pubtypes)
-     252      252       12     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_pubtypes)
-     264      264       12     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_pubtypes)
-     276      276       12     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_pubtypes)
-     288      288       12     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_pubtypes)
-       0        0     829d     1 .debug_line
-       0        0     76fe     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.0.rcgu.o:(.debug_line)
-    76fe     76fe       41     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_line)
-    773f     773f      834     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_line)
-    7f73     7f73       41     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_line)
-    7fb4     7fb4       41     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_line)
-    7ff5     7ff5      2a8     1         lto.tmp:(.debug_line)
+       0        0     98aa     1 .debug_info
+       0        0     8bad     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.debug_info)
+    8bad     8bad       49     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_info)
+    8bf6     8bf6      84a     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_info)
+    9440     9440       49     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_info)
+    9489     9489       49     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_info)
+    94d2     94d2      3d8     1         lto.tmp:(.debug_info)
+       0        0      268     1 .debug_aranges
+       0        0      1f8     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.debug_aranges)
+     1f8      1f8       14     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_aranges)
+     20c      20c       34     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_aranges)
+     240      240       14     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_aranges)
+     254      254       14     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_aranges)
+       0        0     1554     1 .debug_ranges
+       0        0     14e0     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.debug_ranges)
+    14e0     14e0       74     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_ranges)
+       0        0     ec9c     1 .debug_str
+       0        0     ec9c     1         <internal>:(.debug_str)
+       0        0     6503     1 .debug_pubnames
+       0        0     60cb     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.debug_pubnames)
+    60cb     60cb       3b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_pubnames)
+    6106     6106      387     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_pubnames)
+    648d     648d       3b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_pubnames)
+    64c8     64c8       3b     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_pubnames)
+       0        0      2ac     1 .debug_pubtypes
+       0        0      264     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.debug_pubtypes)
+     264      264       12     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_pubtypes)
+     276      276       12     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_pubtypes)
+     288      288       12     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_pubtypes)
+     29a      29a       12     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_pubtypes)
+       0        0     7f01     1 .debug_line
+       0        0     7362     1         /workspaces/mos-hardware/target/mos-mega65-none/release/examples/11_parse-56b84558807669e1.11_parse.dcad4882-cgu.5.rcgu.o:(.debug_line)
+    7362     7362       41     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.3.rcgu.o):(.debug_line)
+    73a3     73a3      834     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.4.rcgu.o):(.debug_line)
+    7bd7     7bd7       41     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.5.rcgu.o):(.debug_line)
+    7c18     7c18       41     1         /workspaces/mos-hardware/target/mos-mega65-none/release/deps/libcompiler_builtins-5d328b95982ac6c3.rlib(compiler_builtins-5d328b95982ac6c3.compiler_builtins.dba9f85a-cgu.6.rcgu.o):(.debug_line)
+    7c59     7c59      2a8     1         lto.tmp:(.debug_line)
        0        0       29     1 .comment
        0        0       29     1         <internal>:(.comment)
        0        0       1d     1 .debug_rnglists
@@ -374,9 +376,9 @@
        0        0       1c     1         lto.tmp:(.debug_addr)
        0        0       bb     1 .debug_line_str
        0        0       bb     1         <internal>:(.debug_line_str)
-       0        0      fa0     4 .symtab
-       0        0      fa0     4         <internal>:(.symtab)
+       0        0      fb0     4 .symtab
+       0        0      fb0     4         <internal>:(.symtab)
        0        0      128     1 .shstrtab
        0        0      128     1         <internal>:(.shstrtab)
-       0        0     1565     1 .strtab
-       0        0     1565     1         <internal>:(.strtab)
+       0        0     15a6     1 .strtab
+       0        0     15a6     1         <internal>:(.strtab)
