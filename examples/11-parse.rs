@@ -37,7 +37,7 @@ enum VarType {
 }
 
 /// as at writing, rust doesn't allow for-loops in compile-time evaluation, hence the while-loop
-const BIN_CONV: [u16; 16] = {
+const _BIN_CONV: [u16; 16] = {
     let mut arr = [0; 16];
     arr[0] = 1;
     let mut i = 1;
@@ -247,9 +247,9 @@ const _TOKENS: [&str; 190] = [
 
 struct Label {
     /// lb$ = label name
-    name: Fat28,
+    pub name: Fat28,
     /// ll$ = (post-processed line)
-    pp_line: u16,
+    pub pp_line: u16,
 }
 
 /*fn print(s: String) {
@@ -497,7 +497,7 @@ fn declare_var(
     element_count: &mut [u16; 5],
     current_line: &mut String,
     next_line: &mut String,
-    is_define: bool,
+    _is_define: bool,
     define_values: &mut [Fat28],
     argument_list: &mut Vec<Fat28>,
     delete_line_flag: &mut bool,
@@ -531,13 +531,15 @@ fn declare_var(
             rhs = trim_right(&rhs, &WHITESPACE_CHARS).into();
 
             if rhs.starts_with('$') {
-                let mut hx = rhs[1..].to_string();
+                let hx = rhs[1..].to_string();
+                // @todo return value never used...
                 convert_hex(&hx);
                 rhs = hx;
             }
 
             if rhs.starts_with('%') {
-                let mut bi = rhs[1..].to_string();
+                let bi = rhs[1..].to_string();
+                // @todo the return value never used...
                 convert_binary(&bi);
                 rhs = bi;
             }
@@ -566,7 +568,7 @@ fn declare_var(
         }
 
         if !t_str.contains("%&$") {
-            t_str = String::new();
+            t_str.clear();
             var_type = VarType::Float;
         }
 
@@ -745,6 +747,7 @@ fn my_contains(string1: &str, string2: &str) -> bool {
 }
 
 // line 2100
+// @todo create and return `argument_list` instead of mutable ref.
 fn parse_args(
     mem: &mut Allocator,
     s: &str,
@@ -752,7 +755,7 @@ fn parse_args(
     parse_brackets: bool,
     argument_list: &mut Vec<Fat28>,
 ) {
-    let mut argument_count = 0;
+    let mut _argument_count = 0;
     let mut inside_group = false;
     const SPACE_CHAR_ONLY: [u8; 1] = [32];
 
@@ -760,19 +763,21 @@ fn parse_args(
         return;
     }
 
-    (*argument_list) = Vec::with_capacity(MAX_CAP);
+    argument_list.clear();
 
     let mut current_arg = String::new();
 
     for letter in s.chars() {
         println!("chr={}", letter);
 
-        if letter == '(' && parse_brackets {
-            println!("inside!");
-            inside_group = true;
-        } else if letter == ')' && parse_brackets {
-            println!("outside!");
-            inside_group = false;
+        if parse_brackets {
+            if letter == '(' {
+                println!("inside!");
+                inside_group = true;
+            } else if letter == ')' {
+                println!("outside!");
+                inside_group = false;
+            }
         }
 
         if delimiter.contains(letter) && !inside_group {
@@ -780,7 +785,7 @@ fn parse_args(
             trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
             println!("arg={}", current_arg[..]);
             argument_list.push(mem.write(current_arg.as_bytes()));
-            argument_count += 1;
+            _argument_count += 1;
             current_arg.clear();
         } else {
             current_arg.push(letter);
@@ -929,22 +934,18 @@ fn prepare_test_memory(verbose: &mut bool) {
     let mut offset = 2;
 
     // functional style, yeah!
-    STRDATA
-        .iter()
-        .copied()
-        .enumerate()
-        .for_each(|(lineno, line)| {
-            unsafe { lpoke(0x8010000u32 + offset, line.len() as u8) };
-            offset += 1;
-            for c in line.chars() {
-                let mut cc: u8 = c as u8;
-                if (cc >= 0x41 && cc <= 0x5a) || (cc >= 0x61u8 && cc <= 0x7au8) {
-                    cc ^= 0x20; // toggle bit 5 to swap upper/lower case between ASCII and PETSCII
-                }
-                unsafe { lpoke(0x8010000u32 + offset, cc) };
-                offset += 1;
+    STRDATA.iter().copied().for_each(|line| {
+        unsafe { lpoke(0x8010000u32 + offset, line.len() as u8) };
+        offset += 1;
+        for c in line.chars() {
+            let mut cc: u8 = c as u8;
+            if (0x41..=0x5a).contains(&cc) || (0x61u8..=0x7au8).contains(&cc) {
+                cc ^= 0x20; // toggle bit 5 to swap upper/lower case between ASCII and PETSCII
             }
-        });
+            unsafe { lpoke(0x8010000u32 + offset, cc) };
+            offset += 1;
+        }
+    });
 }
 
 fn get_filename(verbose: &mut bool) -> String {
