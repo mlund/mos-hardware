@@ -449,7 +449,7 @@ extern "C" {
     pub fn usleep(micros: u32);
 }
 #[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct dmagic_dmalist {
     pub option_0b: ::core::ffi::c_uchar,
     pub option_80: ::core::ffi::c_uchar,

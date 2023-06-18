@@ -15,6 +15,7 @@
 //! Memory related tools
 
 use super::libc;
+use crate::poke;
 use alloc::{string::String, vec::Vec};
 use core::{convert::From, mem::MaybeUninit};
 
@@ -191,5 +192,91 @@ impl Iterator for MemoryIterator {
     fn advance_by(&mut self, n: usize) -> Result<(), usize> {
         self.address += n as u32;
         Ok(())
+    }
+}
+
+impl Default for libc::dmagic_dmalist {
+    fn default() -> Self {
+        Self {
+            option_0b: 0x0b,
+            option_80: 0x80,
+            option_81: 0x81,
+            option_85: 0x85,
+            sub_cmd: 0x00,
+            end_of_options: 0x00,
+            dest_skip: 1,
+            source_addr: 0,
+            source_bank: 0,
+            source_mb: 0,
+            dest_addr: 0,
+            dest_bank: 0,
+            dest_mb: 0,
+            count: 0,
+            modulo: 0,
+            command: Self::COPY,
+        }
+    }
+}
+
+impl libc::dmagic_dmalist {
+    /// Copy command
+    const COPY: u8 = 1;
+    /// Perform the copy once data is in place
+    pub fn do_dma(&self) {
+        let self_ptr = core::ptr::addr_of!(self) as u16;
+        unsafe {
+            libc::mega65_io_enable();
+            poke!(0xd702 as *mut u8, 0);
+            poke!(0xd704 as *mut u8, 0); // List is in $00xxxxx
+            poke!(0xd701 as *mut u8, (self_ptr >> 8) as u8);
+            poke!(0xd701 as *mut u8, (self_ptr & 0xff) as u8); // triggers enhanced DMA
+        }
+    }
+    fn set_source(&mut self, src: u32) {
+        // User should provide 28-bit address for IO
+        // (otherwise we can't DMA to/from RAM under IO)
+        //  if (source_address>=0xd000 && source_address<0xe000)
+        //    dmalist.source_bank|=0x80;
+        self.source_mb = (src >> 20) as u8;
+        self.source_addr = (src & 0xffff) as u16;
+        self.source_bank = ((src >> 16) & 0x0f) as u8;
+    }
+
+    fn set_destinaion(&mut self, dst: u32) {
+        // User should provide 28-bit address for IO
+        // (otherwise we can't DMA to/from RAM under IO)
+        //  if (destination_address>=0xd000 && destination_address<0xe000)
+        //    dmalist.dest_bank|=0x80;
+        self.dest_mb = (dst >> 20) as u8;
+        self.dest_addr = (dst & 0xffff) as u16;
+        self.dest_bank = ((dst >> 16) & 0x0f) as u8;
+    }
+    fn init(&mut self) {
+        self.option_0b = 0x0b;
+        self.option_80 = 0x80;
+        self.option_81 = 0x81;
+        self.option_85 = 0x85;
+        self.sub_cmd = 0x00;
+        self.end_of_options = 0x00;
+        self.dest_skip = 1;
+    }
+
+    pub fn lpeek(&mut self, src: u32) -> u8 {
+        let dst: u8 = 0;
+        self.copy(src, (dst as *mut u8) as u32, 1);
+        dst
+    }
+
+    pub fn lpoke(&mut self, dst: u32, value: u8) {
+        self.copy((value as *mut u8) as u32, dst, 1);
+    }
+
+    pub fn copy(&mut self, src: u32, dst: u32, n: usize) {
+        self.command = Self::COPY;
+        self.count = n as u16;
+        self.init();
+        self.set_source(src);
+        self.set_destinaion(dst);
+        self.do_dma();
     }
 }
