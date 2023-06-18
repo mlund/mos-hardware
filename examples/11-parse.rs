@@ -5,17 +5,17 @@
 extern crate alloc;
 extern crate mos_alloc;
 
+use alloc::format;
 use alloc::string::ToString;
 use alloc::{string::String, vec::Vec};
-use alloc::format;
 use core::panic::PanicInfo;
 use mos_hardware::mega65::lpeek;
 use mos_hardware::mega65::set_lower_case;
 //use mos_hardware::mega65::libc::cputs;
 use mos_hardware::mega65::libc::mega65_fast;
 use mos_hardware::mega65::lpoke;
-use mos_hardware::mega65::Fat28;
 use mos_hardware::mega65::Allocator;
+use mos_hardware::mega65::Fat28;
 
 use ufmt_stdio::*;
 
@@ -27,12 +27,13 @@ const QUOTE_CHAR: &str = "\"";
 /// pf$ = type_suffix
 const _TYPE_SUFFIX: [&str; 4] = ["", "%", "$", "&"];
 
+#[derive(Clone, Copy)]
 enum VarType {
     Float = 0,
     Int = 1,
     String = 2,
     Ref = 3,
-    Define = 4
+    Define = 4,
 }
 
 /// as at writing, rust doesn't allow for-loops in compile-time evaluation, hence the while-loop
@@ -293,7 +294,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // NOTE: Seems like rust chokes if this is too large?
     let _processed_lines: Vec<String> = Vec::with_capacity(MAX_CAP);
     // dim ec(4) = element_count per type
-    let mut element_count: [u16; 5] = [ 0; 5 ];
+    let mut element_count: [u16; 5] = [0; 5];
     // dim vt$(4,200) = var_table per type
 
     set_lower_case();
@@ -366,13 +367,13 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         single_quote_comment_trim(&mut current_line);
 
         //560-580
-        if current_line.len() > 0 {
+        if !current_line.is_empty() {
             current_line = String::from(trim_right(&current_line[..], &WHITESPACE_CHARS[..]));
             //println!("'{}'", &current_line[..]);
         }
 
         //585
-        if current_line.len() > 0 {
+        if !current_line.is_empty() {
             // dl = delete_line_flag
             delete_line_flag = false;
             if verbose {
@@ -384,7 +385,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 );
             }
             // 600
-            if (&current_line[..1]).eq(".") {
+            if (current_line[..1]).eq(".") {
                 println!("dot!");
                 _next_line_flag = true;
                 parse_label(
@@ -397,7 +398,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 );
             }
             // 601
-            if (&current_line[..1]).eq("#") {
+            if (current_line[..1]).eq("#") {
                 parse_preprocessor_directive(
                     &mut mem,
                     &mut current_line,
@@ -408,7 +409,8 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                     &mut var_table,
                     &mut define_values,
                     &mut argument_list,
-                    verbose);
+                    verbose,
+                );
             }
         }
 
@@ -419,13 +421,15 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     0
 }
 
+// @todo: why return a signed int? Should be `usize`.
 fn index_of(line: &str, token: &str) -> i16 {
     if let Some(index) = (*line).find(token) {
         //println!("found {} at {}!", token, index);
-        return index as i16;
+        index as i16
+    } else {
+        //println!("cOULDN'T FIND '{}' in '{}'", token, line);
+        -1
     }
-    //println!("cOULDN'T FIND '{}' in '{}'", token, line);
-    return -1;
 }
 
 // 603 - 607
@@ -436,41 +440,52 @@ fn parse_preprocessor_directive(
     delete_line_flag: &mut bool,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: & mut [Vec<Fat28>; 5],
+    var_table: &mut [Vec<Fat28>; 5],
     define_values: &mut Vec<Fat28>,
-    argument_list: & mut Vec<Fat28>,
-    verbose: bool
+    argument_list: &mut Vec<Fat28>,
+    verbose: bool,
 ) {
     if index_of(current_line, "IFDEF") == 1 {
         // println!("** ifdef!");
         let def_str = &current_line[7..];
         check_if_define_exists(def_str, inside_ifdef, element_count, var_table);
         *delete_line_flag = true;
-    }
-    else if index_of(current_line, "ENDIF") == 1 {
+    } else if index_of(current_line, "ENDIF") == 1 {
         //println!("** endif!");
         *inside_ifdef = false;
         *delete_line_flag = true;
-    }
-    else if index_of(current_line, "DEFINE") == 1 {
+    } else if index_of(current_line, "DEFINE") == 1 {
         println!("** define!");
         let line_suffix = current_line[8..].to_string();
-        declare_var(mem, &line_suffix, var_table,
+        declare_var(
+            mem,
+            &line_suffix,
+            var_table,
             element_count,
-            current_line, next_line,
-            false, define_values, 
+            current_line,
+            next_line,
+            false,
+            define_values,
             argument_list,
-            delete_line_flag, verbose);
-    }
-    else if index_of(current_line, "DECLARE") == 1 {
+            delete_line_flag,
+            verbose,
+        );
+    } else if index_of(current_line, "DECLARE") == 1 {
         println!("** declare!");
         let line_suffix = current_line[9..].to_string();
-        declare_var(mem, &line_suffix, var_table,
+        declare_var(
+            mem,
+            &line_suffix,
+            var_table,
             element_count,
-            current_line, next_line,
-            false, define_values, 
+            current_line,
+            next_line,
+            false,
+            define_values,
             argument_list,
-            delete_line_flag, verbose);
+            delete_line_flag,
+            verbose,
+        );
     }
 }
 
@@ -478,22 +493,22 @@ fn parse_preprocessor_directive(
 fn declare_var(
     mem: &mut Allocator,
     varline: &str,
-    var_table:  &mut [Vec<Fat28>; 5],
+    var_table: &mut [Vec<Fat28>; 5],
     element_count: &mut [u16; 5],
     current_line: &mut String,
     next_line: &mut String,
     is_define: bool,
-    define_values: &mut Vec<Fat28>,
+    define_values: &mut [Fat28],
     argument_list: &mut Vec<Fat28>,
     delete_line_flag: &mut bool,
-    verbose: bool
+    verbose: bool,
 ) {
     println!("new var! {}", varline);
     parse_args(mem, varline, ",;", true, argument_list);
 
-    if argument_list.len() == 0 {
+    if argument_list.is_empty() {
         println!("?DECLARE PARAMETER MISSING IN LINE ..."); // {}", source_line_counter);
-        // TODO: need to do goto 1800
+                                                            // TODO: need to do goto 1800
         return;
     }
 
@@ -505,38 +520,37 @@ fn declare_var(
         let open_bkt_pos = arg.find('('); // b1
         let close_bkt_pos = arg.find(')'); // b2
         let equals_pos = arg.find('='); // eq
-        let mut rhs = String::new();    // vl$
-        let mut lhs = String::new();    // p$
+        let mut rhs = String::new(); // vl$
+        let mut lhs = String::new(); // p$
 
         if let Some(eq_idx) = equals_pos {
             // --- assignment ---
             rhs = arg.split_off(eq_idx + 1);
             lhs = arg[..eq_idx - 1].to_string();
-            trim_left(&mut lhs, &WHITESPACE_CHARS);
-    
-            trim_right(&mut rhs, &WHITESPACE_CHARS);
-    
-            if rhs.starts_with("$") {
+            lhs = trim_left(&lhs, &WHITESPACE_CHARS).into();
+            rhs = trim_right(&rhs, &WHITESPACE_CHARS).into();
+
+            if rhs.starts_with('$') {
                 let mut hx = rhs[1..].to_string();
-                convert_hex(&mut hx);
+                convert_hex(&hx);
                 rhs = hx;
             }
-    
-            if rhs.starts_with("%") {
+
+            if rhs.starts_with('%') {
                 let mut bi = rhs[1..].to_string();
-                convert_binary(&mut bi);
+                convert_binary(&bi);
                 rhs = bi;
             }
         }
-    
+
         // 1050 - 1060
         if let (Some(opn_bkt_idx), Some(close_bkt_idx)) = (open_bkt_pos, close_bkt_pos) {
             // --- dimension ---
             dimension = arg[opn_bkt_idx + 1..close_bkt_idx].to_string();
             arg = arg[..opn_bkt_idx - 1].to_string();
-    
-            replace_vars_and_labels_in_source_string(&mut dimension);
-    
+
+            replace_vars_and_labels_in_source_string(&dimension);
+
             *delete_line_flag = false;
         }
 
@@ -545,89 +559,87 @@ fn declare_var(
         if verbose {
             print!("adding {{rvon}}");
         }
-    
+
         let mut t_str = String::new();
         if let Some(t_char) = t {
             t_str.push(t_char);
         }
-    
-        if !t_str.contains(&"%&$") {
+
+        if !t_str.contains("%&$") {
             t_str = String::new();
             var_type = VarType::Float;
         }
 
-        if *delete_line_flag == true {
+        if *delete_line_flag {
             var_type = VarType::Define;
         }
-    
+
         if t_str == "%" {
             var_type = VarType::Int;
         }
-    
+
         if t_str == "$" {
             var_type = VarType::String;
         }
-    
+
         if t_str == "&" {
             var_type = VarType::Ref;
         }
-            
-        // 1074
-        var_table[var_type as usize][element_count[var_type as usize] as usize] = mem.write(arg.as_bytes());
 
-        let mut var_name: String = String::new();
+        // 1074
+        var_table[var_type as usize][element_count[var_type as usize] as usize] =
+            mem.write(arg.as_bytes());
 
         if !dimension.is_empty() {
             let id = element_count[var_type as usize];
-            var_name = generate_varname_from_index(id as usize);
-            if *delete_line_flag == false {
+            let var_name = generate_varname_from_index(id as usize);
+            if !(*delete_line_flag) {
                 // nl$ = next_line
-                next_line.push_str(&format!("dim {}{}({}):", var_name, t_str, dimension));
+                next_line.push_str(&format!("dim {var_name}{t_str}({dimension}):"));
             }
         }
-    
+
         if !rhs.is_empty() {
             let id = element_count[var_type as usize];
-            var_name = generate_varname_from_index(id as usize);
-            if *delete_line_flag == false {
-                next_line.push_str(&format!("{}{}={}:", var_name, t_str, rhs));
+            let var_name = generate_varname_from_index(id as usize);
+            if !(*delete_line_flag) {
+                next_line.push_str(&format!("{var_name}{t_str}={rhs}:"));
             }
         }
-    
-        if *delete_line_flag == true {
+
+        if *delete_line_flag {
             define_values[element_count[var_type as usize] as usize] = mem.write(rhs.as_bytes());
         }
-    
+
         if verbose {
-            print!("{}{{rvof}}: {}", arg.as_str(), element_count[var_type as usize]);
+            print!(
+                "{}{{rvof}}: {}",
+                arg.as_str(),
+                element_count[var_type as usize]
+            );
         }
-    
+
         element_count[var_type as usize] += 1;
     }
 
     // 1120
-    if !next_line.is_empty() {
-        *delete_line_flag = false;
-        *current_line = format!("^^{}", next_line);
-    } else {
+    if next_line.is_empty() {
         *delete_line_flag = true;
+    } else {
+        *delete_line_flag = false;
+        *current_line = format!("^^{next_line}");
     }
 }
 
 // lines 5000 - 5030
 fn generate_varname_from_index(id: usize) -> String {
-    let vn: String;
-    
     if id < 26 {
-        vn = ((65 + id as u8) as char).to_string();
+        ((65 + id as u8) as char).to_string()
     } else {
         let n2 = id % 26;
         let n1 = id / 26 - 1;
-        vn = format!("{}{}", ((65 + n1 as u8) as char).to_string(),
-            ((65 + n2 as u8) as char).to_string());
+        format!("{}{}", ((65 + n1 as u8) as char), ((65 + n2 as u8) as char))
     }
-    
-    vn
 }
 
 fn convert_binary(bi: &str) -> u16 {
@@ -647,9 +659,7 @@ fn convert_binary(bi: &str) -> u16 {
     }
 
     let c = br.to_string()[1..].to_string();
-    let c_num = c.parse::<u16>().unwrap();
-
-    c_num
+    c.parse::<u16>().unwrap()
 }
 
 fn convert_hex(hx: &str) -> u16 {
@@ -667,7 +677,7 @@ fn replace_vars_and_labels_in_source_string(s: &str) -> String {
     if s.starts_with("^^") {
         return s[2..].to_string();
     }
-    
+
     let mut quote_flag = false;
     let mut a = String::new();
     let mut c = String::new();
@@ -703,8 +713,7 @@ fn replace_vars_and_labels_in_source_string(s: &str) -> String {
     }
 
     a.push_str(&assess_token(&c));
-    let result = a + &c;
-    result
+    a + &c
 }
 
 fn assess_token(token: &str) -> String {
@@ -741,52 +750,42 @@ fn parse_args(
     s: &str,
     delimiter: &str,
     parse_brackets: bool,
-    argument_list: &mut Vec<Fat28>
+    argument_list: &mut Vec<Fat28>,
 ) {
-
-    let mut remaining_string = s.to_string();
     let mut argument_count = 0;
-    let string_length = remaining_string.len();
     let mut inside_group = false;
     const SPACE_CHAR_ONLY: [u8; 1] = [32];
 
-    (*argument_list) = Vec::with_capacity(MAX_CAP);
-
-    if string_length == 0 {
-        return; // no string
+    if s.is_empty() {
+        return;
     }
 
-    let mut i = 0;
+    (*argument_list) = Vec::with_capacity(MAX_CAP);
+
     let mut current_arg = String::new();
 
-    while i < string_length {
-        let b = remaining_string.chars().nth(i).unwrap().to_string();
-        println!("chr={}", b[..]);
+    for letter in s.chars() {
+        println!("chr={}", letter);
 
-        if b == "(" && parse_brackets == true {
+        if letter == '(' && parse_brackets {
             println!("inside!");
             inside_group = true;
-        }
-
-        if b == ")" && parse_brackets == true {
+        } else if letter == ')' && parse_brackets {
             println!("outside!");
             inside_group = false;
         }
 
-        if my_contains(delimiter, &b) && inside_group == false {
+        if delimiter.contains(letter) && !inside_group {
             //(*argument_list).push(String::from(trim_all(&b[..], &SPACE_CHAR_ONLY)));
             trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
             println!("arg={}", current_arg[..]);
             argument_list.push(mem.write(current_arg.as_bytes()));
             argument_count += 1;
-            current_arg = String::new();
+            current_arg.clear();
         } else {
-            current_arg.push_str(&b);
+            current_arg.push(letter);
         }
-
-        i += 1;
     }
-
     trim_all(&mut current_arg, &SPACE_CHAR_ONLY);
     println!("lastarg={}", current_arg[..]);
     argument_list.push(mem.write(current_arg.as_bytes()));
@@ -797,7 +796,7 @@ fn check_if_define_exists(
     def_str: &str,
     inside_ifdef: &mut bool,
     element_count: &mut [u16; 5],
-    var_table: &[Vec<Fat28>; 5]
+    var_table: &[Vec<Fat28>; 5],
 ) {
     *inside_ifdef = true;
     for k in 0..element_count[VarType::Define as usize] {
@@ -832,8 +831,8 @@ fn single_quote_comment_trim(current_line: &mut String) {
         }
     }
     //540
-    if cut_tail_idx.is_some() {
-        *current_line = current_line[..cut_tail_idx.unwrap()].to_string();
+    if let Some(index) = cut_tail_idx {
+        *current_line = current_line[..index].to_string();
     }
     //println!("'{}'", &(*current_line)[..]);
 }
@@ -889,7 +888,7 @@ fn trim_right<'a>(line: &'a str, trim_chars: &[u8]) -> &'a str {
     let mut i = (line.len() - 1) as i16;
 
     while i >= 0 && trim_chars.contains(&line.as_bytes()[i as usize]) {
-        i = i - 1;
+        i -= 1;
     }
 
     &line[..((i + 1) as usize)]
@@ -917,25 +916,25 @@ fn prepare_test_memory(verbose: &mut bool) {
         "#ifdef z",
         "  print z",
         "#endif",
-        "#declare v1$(15)"
-/*        ".main",
-        "  for x = 0 to 15",
-        "    print x",
-        "  next x   ' trailing comment" */
+        "#declare v1$(15)", /*        ".main",
+                            "  for x = 0 to 15",
+                            "    print x",
+                            "  next x   ' trailing comment" */
     ];
 
     // write number of lines
     unsafe { lpoke(0x8010000u32, (STRDATA.len() & 0xff) as u8) }
     unsafe { lpoke(0x8010001u32, ((STRDATA.len() >> 8) & 0xff) as u8) }
 
-    let mut offset = 2 as u32;
+    let mut offset = 2;
 
     // functional style, yeah!
-    STRDATA.iter()
+    STRDATA
+        .iter()
         .copied()
         .enumerate()
-        .for_each(|(lineno, line)|{
-            unsafe { lpoke(0x8010000u32 + offset, line.len() as u8)};
+        .for_each(|(lineno, line)| {
+            unsafe { lpoke(0x8010000u32 + offset, line.len() as u8) };
             offset += 1;
             for c in line.chars() {
                 let mut cc: u8 = c as u8;
@@ -944,7 +943,8 @@ fn prepare_test_memory(verbose: &mut bool) {
                 }
                 unsafe { lpoke(0x8010000u32 + offset, cc) };
                 offset += 1;
-            }});
+            }
+        });
 }
 
 fn get_filename(verbose: &mut bool) -> String {
@@ -980,7 +980,7 @@ fn get_filename(verbose: &mut bool) -> String {
         // 7080 bend
     }
 
-    return filename;
+    filename
     // NOTE: not sure how to do 'input' in rust yet, so skipping this part...
     // (maybe something in mega65's libc could do it?)
 
