@@ -19,7 +19,7 @@ use mos_hardware::mega65::Fat28;
 
 use ufmt_stdio::*;
 
-const MAX_CAP: usize = 20;
+const MAX_CAP: usize = 2;
 
 const RVS_ON: &str = "\x12";
 const RVS_OFF: &str = "\u{0092}";
@@ -52,6 +52,8 @@ const _BIN_CONV: [u16; 16] = {
 const WHITESPACE_CHARS: [u8; 4] = [32, 160, 29, 9]; // space, shift+space, right, tab
 
 // rw$
+
+/*
 const _TOKENS: [&str; 190] = [
     "print",
     "input",
@@ -244,7 +246,7 @@ const _TOKENS: [&str; 190] = [
     "xor",
     "key",
 ];
-
+ */
 struct Label {
     /// lb$ = label name
     pub name: Fat28,
@@ -286,7 +288,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     prepare_test_memory(&mut verbose);
 
     // ln%() = map_gen_line_to_orig_line[]
-    let _map_gen_line_to_orig_line: [u16; 500] = [0; 500];
+    //let _map_gen_line_to_orig_line: [u16; 500] = [0; 500];
 
     set_lower_case();
 
@@ -335,7 +337,6 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // clean up temporary files
     // NOTE: sl/source_line_counter and rl/current_line_index serve the same purpose
     // so I will remove 'current_line_index'
-    let mut source_line_counter = 0; // sl
     let mut _post_proc_line_counter = 0; // ln
 
     // TODO: 195 clr ti: rem keep start time for timing
@@ -348,27 +349,28 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // removing this one, as it's equivalent to sl/soure_line_counter
     //let mut current_line_index = 0;
     // tl = total_lines
-    let mut _total_lines: u16 = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16;
+    let total_lines: u16 = lpeek(ca_addr) as u16 + 256 * lpeek(ca_addr + 1) as u16;
 
     ca_addr += 2;
 
     pp_line = 0; // ln = index into li$ (current post-processed line)
 
     //200
-    while source_line_counter != _total_lines {
+    for source_line_counter in 0..total_lines {
+        //    while source_line_counter != _total_lines {
         copy_data_to_current_line(&mut ca_addr, &mut current_line);
 
         println!("l{}: {}", source_line_counter, &current_line[..]);
 
         // 340
-        current_line = String::from(trim_left(&current_line[..], &WHITESPACE_CHARS[..]));
+        current_line = trim_left(&current_line[..], &WHITESPACE_CHARS[..]).into();
         println!("{}", &current_line[..]);
 
         single_quote_comment_trim(&mut current_line);
 
         //560-580
         if !current_line.is_empty() {
-            current_line = String::from(trim_right(&current_line[..], &WHITESPACE_CHARS[..]));
+            current_line = trim_right(&current_line[..], &WHITESPACE_CHARS[..]).into();
             //println!("'{}'", &current_line[..]);
         }
 
@@ -415,7 +417,6 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
         }
 
         // 750
-        source_line_counter += 1;
     }
 
     0
@@ -641,23 +642,15 @@ fn generate_varname_from_index(id: usize) -> String {
 }
 
 fn convert_binary(bi: &str) -> u16 {
-    let mut br: u16 = 0; // result
-
-    for (b, bc) in bi.chars().rev().enumerate() {
-        let bc_str = bc.to_string();
-
-        if bc_str != "1" && bc_str != "0" {
-            // Bail out
-            bail_out();
-        }
-
-        if bc_str == "1" {
-            br += 1 << b;
+    let mut val: u16 = 0; // result
+    for (b, letter) in bi.chars().rev().enumerate() {
+        match letter {
+            '1' => val += (1 << b),
+            '0' => continue,
+            _ => bail_out(),
         }
     }
-
-    let c = br.to_string()[1..].to_string();
-    c.parse::<u16>().unwrap()
+    val.to_string()[1..].parse::<u16>().unwrap()
 }
 
 fn convert_hex(hx: &str) -> u16 {
@@ -740,7 +733,7 @@ fn my_contains(string1: &str, string2: &str) -> bool {
             }
         }
     }
-    return false;
+    false
 }
 
 // line 2100
@@ -841,7 +834,7 @@ fn single_quote_comment_trim(current_line: &mut String) {
 
 /// @todo: skip `current_line` as argument as it is zeroed
 fn copy_data_to_current_line(ca_addr: &mut u32, current_line: &mut String) {
-    *current_line = String::new();
+    current_line.clear();
     let line_length = lpeek(*ca_addr) as u32;
     *ca_addr += 1;
 
