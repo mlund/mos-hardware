@@ -1,0 +1,3 @@
+all:
+	clear
+	./build.sh
