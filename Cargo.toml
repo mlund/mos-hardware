@@ -26,6 +26,7 @@ opt-level = "s"
 lto = true
 debug = 2
 panic = "abort"
+codegen-units = 1
 
 [lib]
 doctest = false
