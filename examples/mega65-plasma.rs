@@ -6,12 +6,16 @@
 
 #![no_std]
 #![feature(start)]
+#![feature(default_alloc_error_handler)]
 
 extern crate mos_alloc;
 extern crate mos_hardware;
 
+use core::ops::BitOr;
 use core::panic::PanicInfo;
+use mos_hardware::mega65::random::LibcRng;
 use mos_hardware::{mega65, repeat_element, sine, SINETABLE};
+use rand::Rng;
 
 /// Class for rendering a character mode plasma effect
 struct Plasma {
@@ -38,24 +42,19 @@ impl Plasma {
     }
     /// Generate stochastic character set
     fn make_charset(charset_address: *mut u8) {
-        let generate_char = |sine| {
-            let mut char_pattern: u8 = 0;
+        let mut rng = LibcRng::default();
+        let make_char = |sine| {
             [1, 2, 4, 8, 16, 32, 64, 128]
                 .iter()
-                .filter(|_| mega65::random::rand8(u8::MAX) > sine)
-                .for_each(|bit| {
-                    char_pattern |= bit;
-                });
-            char_pattern
+                .filter(|_| rng.gen::<u8>() > sine)
+                .fold(0, |pattern, i| pattern.bitor(i))
         };
 
         repeat_element(SINETABLE.iter().copied(), 8)
+            .map(make_char)
             .enumerate()
-            .for_each(|(offset, sine)| {
-                let character = generate_char(sine);
-                unsafe {
-                    charset_address.add(offset).write_volatile(character);
-                }
+            .for_each(|(i, pattern)| unsafe {
+                charset_address.add(i).write_volatile(pattern);
             });
     }
 
@@ -81,16 +80,10 @@ impl Plasma {
         self.xindex1 = self.xindex1.wrapping_add(2);
         self.xindex2 = self.xindex2.wrapping_sub(3);
 
-        let mut offset: usize = 0; // screen memory offset
-        for y in self.ybuffer.iter().copied() {
-            for x in self.xbuffer.iter().copied() {
-                let sum = x.wrapping_add(y);
-                unsafe {
-                    screen_address.add(offset).write_volatile(sum);
-                }
-                offset += 1;
-            }
-        }
+        itertools::iproduct!(self.ybuffer.iter().copied(), self.xbuffer.iter().copied())
+            .map(|(y, x)| x.wrapping_add(y))
+            .enumerate()
+            .for_each(|(i, sum)| unsafe { screen_address.add(i).write_volatile(sum) });
     }
 }
 
