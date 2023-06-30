@@ -17,9 +17,9 @@
 //! Utility functions for working with single PETSCII characters
 //!
 //! This is based on the following resources:
-//! - PETSCII to unicode look-up table from https://github.com/simmons/cbm
-//!   which in turn is from https://sta.c64.org/cbm64pettoscr.html.
-//! - PETSCII to screen code conversion based on https://sta.c64.org/cbm64pettoscr.html.
+//! - PETSCII to unicode look-up table from <https://github.com/simmons/cbm>
+//!   which in turn is from <https://sta.c64.org/cbm64pettoscr.html>.
+//! - PETSCII to screen code conversion based on <https://sta.c64.org/cbm64pettoscr.html>.
 
 use core::convert::From;
 use core::fmt;
@@ -132,7 +132,7 @@ impl Petscii {
 
     /// Convert PETSCII to screen code
     ///
-    /// See https://sta.c64.org/cbm64pettoscr.html
+    /// See <https://sta.c64.org/cbm64pettoscr.html>
     ///
     /// # Examples
     /// ~~~

@@ -191,6 +191,12 @@ impl Iterator for MemoryIterator {
         Ok(dst)
     }
 
+    #[cfg(version("1.69"))]
+    fn advance_by(&mut self, n: usize) -> Result<(), core::num::NonZeroUsize> {
+        self.address += n as u32;
+        Ok(())
+    }
+    #[cfg(not(version("1.69")))]
     fn advance_by(&mut self, n: usize) -> Result<(), usize> {
         self.address += n as u32;
         Ok(())
