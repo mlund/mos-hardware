@@ -51,23 +51,23 @@ pub unsafe fn lcopy(source: u32, destination: u32, length: usize) {
 ///
 /// # Examples
 ///
-/// The allocated 28-bit region is described by a `Fat28` pointer,
-/// here called `fat` which implements the `From` trait for common
+/// The allocated 28-bit region is described by a fat `Ptr28` pointer,
+/// which implements the `From` trait for common
 /// types such as `Vec<u8>` and `String`.
 /// ~~~
-/// let mut mem = Allocator::new(0x40000);
+/// let mut bank = Allocator::new(0x40000);
 /// let a = Vec::<u8>::from([7, 9, 13]);
-/// let fat = mem.write(a.as_slice()); // dma write
-/// let b = Vec::<u8>::from(fat); // dma read
+/// let ptr = bank.write(a.as_slice()); // dma write
+/// let b = Vec::<u8>::from(ptr); // dma read
 /// assert_eq!(a, b);
 /// ~~~
 ///
-/// `Vec<Fat28>` can be traversed almost as if a vector of values:
+/// `Vec<Ptr28>` can be traversed almost as if a vector of values:
 /// ~~~
-/// let cnt = Vec::from([mem.push(b"first"), mem.push(b"second")])
+/// let cnt = Vec::from([bank.push(b"first"), bank.push(b"second")])
 ///      .iter()
 ///      .copied()
-///      .map(String::from)
+///      .map(String::from) // dma write
 ///      .filter(|s| s.starts_with('s'))
 ///      .count();
 /// assert_eq!(cnt, 1);
@@ -78,15 +78,16 @@ pub struct Allocator {
 }
 
 impl Allocator {
+    /// New allocator starting at `address`
     pub const fn new(address: u32) -> Self {
         Self { address }
     }
-    /// DMA copy bytes to next available 28-bit memory location.
+    /// DMA copy bytes to next free 28-bit memory location.
     ///
     /// Every call to `write` advances the address by `bytes.len()`.
-    pub fn write(&mut self, bytes: &[u8]) -> Fat28 {
+    pub fn write(&mut self, bytes: &[u8]) -> Ptr28 {
         let len = bytes.len();
-        let ptr = Fat28 {
+        let ptr = Ptr28 {
             address: self.address,
             len,
         };
@@ -100,21 +101,22 @@ impl Allocator {
 
 /// Fat pointer to region in 28-bit address space
 #[derive(Clone, Copy)]
-pub struct Fat28 {
+pub struct Ptr28 {
     /// Address
     pub address: u32,
     /// Length in bytes
     pub len: usize,
 }
 
-impl From<Fat28> for String {
-    fn from(value: Fat28) -> Self {
+impl From<Ptr28> for String {
+    fn from(value: Ptr28) -> Self {
+        // naughty camouflage of unsafe code...
         unsafe { Self::from_utf8_unchecked(value.into()) }
     }
 }
 
-impl From<Fat28> for Vec<u8> {
-    fn from(value: Fat28) -> Self {
+impl From<Ptr28> for Vec<u8> {
+    fn from(value: Ptr28) -> Self {
         MemoryIterator::new(value.address).get_chunk(value.len)
     }
 }
@@ -232,6 +234,7 @@ impl libc::dmagic_dmalist {
             poke!(0xd701 as *mut u8, (self_ptr & 0xff) as u8); // triggers enhanced DMA
         }
     }
+    /// Set source address
     fn set_source(&mut self, src: u32) {
         // User should provide 28-bit address for IO
         // (otherwise we can't DMA to/from RAM under IO)
@@ -242,6 +245,7 @@ impl libc::dmagic_dmalist {
         self.source_bank = ((src >> 16) & 0x0f) as u8;
     }
 
+    /// Set destination address
     fn set_destinaion(&mut self, dst: u32) {
         // User should provide 28-bit address for IO
         // (otherwise we can't DMA to/from RAM under IO)
@@ -261,6 +265,7 @@ impl libc::dmagic_dmalist {
         self.dest_skip = 1;
     }
 
+    /// Peek into memory using DMA copy
     pub fn lpeek(&mut self, src: u32) -> u8 {
         let dst: u8 = 0;
         self.copy(src, (dst as *mut u8) as u32, 1);
@@ -271,6 +276,7 @@ impl libc::dmagic_dmalist {
         self.copy((value as *mut u8) as u32, dst, 1);
     }
 
+    /// DMA copy `n` bytes from `src` address to `dst` address
     pub fn copy(&mut self, src: u32, dst: u32, n: usize) {
         self.command = Self::COPY;
         self.count = n as u16;
