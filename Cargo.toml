@@ -23,8 +23,9 @@ codegen-units = 1
 [profile.release]
 opt-level = "s"
 lto = true
-debug = 2
+strip = true
 panic = "abort"
+debug = 0
 
 [lib]
 doctest = false
