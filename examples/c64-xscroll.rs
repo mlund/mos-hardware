@@ -16,6 +16,7 @@
 
 #![no_std]
 #![feature(start)]
+#![feature(default_alloc_error_handler)]
 
 extern crate alloc;
 extern crate mos_alloc;
@@ -25,12 +26,6 @@ use mos_hardware::screen_codes;
 use mos_hardware::sid::SidTune;
 use mos_hardware::{c64, vic2};
 use vic2::*;
-
-/// Trait that in the future may be used for IRQs (currently no effect)
-trait Interrupt {
-    /// Called for every trigger event
-    fn update(&mut self, counter: u8);
-}
 
 /// Classic, smooth x-scroll using VIC2's 0xd016 register
 struct SmoothScroll {
@@ -49,15 +44,18 @@ impl SmoothScroll {
     const RIGHTMOST_CHAR: *mut u8 =
         (0x0400 + (40 * SmoothScroll::YPOSITION + 39 as u16)) as *mut u8;
     /// PETSCII encoded scroll text
-
-    const SCROLL_TEXT: [u8; 254] = screen_codes!(
+    const SCROLL_TEXT: [u8; 262] = screen_codes!(
         "Hello from RUST! This is a tiny demo written \
     in rust using the llvm-mos backend for 6502 code generation. \
-    The top color flickering reflects the time spend on rust in the raster interrupt \
-    (scroll and sprite movement) while SID music playback is excluded. "
+    The top color flickering reflects time spent in the raster interrupt, i.e. \
+    scroll (green) and sprite movement (red), while SID music playback is not shown. "
     );
 
-    const fn default() -> Self {
+    /// Create new instance
+    ///
+    /// Note this is an associated `const` function:
+    /// https://doc.rust-lang.org/reference/const_eval.html#const-functions
+    const fn new() -> Self {
         Self {
             text_index: 0,
             displacement: 7,
@@ -88,15 +86,15 @@ impl SmoothScroll {
         }
     }
 
-    // Copy all characters on scroll line ONE character to the left (0-39 <-- 1-40)
+    /// Copy all characters on scroll line ONE character to the left (0-39 <-- 1-40)
     #[inline]
     fn leftcopy_chars(&self) {
         // faster than core::ptr::copy(LEFTMOST_CHAR.offset(1), LEFTMOST_CHAR, 39)
-        for i in 1..40 {
+        for i in 0..39 {
             unsafe {
-                let character = SmoothScroll::LEFTMOST_CHAR.offset(i).read_volatile();
+                let character = SmoothScroll::LEFTMOST_CHAR.offset(i + 1).read_volatile();
                 SmoothScroll::LEFTMOST_CHAR
-                    .offset(i - 1)
+                    .offset(i)
                     .write_volatile(character);
             }
         }
@@ -114,10 +112,9 @@ impl SmoothScroll {
         self.leftcopy_chars();
         self.text_index += 1;
     }
-}
 
-impl Interrupt for SmoothScroll {
-    fn update(&mut self, _counter: u8) {
+    /// Called at every IRQ
+    fn update(&mut self) {
         self.move_pixel();
         if self.displacement == 7 {
             self.update_chars();
@@ -127,43 +124,61 @@ impl Interrupt for SmoothScroll {
 
 /// Move single sprite in sine pattern in x-y direction
 struct SpriteMove {
+    /// Tracks x position and increased in every update
+    counter_x: u8,
+    /// Tracks y position and increased in every update
     counter_y: u8,
 }
 
 impl SpriteMove {
+    const SPRITE_ADDRESS: u16 = 0x2000;
+    const SPRITE_PTR: u8 = vic2::to_sprite_pointer(SpriteMove::SPRITE_ADDRESS);
     const OFFSET: u8 = 30;
-    const fn default() -> Self {
-        SpriteMove { counter_y: 0 }
+    const MSB_THRESHOLD: u8 = 255 - SpriteMove::OFFSET;
+
+    /// An associated `const` function to generate a new instance
+    const fn new() -> Self {
+        SpriteMove {
+            counter_x: 0,
+            counter_y: 0,
+        }
     }
-}
+    /// Initialize (copy Rust logo to sprite address; set sprite shape pointers)
+    pub fn init(&self) {
+        unsafe {
+            *(SpriteMove::SPRITE_ADDRESS as *mut [u8; 63]) = RUST_LOGO;
+            c64::DEFAULT_SPRITE_PTR[0].write_volatile(SpriteMove::SPRITE_PTR);
+            c64::vic2().sprite_expand_x.write(Sprites::SPRITE0);
+            c64::vic2().sprite_expand_y.write(Sprites::SPRITE0);
+            c64::vic2().sprite_enable.write(Sprites::SPRITE0);
+        }
+        c64::vic2().set_sprite_color(0, GREEN);
+    }
 
-impl Interrupt for SpriteMove {
-    fn update(&mut self, counter: u8) {
-        const XSINE: [u8; 256] = mos_hardware::make_sine(1, 0);
-        const YSINE: [u8; 256] = mos_hardware::make_sine(4, 70);
-        const MSB_THRESHOLD: u8 = 255 - SpriteMove::OFFSET;
-
-        let x = XSINE[counter as usize];
+    /// Advance sprite position in a sine pattern
+    fn update(&mut self) {
+        static XSINE: [u8; 256] = mos_hardware::make_sine(1, 0);
+        static YSINE: [u8; 256] = mos_hardware::make_sine(4, 70);
+        let x = XSINE[self.counter_x as usize];
         let y = YSINE[self.counter_y as usize];
-
-        let (offset, msb) = match x > MSB_THRESHOLD {
+        let (offset, msb) = match x > SpriteMove::MSB_THRESHOLD {
             true => (SpriteMove::OFFSET.wrapping_sub(255), Sprites::SPRITE0),
             false => (SpriteMove::OFFSET, Sprites::empty()),
         };
-
         unsafe {
             c64::vic2()
                 .sprite_positions_most_significant_bit_of_x
                 .write(msb);
         }
         c64::vic2().set_sprite_pos(0, x + offset, y);
+        self.counter_x += 2;
         self.counter_y += 1;
     }
 }
 
 /// Global since the interrupt wrapper currently do not take arguments
-static mut SCROLL: SmoothScroll = SmoothScroll::default();
-static mut SPRITE_MOVE: SpriteMove = SpriteMove::default();
+static mut SCROLL: SmoothScroll = SmoothScroll::new();
+static mut SPRITE_MOVE: SpriteMove = SpriteMove::new();
 
 struct SidFile;
 impl SidTune for SidFile {
@@ -178,13 +193,14 @@ static MUSIC: SidFile = SidFile;
 /// and exiting the function (SID tune is excluded).
 #[no_mangle]
 pub extern "C" fn called_every_frame() {
-    static mut COUNTER: u8 = 0;
+    let mut cnt: u8 = 0;
     unsafe {
+        c64::vic2().border_color.write(vic2::RED);
+        SPRITE_MOVE.update();
         c64::vic2().border_color.write(vic2::LIGHT_GREEN);
-        SPRITE_MOVE.update(COUNTER);
-        COUNTER += 2;
-        if COUNTER % 2 == 0 {
-            SCROLL.update(0);
+        cnt += 2;
+        if cnt % 2 == 0 {
+            SCROLL.update();
         }
         c64::vic2().border_color.write(vic2::BLACK);
     }
@@ -193,25 +209,18 @@ pub extern "C" fn called_every_frame() {
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+    // unsafe {
+    //     mos_hardware::mega65::libc::mega65_io_enable();
+    // }
+    // //    mos_hardware::mega65::speed_mode3();
     c64::clear_screen();
     c64::set_lower_case();
     unsafe {
         SCROLL.init();
+        SPRITE_MOVE.init();
         MUSIC.to_memory();
     }
     MUSIC.init(0);
-
-    // Copy Rust logo to sprite address and set sprite shape pointers
-    const SPRITE_ADDRESS: u16 = 0x2000;
-    const SPRITE_PTR: u8 = vic2::to_sprite_pointer(SPRITE_ADDRESS);
-    unsafe {
-        *(SPRITE_ADDRESS as *mut [u8; 63]) = RUST_LOGO;
-        c64::DEFAULT_SPRITE_PTR[0].write_volatile(SPRITE_PTR);
-        c64::vic2().sprite_expand_x.write(Sprites::SPRITE0);
-        c64::vic2().sprite_expand_y.write(Sprites::SPRITE0);
-        c64::vic2().sprite_enable.write(Sprites::SPRITE0);
-    }
-    c64::vic2().set_sprite_color(0, GREEN);
     c64::hardware_raster_irq(20);
     loop {} // let's not return to dead BASIC
 }
@@ -224,8 +233,7 @@ const RUST_LOGO: [u8; 63] = [
 ];
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    #[cfg(not(target_vendor = "nes-nrom-128"))]
+fn panic(_: &PanicInfo) -> ! {
     loop {
         unsafe {
             c64::vic2().border_color.write(RED);
