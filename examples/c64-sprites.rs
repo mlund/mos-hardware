@@ -16,11 +16,11 @@
 
 #![no_std]
 #![feature(start)]
+#![feature(default_alloc_error_handler)]
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
 use mos_hardware::{c64, poke, vic2};
-use ufmt_stdio::*;
 use vic2::*;
 
 /// Sprite pattern
@@ -55,38 +55,45 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     // VIC-II chip on C64 (0xD000)
     let vic = c64::vic2();
 
+    // Copy Rust logo to sprite address and set sprite shape pointers
     unsafe {
-        // Copy Rust logo to sprite address and set sprite shape pointers
         *(SPRITE_ADDRESS as *mut [u8; 63]) = RUST_LOGO;
         poke!(c64::DEFAULT_SPRITE_PTR[0], SPRITE_PTR);
         poke!(c64::DEFAULT_SPRITE_PTR[2], SPRITE_PTR);
+    }
 
-        // Sprite 0 properties
-        vic.set_sprite_pos(0, 180, 100);
-        vic.set_sprite_color(0, GREEN);
+    // Sprite 0 properties
+    vic.set_sprite_pos(0, 180, 100);
+    vic.set_sprite_color(0, GREEN);
+    unsafe {
         vic.sprite_expand_x.write(Sprites::SPRITE0);
         vic.sprite_expand_y.write(Sprites::SPRITE0);
-
-        // Sprite 2 properties
-        vic.set_sprite_pos(2, 180, 60);
-        vic.set_sprite_color(2, RED);
-        vic.sprite_background_priority.write(Sprites::SPRITE2);
-
-        // Show sprite 0, 2, and 7
-        vic.sprite_enable
-            .write(Sprites::SPRITE0 | Sprites::SPRITE2 | Sprites::SPRITE7);
-
-        // Ups, we didn't mean to show sprite 7, so let's disable it again:
-        let mut enabled_sprites = vic.sprite_enable.read();
-        enabled_sprites.remove(Sprites::SPRITE7);
-        vic.sprite_enable.write(enabled_sprites);
     }
+
+    // Sprite 2 properties
+    vic.set_sprite_pos(2, 180, 60);
+    vic.set_sprite_color(2, RED);
+    unsafe { vic.sprite_background_priority.write(Sprites::SPRITE2) };
+
+    // Show sprite 0, 2, and 7
+    unsafe {
+        vic.sprite_enable
+            .write(Sprites::SPRITE0 | Sprites::SPRITE2 | Sprites::SPRITE7)
+    };
+
+    // Ups, we didn't mean to show sprite 7, so let's disable it again:
+    let mut enabled_sprites = vic.sprite_enable.read();
+    enabled_sprites.remove(Sprites::SPRITE7);
+    unsafe { vic.sprite_enable.write(enabled_sprites) };
     0
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    #[cfg(not(target_vendor = "nes-nrom-128"))]
-    print!("panic!");
-    loop {}
+    loop {
+        unsafe {
+            c64::vic2().border_color.write(RED);
+            c64::vic2().border_color.write(BLACK);
+        }
+    }
 }
