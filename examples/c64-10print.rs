@@ -11,6 +11,8 @@
 
 #![no_std]
 #![feature(start)]
+#![feature(default_alloc_error_handler)]
+
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
@@ -21,7 +23,6 @@ use ufmt_stdio::*;
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     let mut rng = SIDRng::new(c64::sid());
-
     for offset in 0..40 * 25 {
         let random_char = [77u8, 78u8].choose(&mut rng).copied().unwrap();
         unsafe {

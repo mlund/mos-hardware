@@ -24,6 +24,7 @@
 
 #![no_std]
 #![feature(start)]
+#![feature(default_alloc_error_handler)]
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
@@ -90,7 +91,6 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
 #[panic_handler]
 fn panic(_: &PanicInfo) -> ! {
-    #[cfg(not(target_vendor = "nes-nrom-128"))]
     print!("PANIC!");
     loop {}
 }

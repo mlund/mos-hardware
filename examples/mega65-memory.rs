@@ -18,6 +18,7 @@
 
 #![no_std]
 #![feature(start)]
+#![feature(default_alloc_error_handler)]
 extern crate alloc;
 extern crate mos_alloc;
 
@@ -43,30 +44,30 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     // Memory allocation in bank 4 (0x40000 - 0x4ffff)
     const ADDRESS: u32 = 0x40000;
-    let mut mem = Allocator::new(ADDRESS);
+    let mut bank = Allocator::new(ADDRESS);
 
-    // Copy bytes to upper mem, then back again
-    let ptr: Fat28 = mem.write([7, 9, 13].as_slice());
+    // DMA copy bytes to upper mem, then back again
+    let ptr: Ptr28 = bank.write([7, 9, 13].as_slice());
     assert_eq!(Vec::<u8>::from(ptr), [7, 9, 13]);
     println!("ADDRESS = 0X{:x} LEN = {}", ptr.address, ptr.len);
 
-    // Copy string to upper mem, then back again
-    let ptr: Fat28 = mem.write("some LARGE string".as_bytes());
+    // DMA copy string to upper mem, then back again
+    let ptr: Ptr28 = bank.write(b"some LARGE string");
     assert_eq!(String::from(ptr), "some LARGE string");
     println!("ADDRESS = 0X{:x} LEN = {}", ptr.address, ptr.len);
 
     // Test memory iterator; memory is already filled from above.
     let bytes: Vec<u8> = MemoryIterator::new(ADDRESS).skip(3 + 5).take(5).collect();
-    let s = unsafe { str::from_utf8_unchecked(bytes.as_slice()) };
+    let s: &str = unsafe { str::from_utf8_unchecked(bytes.as_slice()) };
     assert_eq!(s, "LARGE");
     println!("EXTRACTED STRING = {}", s);
 
     // Loop over vector of fat pointers as if strings
     // (transparent DMA copying)
-    let cnt = Vec::from([mem.write(b"first"), mem.write(b"second")])
+    let cnt = Vec::from([bank.write(b"first"), bank.write(b"second")])
         .iter()
         .copied()
-        .map(String::from)
+        .map(String::from) // dma read
         .filter(|s| s.starts_with('s'))
         .count();
     assert_eq!(cnt, 1);
