@@ -41,7 +41,7 @@ genio = {version = "0.2", default-features = false}
 
 [dev-dependencies]
 rand = {version = "0.8", default-features = false}
-itertools = {version = "0.11", default-features = false}
+itertools = {version = "0.12", default-features = false}
 mos-alloc = "0.2"
 ufmt-stdio = "0.4"
 
