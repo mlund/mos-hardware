@@ -47,7 +47,7 @@ ufmt-stdio = "0.4"
 
 [build-dependencies]
 cc = { version = "1.0", optional = true }
-bindgen = { version = "0.66", optional = true }
+bindgen = { version = "0.69", optional = true }
 
 [features]
 default = ["c64", "cx16", "mega65", "petscii", "vera", "sid", "vic2"]
