@@ -79,6 +79,10 @@ You can also do this manually:
    cargo build --target mos-mega65-none
    ~~~
 
+### Troubleshooting
+
+- If you encounter issues with `cargo/home`, force older version `cargo update -p home@0.5.9 --precise 0.5.5`
+
 ## Status
 
 The hardware registers are currently incomplete and the library may
