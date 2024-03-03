@@ -1,5 +1,5 @@
 {
-  "image": "mrkits/rust-mos:latest",
+  "image": "mrkits/rust-mos:d6ed9aa89-7d9eac4-9c135159",
   "onCreateCommand": "echo settings set target.load-cwd-lldbinit true > /home/mos/.lldbinit",
   "settings": {
     "rust-analyzer.checkOnSave.command": "check",
