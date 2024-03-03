@@ -7,4 +7,4 @@
 * Fix Cargo warnings.
 * Update `Carlo.lock`
 
-**Full Changelog**: https://github.com/mlund/mos-hardware/compare/v0.3.1...v0.4.0
+**Full Changelog**: https://github.com/mlund/mos-hardware/compare/v0.3.1...v0.3.1
