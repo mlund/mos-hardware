@@ -35,6 +35,113 @@ mod memory;
 pub mod random;
 pub use memory::*;
 
+/// Default system palette
+///
+/// The following table is extracted from the MEGA65 user guide.
+///
+/// Code |  Red  | Green | Blue  | Name             | HTML color
+/// ---- | ----- | ----- | ----- | ---------------- | -----------
+/// 0    |    0  |   0   |  0    | Black            | #000000
+/// 1    |   15  |  15   | 15    | White            | #FFFFFF
+/// 2    |   15  |   0   |  0    | Red              | #FF0000
+/// 3    |    0  |  15   | 15    | Cyan             | #00FFFF
+/// 4    |   15  |   0   | 15    | Purple           | #FF00FF
+/// 5    |    0  |  15   |  0    | Green            | #00FF00
+/// 6    |    0  |   0   | 15    | Blue             | #0000FF
+/// 7    |   15  |  15   |  0    | Yellow           | #FFFF00
+/// 8    |   15  |   6   |  0    | Orange           | #FF6F00
+/// 9    |   10  |   4   |  0    | Brown            | #A04000
+/// 10   |   15  |   7   |  7    | Light Red (Pink) | #FF7777
+/// 11   |    5  |   5   |  5    | Dark Grey        | #050505
+/// 12   |    8  |   8   |  8    | Medium Grey      | #080808
+/// 13   |    9  |  15   |  9    | Light Green      | #09FF09
+/// 14   |    9  |   9   | 15    | Light Blue       | #0909FF
+/// 15   |   11  |  11   | 11    | Light Grey       | #0B0B0B
+/// 16   |   14  |   0   |  0    | Guru Meditation  | #E00000
+/// 17   |   15  |   5   |  0    | Rambutan         | #FF5000
+/// 18   |   15  |  11   |  0    | Carrot           | #FF6F00
+/// 19   |   14  |  14   |  0    | Lemon Tart       | #8E8E00
+/// 20   |    7  |  15   |  0    | Pandan           | #07FF00
+/// 21   |    6  |  14   |  6    | Seasick Green    | #06E606
+/// 22   |    0  |  14   |  3    | Soylent Green    | #00E003
+/// 23   |    0  |  15   |  9    | Slimer Green     | #00FF09
+/// 24   |    0  |  13   | 13    | The Other Cyan   | #00DDDD
+/// 25   |    0  |   9   | 15    | Sea Sky          | #009FFF
+/// 26   |    0  |   3   | 15    | Smurf Blue       | #003FFF
+/// 27   |    0  |   0   | 14    | Screen of Death  | #0000E0
+/// 28   |    7  |   0   | 15    | Plum Sauce       | #0700FF
+/// 29   |   12  |   0   | 15    | Sour Grape       | #0C00FF
+/// 30   |   15  |   0   | 11    | Bubblegum        | #FF0B0B
+/// 31   |   15  |   3   |  6    | Hot Tamales      | #FF0306
+#[repr(u8)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum DefaultPalette {
+    /// Black color (<a style="color:#000000;">&#9679;</a>)
+    Black = 0,
+    /// White color (<a style="color:#FFFFFF;">&#9679;</a>)
+    White = 1,
+    /// Red color (<a style="color:#FF0000;">&#9679;</a>)
+    Red = 2,
+    /// Cyan color (<a style="color:#00FFFF;">&#9679;</a>)
+    Cyan = 3,
+    /// Purple color (<a style="color:#FF00FF;">&#9679;</a>)
+    Purple = 4,
+    /// Green color (<a style="color:#00FF00;">&#9679;</a>)
+    Green = 5,
+    /// Blue color (<a style="color:#0000FF;">&#9679;</a>)
+    Blue = 6,
+    /// Yellow color (<a style="color:#FFFF00;">&#9679;</a>)
+    Yellow = 7,
+    /// Orange color (<a style="color:#FF6F00;">&#9679;</a>)
+    Orange = 8,
+    /// Brown color (<a style="color:#A04000;">&#9679;</a>)
+    Brown = 9,
+    /// Light Red (Pink) color (<a style="color:#FF7777;">&#9679;</a>)
+    LightRed = 10,
+    /// Dark Grey color (<a style="color:#050505;">&#9679;</a>)
+    DarkGrey = 11,
+    /// Medium Grey color (<a style="color:#080808;">&#9679;</a>)
+    MediumGrey = 12,
+    /// Light Green color (<a style="color:#09FF09;">&#9679;</a>)
+    LightGreen = 13,
+    /// Light Blue color (<a style="color:#0909FF;">&#9679;</a>)
+    LightBlue = 14,
+    /// Light Grey color (<a style="color:#0B0B0B;">&#9679;</a>)
+    LightGrey = 15,
+    /// Guru Meditation color (<a style="color:#E00000;">&#9679;</a>)
+    GuruMeditation = 16,
+    /// Rambutan color (<a style="color:#FF5000;">&#9679;</a>)
+    Rambutan = 17,
+    /// Carrot color (<a style="color:#FF6F00;">&#9679;</a>)
+    Carrot = 18,
+    /// Lemon Tart color (<a style="color:#8E8E00;">&#9679;</a>)
+    LemonTart = 19,
+    /// Pandan color (<a style="color:#07FF00;">&#9679;</a>)
+    Pandan = 20,
+    /// Seasick Green color (<a style="color:#06E606;">&#9679;</a>)
+    SeasickGreen = 21,
+    /// Soylent Green color (<a style="color:#00E003;">&#9679;</a>)
+    SoylentGreen = 22,
+    /// Slimer Green color (<a style="color:#00FF09;">&#9679;</a>)
+    SlimerGreen = 23,
+    /// The Other Cyan color (<a style="color:#00DDDD;">&#9679;</a>)
+    TheOtherCyan = 24,
+    /// Sea Sky color (<a style="color:#009FFF;">&#9679;</a>)
+    SeaSky = 25,
+    /// Smurf Blue color (<a style="color:#003FFF;">&#9679;</a>)
+    SmurfBlue = 26,
+    /// Screen of Death color (<a style="color:#0000E0;">&#9679;</a>)
+    ScreenOfDeath = 27,
+    /// Plum Sauce color (<a style="color:#0700FF;">&#9679;</a>)
+    PlumSauce = 28,
+    /// Sour Grape color (<a style="color:#0C00FF;">&#9679;</a>)
+    SourGrape = 29,
+    /// Bubblegum color (<a style="color:#FF0B0B;">&#9679;</a>)
+    Bubblegum = 30,
+    /// Hot Tamales color (<a style="color:#FF0306;">&#9679;</a>)
+    HotTamales = 31,
+}
+
 pub const DEFAULT_SCREEN: *mut u8 = (0x0800) as *mut u8;
 pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
 pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
