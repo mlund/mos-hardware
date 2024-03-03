@@ -50,7 +50,7 @@
 #![feature(iter_advance_by)]
 #![feature(iter_next_chunk)]
 #![feature(cfg_version)]
-
+#![allow(clippy::bad_bit_mask)]
 extern crate alloc;
 extern crate static_assertions;
 
@@ -71,8 +71,6 @@ pub mod sid;
 pub mod vera;
 #[cfg(feature = "vic2")]
 pub mod vic2;
-
-use core::iter::Iterator;
 
 /// Peek into memory (volatile read)
 ///

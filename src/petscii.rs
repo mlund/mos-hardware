@@ -21,7 +21,6 @@
 //!   which in turn is from <https://sta.c64.org/cbm64pettoscr.html>.
 //! - PETSCII to screen code conversion based on <https://sta.c64.org/cbm64pettoscr.html>.
 
-use core::convert::From;
 use core::fmt;
 
 /// The Unicode code point we use for untranslatable PETSCII characters.

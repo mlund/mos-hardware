@@ -17,7 +17,7 @@
 use super::libc;
 use crate::poke;
 use alloc::{string::String, vec::Vec};
-use core::{convert::From, mem::MaybeUninit};
+use core::mem::MaybeUninit;
 
 /// Maximum value in 28-bit address space
 pub const MAX_28_BIT_ADDRESS: u32 = 0xFFFFFFF;

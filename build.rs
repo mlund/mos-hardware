@@ -4,6 +4,7 @@
 /// rustfmt src/mega65/libc/bindings.rs
 /// ~~~
 /// Call to update mega65/libc/bindings.rs
+
 #[cfg(feature = "mega65")]
 fn _make_mega65_libc_bindings() {
     bindgen::Builder::default()
@@ -18,7 +19,7 @@ fn _make_mega65_libc_bindings() {
         .header("src/mega65/libc/targets.h")
         .header("src/mega65/libc/tests.h")
         .header("src/mega65/libc/time.h")
-        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         .ctypes_prefix("::core::ffi")
         .use_core()
         .derive_default(true)
@@ -32,7 +33,7 @@ fn _make_mega65_libc_bindings() {
 fn _make_cbm_kernal_bindings() {
     bindgen::Builder::default()
         .header("cbm.h") // from llvm-mos-sdk/mos-targets/commodore/cbm.h
-        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         .ctypes_prefix("::core::ffi")
         .use_core()
         .derive_default(true)

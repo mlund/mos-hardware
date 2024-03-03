@@ -16,7 +16,6 @@
 
 #![no_std]
 #![feature(start)]
-#![feature(default_alloc_error_handler)]
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
