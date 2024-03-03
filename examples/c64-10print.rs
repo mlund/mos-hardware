@@ -21,6 +21,7 @@ use ufmt_stdio::*;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+    c64::set_upper_case();
     let mut rng = SIDRng::new(c64::sid());
     for offset in 0..40 * 25 {
         let random_char = [77u8, 78u8].choose(&mut rng).copied().unwrap();
@@ -30,7 +31,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
                 .write_volatile(random_char)
         };
     }
-    println!("10PRINT MAZE IN RUST!");
+    println!("10print maze in rust!");
     0
 }
 
