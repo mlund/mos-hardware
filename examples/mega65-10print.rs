@@ -21,18 +21,16 @@ use ufmt_stdio::*;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-    mega65::set_upper_case();
     let mut rng = mega65::random::LibcRng::default();
-    //   const SCREEN_MEMORY: *mut [u8; 25 * 80] = (0x0800) as *mut [u8; 25 * 80];
-    const SCREEN_MEMORY: *mut u8 = (0x0800) as *mut u8;
+    mega65::set_upper_case();
     for offset in 0..80 * 25 {
         let random_char = [77u8, 78u8].choose(&mut rng).copied().unwrap();
-        unsafe { SCREEN_MEMORY.add(offset).write_volatile(random_char) };
+        unsafe {
+            mega65::DEFAULT_SCREEN
+                .add(offset)
+                .write_volatile(random_char)
+        };
     }
-
-    // unsafe { *SCREEN_MEMORY }.iter_mut().for_each(|i| unsafe {
-    //     core::ptr::write_volatile(i, [77u8, 78u8].choose(&mut rng).copied().unwrap());
-    // });
     println!("10print maze in rust!");
     0
 }
