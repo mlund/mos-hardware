@@ -63,21 +63,25 @@ If you want to start a new project which uses `mos-hardware`, there's a
 
 ### Docker and Visual Studio Code
 
-The easiest way is to use the provided `.devcontainer.json` configuration for vscode
-by clicking the _Dev Containers Open_ badge above, assuming you have VSC and Docker installed.
-You can also do this manually:
+The easiest way is to use the provided `.devcontainer.json` configuration for Visual Studio Code.
+Before starting up VSC, you may want to edit `.devcontainer.json` to point to a recent, tagged image of
+[`mrkits/rust-mos`](https://hub.docker.com/r/mrkits/rust-mos/tags).
+In particular, if you're on an ARM architecture, e.g. Apple Silicon, make sure to use an image compiled for
+`linux/arm64` as emulating x86 in Docker is painfully slow.
 
-1. Configure Visual Studio Code with the _Remote - Containers_ extension
-2. Start Docker
-3. Open the project inside devcontainer when asked
-4. In the vscode terminal do:
+1. Install and start [Docker](https://www.docker.com/products/docker-desktop/)
+2. Configure Visual Studio Code with the _Remote - Containers_ extension:
    ~~~ bash
-   # if Docker uses qemu (i.e. on apple silicon)
-   export CARGO_NET_GIT_FETCH_WITH_CLI=true
-   
-   # build for the MEGA65:
-   cargo build --target mos-mega65-none
+   cd mos-hardware
+   code --install-extension ms-vscode-remote.remote-containers
+   code .
    ~~~
+   When asked, re-open in _Dev container_.
+3. Inside a VSC terminal, build with:
+   ~~~ bash
+   cargo build --release --target mos-c64-none  --example c64-plasma
+   ~~~
+4. Find the binary in `target/` and run in an emulator or transfer to real hardware.
 
 ### Troubleshooting
 
