@@ -51,6 +51,7 @@
 #![feature(iter_next_chunk)]
 #![feature(cfg_version)]
 #![allow(clippy::bad_bit_mask)]
+#![feature(const_trait_impl)]
 extern crate alloc;
 extern crate static_assertions;
 

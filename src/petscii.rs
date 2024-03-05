@@ -27,8 +27,9 @@ use core::fmt;
 pub const NONE: char = char::REPLACEMENT_CHARACTER;
 
 /// From: http://style64.org/petscii/
+/// This is valid when the C64 is in lower case mode.
 #[rustfmt::skip]
-const PETSCII_TO_CHAR_MAP: [char; 256] = [
+const PETSCII_TO_CHAR_LOWERCASE: [char; 256] = [
     // control codes
     NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
     NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, NONE,
@@ -120,8 +121,8 @@ impl Petscii {
     /// Create from unicode character
     pub const fn from_char(letter: char) -> Petscii {
         let mut petscii = 0;
-        while petscii < PETSCII_TO_CHAR_MAP.len() {
-            if letter == PETSCII_TO_CHAR_MAP[petscii] {
+        while petscii < PETSCII_TO_CHAR_LOWERCASE.len() {
+            if letter == PETSCII_TO_CHAR_LOWERCASE[petscii] {
                 return Petscii::from_byte(petscii as u8);
             }
             petscii += 1;
@@ -155,7 +156,7 @@ impl Petscii {
 
     /// Convert to unicode
     pub const fn to_char(&self) -> char {
-        PETSCII_TO_CHAR_MAP[self.0 as usize]
+        PETSCII_TO_CHAR_LOWERCASE[self.0 as usize]
     }
 
     /// Convert to byte
@@ -164,25 +165,25 @@ impl Petscii {
     }
 }
 
-impl From<Petscii> for char {
+impl const From<Petscii> for char {
     fn from(petscii: Petscii) -> Self {
         petscii.to_char()
     }
 }
 
-impl From<Petscii> for u8 {
+impl const From<Petscii> for u8 {
     fn from(petscii: Petscii) -> Self {
         petscii.0
     }
 }
 
-impl From<u8> for Petscii {
+impl const From<u8> for Petscii {
     fn from(value: u8) -> Self {
         Petscii::from_byte(value)
     }
 }
 
-impl From<char> for Petscii {
+impl const From<char> for Petscii {
     fn from(value: char) -> Self {
         Petscii::from_char(value)
     }
