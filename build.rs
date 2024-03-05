@@ -77,8 +77,9 @@ fn main() {
             "src/mega65/libc/targets.c",
             "src/mega65/libc/tests.c",
             "src/mega65/libc/time.c",
+            "src/mega65/random.c",
         ])
-        .flag("-mcpu=mos65c02")
+        .flag("-mcpu=mos45gs02")
         .flag("-w")
         .flag("-Os")
         .compile("mega65libc");
