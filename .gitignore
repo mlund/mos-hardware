@@ -2,6 +2,9 @@
 *.prg
 *.swp
 *.o
+*.elf
+*.lto.s
+a.out
 .DS_Store
 .vscode
 
