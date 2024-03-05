@@ -29,7 +29,7 @@ extern crate mos_alloc;
 use core::panic::PanicInfo;
 use mos_hardware::mega65::*;
 use mos_hardware::screen_codes_null;
-use rand::{seq::SliceRandom, SeedableRng};
+use rand::seq::SliceRandom;
 use ufmt_stdio::*;
 
 #[start]
@@ -51,11 +51,11 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
 
     print!("RANDUM BYTES FROM LIBC: ");
     for _ in 0..10 {
-        print!("{} ", random::rand8(u8::MAX));
+        print!("{} ", random::rand8());
     }
 
     print!("\nRANDOM SHUFFLE USING RNGCORE TRAIT:  ");
-    let mut rng = random::LibcRng::seed_from_u64(1);
+    let mut rng = random::HardwareRng::default();
     let mut seq = [0, 1, 2, 3, 4, 5, 6, 7, 9];
     seq.shuffle(&mut rng);
     println!("{:?}", &seq);

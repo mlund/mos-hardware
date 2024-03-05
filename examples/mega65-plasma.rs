@@ -12,7 +12,7 @@ extern crate mos_hardware;
 
 use core::ops::BitOr;
 use core::panic::PanicInfo;
-use mos_hardware::mega65::random::LibcRng;
+use mos_hardware::mega65::random::HardwareRng;
 use mos_hardware::{mega65, repeat_element, sine, SINETABLE};
 use rand::Rng;
 
@@ -41,7 +41,7 @@ impl Plasma {
     }
     /// Generate stochastic character set
     fn make_charset(charset_address: *mut u8) {
-        let mut rng = LibcRng::default();
+        let mut rng = HardwareRng::default();
         let make_char = |sine| {
             [1, 2, 4, 8, 16, 32, 64, 128]
                 .iter()

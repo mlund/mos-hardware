@@ -14,69 +14,46 @@
 
 //! Support for pseudo random numbers
 
-use super::libc;
 use core::ops::Shl;
-use rand_core::{Error, RngCore, SeedableRng};
+use rand_core::{Error, RngCore};
 
-/// Generate random byte using MEGA65 libc
-pub fn rand8(max_value: u8) -> u8 {
-    unsafe { libc::rand8(max_value) }
+extern "C" {
+    pub fn mega65_hardware_rand_c() -> u8;
 }
 
-/// Non-deterministic random number generator using MEGA65 Libc
+/// Read random byte from MEGA65 hardware random number generator
+pub fn rand8() -> u8 {
+    unsafe { mega65_hardware_rand_c() }
+}
+
+/// Non-deterministic pseudo random number generator using MEGA65 hardware
 ///
 /// Implements the [`rand::RngCore`](https://docs.rs/rand/latest/rand/trait.RngCore.html)
 /// trait and can thus be used with Rusts `rand` crate.
 ///
 /// ## Examples
 /// ~~~
-/// use mos_hardware::mega65::random;
+/// use mos_hardware::mega65::random::HardwareRng;
 /// use rand::seq::SliceRandom;
-/// let mut rng = LibcRng::default();
+/// let mut rng = HardwareRng::default();
 /// let value = [11, 23].choose(&mut rng).unwrap(); // 11 or 23
 /// ~~~
 #[derive(Default)]
-pub struct LibcRng {}
+pub struct HardwareRng {}
 
-impl LibcRng {
-    /// New seeded generator
-    pub fn new(seed: LibcSeed) -> Self {
-        unsafe { libc::srand(u32::from_ne_bytes(seed.0)) };
-        LibcRng::default()
-    }
-}
-
-impl RngCore for LibcRng {
+impl RngCore for HardwareRng {
     fn next_u32(&mut self) -> u32 {
-        unsafe { libc::rand32(u32::MAX) }
+        u32::from_ne_bytes([rand8(), rand8(), rand8(), rand8()])
     }
     fn next_u64(&mut self) -> u64 {
         // https://stackoverflow.com/a/2769598
         u64::from(self.next_u32()).shl(32) | u64::from(self.next_u32())
     }
     fn fill_bytes(&mut self, dest: &mut [u8]) {
-        dest.iter_mut()
-            .for_each(|byte| *byte = unsafe { libc::rand8(u8::MAX) });
+        dest.iter_mut().for_each(|byte| *byte = rand8());
     }
     fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
         self.fill_bytes(dest);
         Ok(())
-    }
-}
-
-/// 32-bit random number seed
-#[derive(Default)]
-pub struct LibcSeed(pub [u8; 4]);
-
-impl AsMut<[u8]> for LibcSeed {
-    fn as_mut(&mut self) -> &mut [u8] {
-        &mut self.0
-    }
-}
-
-impl SeedableRng for LibcRng {
-    type Seed = LibcSeed;
-    fn from_seed(seed: Self::Seed) -> Self {
-        LibcRng::new(seed)
     }
 }

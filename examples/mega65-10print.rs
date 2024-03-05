@@ -21,17 +21,12 @@ use ufmt_stdio::*;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-    let mut rng = mega65::random::LibcRng::default();
     mega65::set_upper_case();
-    for offset in 0..80 * 25 {
-        let random_char = [77u8, 78u8].choose(&mut rng).copied().unwrap();
-        unsafe {
-            mega65::DEFAULT_SCREEN
-                .add(offset)
-                .write_volatile(random_char)
-        };
+    let mut rng = mega65::random::HardwareRng::default();
+    for _ in 0..1000 {
+        let c = "MN".as_bytes().choose(&mut rng).copied().unwrap() as char;
+        print!("{}", c);
     }
-    println!("10print maze in rust!");
     0
 }
 
