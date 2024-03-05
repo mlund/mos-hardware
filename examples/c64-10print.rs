@@ -6,8 +6,12 @@
 //! We here use the `SIDRng` random number back-end which implements
 //! the [`rand::RngCore`](https://docs.rs/rand/latest/rand/trait.RngCore.html) trait
 //! and can therefore be used with slices, iterators etc. It is of course overkill
-//! for merely picking two characters (`/`, end `\`), and it would be more efficient
+//! for merely picking two characters (`╲` or `╱`), and it would be more efficient
 //! to manually comparing with a random byte.
+//!
+//! PETSCII characters are written directly to screen memory and thus
+//! needs to be converted using the `screen_codes!` macro. This has no overhead as it is
+//! done at compile time using Rust's const evaluation features.
 
 #![no_std]
 #![feature(start)]
@@ -15,16 +19,18 @@
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
-use mos_hardware::{c64, sid::SIDRng};
+use mos_hardware::{c64, screen_codes, sid::SIDRng};
 use rand::seq::SliceRandom;
 use ufmt_stdio::*;
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-    c64::set_upper_case();
+    const SCREEN_SIZE: usize = 40 * 25;
+    const LEFT_OR_RIGHT: [u8; 2] = screen_codes!("MN"); // ╲ or ╱
     let mut rng = SIDRng::new(c64::sid());
-    for offset in 0..40 * 25 {
-        let random_char = [77u8, 78u8].choose(&mut rng).copied().unwrap();
+    c64::set_upper_case();
+    for offset in 0..SCREEN_SIZE {
+        let random_char = LEFT_OR_RIGHT.choose(&mut rng).copied().unwrap();
         unsafe {
             c64::DEFAULT_VIDEO_MEMORY
                 .add(offset)
