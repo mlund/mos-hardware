@@ -59,16 +59,16 @@ bitflags! {
 }
 
 /// Pointer to the `R6510` register for 6510 I/O (0x0001)
-pub const CPU_PORT: *mut RW<CpuPortFlags> = (0x0001) as *mut RW<CpuPortFlags>;
+pub const CPU_PORT: *mut RW<CpuPortFlags> = (0x0001) as _;
 
 /// Pointer to beginning of default video memory (0x0400)
-pub const DEFAULT_VIDEO_MEMORY: *mut u8 = (0x0400) as *mut u8;
+pub const DEFAULT_VIDEO_MEMORY: *mut u8 = (0x0400) as _;
 
 /// Pointer to the default video matrix area (0x0400)
 ///
 /// The video matrix is where text screen characters are stored in RAM.
 /// By default this corresponds to 25 lines, each with 40 columns.
-pub const DEFAULT_VIDEO_MATRIX: *mut [u8; 25 * 40] = (0x0400) as *mut [u8; 25 * 40];
+pub const DEFAULT_VIDEO_MATRIX: *mut [u8; 25 * 40] = (0x0400) as _;
 
 /// Default sprite shape pointers (0x0400)
 ///
@@ -88,37 +88,34 @@ pub const DEFAULT_SPRITE_PTR: [*mut u8; 8] = [
 ];
 
 /// Default upper case font in the CHARROM (0x1000)
-pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
+pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as _;
 
 /// Default mixed case font in the CHARROM (0x1800)
-pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
+pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as _;
 
 /// Pointer to BASIC ROM start (0xa000)
-pub const BASIC_ROM: *mut u8 = (0xa000) as *mut u8;
+pub const BASIC_ROM: *mut u8 = (0xa000) as _;
 
 /// Pointer to BASIC ROM area (0xa000 - 0xbfff)
-pub const BASIC_ROM_AREA: *mut [u8; 0x1fff] = (0xa000) as *mut [u8; 0x1fff];
+pub const BASIC_ROM_AREA: *mut [u8; 0x1fff] = (0xa000) as _;
 
 /// Pointer to the video interface controller (0xd000)
-pub const VIC: *const MOSVideoInterfaceControllerII =
-    (0xd000) as *const MOSVideoInterfaceControllerII;
+pub const VIC: *const MOSVideoInterfaceControllerII = (0xd000) as _;
 
 /// Pointer to the sound interface device (0xd400)
-pub const SID: *const MOSSoundInterfaceDevice = (0xd400) as *const MOSSoundInterfaceDevice;
+pub const SID: *const MOSSoundInterfaceDevice = (0xd400) as _;
 
 /// Pointer to default color RAM (0xd800)
-pub const COLOR_RAM: *mut u8 = (0xd800) as *mut u8;
+pub const COLOR_RAM: *mut u8 = (0xd800) as _;
 
 /// Pointer to first complex interface adapter (0xdc00)
-pub const CIA1: *const MOSComplexInterfaceAdapter6526 =
-    (0xdc00) as *const MOSComplexInterfaceAdapter6526;
+pub const CIA1: *const MOSComplexInterfaceAdapter6526 = (0xdc00) as _;
 
 /// Pointer to second complex interface adapter (0xdd00)
-pub const CIA2: *const MOSComplexInterfaceAdapter6526 =
-    (0xdd00) as *const MOSComplexInterfaceAdapter6526;
+pub const CIA2: *const MOSComplexInterfaceAdapter6526 = (0xdd00) as _;
 
 /// Pointer to the KERNAL ROM memory area (0xe000 - 0xffff)
-pub const KERNAL_ROM: *mut [u8; 8192] = (0xe000) as *mut [u8; 8192];
+pub const KERNAL_ROM: *mut [u8; 8192] = (0xe000) as _;
 
 bitflags! {
     /// Flags for the `CIA1::control_a` register (0xdc0e)

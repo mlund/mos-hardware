@@ -183,25 +183,22 @@ pub struct Emulator {
 }
 
 // Memory layout
-pub const RAM_BANK: *mut u8 = (0x00) as *mut u8;
-pub const ROM_BANK: *mut u8 = (0x01) as *mut u8;
+pub const RAM_BANK: *mut u8 = (0x00) as _;
+pub const ROM_BANK: *mut u8 = (0x01) as _;
 
 /// Pointer to first Versatile Interface Adapter (VIA1)
-pub const VIA1: *const VersatileInterfaceAdapter65C22 =
-    (0x9f00) as *const VersatileInterfaceAdapter65C22;
+pub const VIA1: *const VersatileInterfaceAdapter65C22 = (0x9f00) as _;
 
 /// Pointer to second Versatile Interface Adapter (VIA2)
-pub const VIA2: *const VersatileInterfaceAdapter65C22 =
-    (0x9f10) as *const VersatileInterfaceAdapter65C22;
+pub const VIA2: *const VersatileInterfaceAdapter65C22 = (0x9f10) as _;
 
 /// Pointer to the Versatile Embedded Retro Adapter chip
-pub const VERA: *const VersatileEmbeddedRetroAdapter =
-    (0x9f20) as *const VersatileEmbeddedRetroAdapter;
+pub const VERA: *const VersatileEmbeddedRetroAdapter = (0x9f20) as _;
 
 /// Pointer to Yamaha 2151 sound chip
-pub const YM2151: *mut u8 = (0x9f40) as *mut u8;
+pub const YM2151: *mut u8 = (0x9f40) as _;
 
 /// Access to emulator specific features
-pub const EMULATOR: *const Emulator = (0x9fb0) as *const Emulator;
+pub const EMULATOR: *const Emulator = (0x9fb0) as _;
 
-pub const BANK_RAM: *mut u8 = (0xa000) as *mut u8;
+pub const BANK_RAM: *mut u8 = (0xa000) as _;

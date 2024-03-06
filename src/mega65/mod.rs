@@ -142,30 +142,27 @@ pub enum DefaultPalette {
     HotTamales = 31,
 }
 
-pub const DEFAULT_SCREEN: *mut u8 = (0x0800) as *mut u8;
-pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as *mut u8;
-pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as *mut u8;
-
-pub const VICII: *const MOSVideoInterfaceControllerII =
-    (0xd000) as *const MOSVideoInterfaceControllerII;
+pub const DEFAULT_SCREEN: *mut u8 = (0x0800) as _;
+pub const DEFAULT_UPPERCASE_FONT: *mut u8 = (0x1000) as _;
+pub const DEFAULT_MIXEDCASE_FONT: *mut u8 = (0x1800) as _;
+pub const VICII: *const MOSVideoInterfaceControllerII = (0xd000) as _;
 
 /// Pointer to first sound interface device
-pub const SID0: *const MOSSoundInterfaceDevice = (0xd400) as *const MOSSoundInterfaceDevice;
+pub const SID0: *const MOSSoundInterfaceDevice = (0xd400) as _;
 /// Pointer to second sound interface device
-pub const SID1: *const MOSSoundInterfaceDevice = (0xd420) as *const MOSSoundInterfaceDevice;
+pub const SID1: *const MOSSoundInterfaceDevice = (0xd420) as _;
 /// Pointer to third sound interface device
-pub const SID2: *const MOSSoundInterfaceDevice = (0xd440) as *const MOSSoundInterfaceDevice;
+pub const SID2: *const MOSSoundInterfaceDevice = (0xd440) as _;
 /// Pointer to fourth sound interface device
-pub const SID3: *const MOSSoundInterfaceDevice = (0xd460) as *const MOSSoundInterfaceDevice;
+pub const SID3: *const MOSSoundInterfaceDevice = (0xd460) as _;
 
-pub const COLOR_RAM: *mut u8 = (0xd800) as *mut u8;
+pub const COLOR_RAM: *mut u8 = (0xd800) as _;
 
 /// Math multiplication-division status flags
-pub const MATH_STATUS: *const volatile_register::RO<math::StatusFlags> =
-    (0xd70f) as *const volatile_register::RO<math::StatusFlags>;
+pub const MATH_STATUS: *const volatile_register::RO<math::StatusFlags> = (0xd70f) as _;
 
 /// Math Acceleration registers
-pub const MATH_ACCELERATOR: *const math::MathAccelerator = (0xd768) as *const math::MathAccelerator;
+pub const MATH_ACCELERATOR: *const math::MathAccelerator = (0xd768) as _;
 
 pub enum VicBank {
     Region0000 = 0x11, // Bank 0
