@@ -22,7 +22,6 @@ extern crate mos_alloc;
 use core::panic::PanicInfo;
 use mos_hardware::sid::SidTune;
 use mos_hardware::{c64, sid, vic2};
-use vic2::*;
 
 pub struct SidFile;
 impl sid::SidTune for SidFile {
@@ -37,19 +36,17 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     }
     music.init(0);
     loop {
-        if c64::vic2().raster_counter.read() == 20 {
+        let line = c64::vic2().raster_counter.read();
+        if line == 60 {
+            unsafe { c64::vic2().border_color.write(vic2::RED) }
             music.play();
-            while c64::vic2().raster_counter.read() < 80 {}
+            unsafe { c64::vic2().border_color.write(vic2::BLACK) }
+            while c64::vic2().raster_counter.read() < 100 {}
         }
     }
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    loop {
-        unsafe {
-            c64::vic2().border_color.write(RED);
-            c64::vic2().border_color.write(BLACK);
-        }
-    }
+    loop {}
 }
