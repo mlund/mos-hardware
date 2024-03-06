@@ -20,31 +20,28 @@
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
-use mos_hardware::*;
-use ufmt_stdio::*;
+use mos_hardware::{c64, vic2::BLACK, vic2::LIGHT_GREEN};
 
 // This function is called at every triggering event.
 #[no_mangle]
 pub extern "C" fn called_every_frame() {
-    unsafe {
-        (*c64::VIC).border_color.write(vic2::LIGHT_GREEN);
-        loop {
-            if (*c64::VIC).raster_counter.read() > 120 {
-                break;
-            }
+    unsafe { c64::vic2().border_color.write(LIGHT_GREEN) };
+    loop {
+        if c64::vic2().raster_counter.read() > 120 {
+            break;
         }
-        (*c64::VIC).border_color.write(vic2::BLACK);
     }
+    unsafe { c64::vic2().border_color.write(BLACK) };
 }
 
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
-    c64::hardware_raster_irq(100); // trigger at raster line 100
-    loop {} // let's not return to dead BASIC
+    const TRIGGER_LINE: u8 = 100;
+    c64::hardware_raster_irq(TRIGGER_LINE);
+    loop {}
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    print!("!");
     loop {}
 }
