@@ -61,8 +61,11 @@ bitflags! {
 /// Pointer to the `R6510` register for 6510 I/O (0x0001)
 pub const CPU_PORT: *mut RW<CpuPortFlags> = (0x0001) as _;
 
+/// Default video memory address (0x0400)
+pub const DEFAULT_VIDEO_ADDR: u16 = 0x0400;
+
 /// Pointer to beginning of default video memory (0x0400)
-pub const DEFAULT_VIDEO_MEMORY: *mut u8 = (0x0400) as _;
+pub const DEFAULT_VIDEO_MEMORY: *mut u8 = DEFAULT_VIDEO_ADDR as _;
 
 /// Pointer to the default video matrix area (0x0400)
 ///
