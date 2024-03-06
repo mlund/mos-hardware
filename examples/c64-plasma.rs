@@ -12,9 +12,7 @@ extern crate mos_alloc;
 use core::ops::BitOrAssign;
 use core::panic::PanicInfo;
 use itertools::iproduct;
-use mos_hardware::vic2::{BLACK, RED};
 use mos_hardware::*;
-use ufmt_stdio::*;
 
 /// Class for rendering a character mode plasma effect
 struct Plasma {
@@ -22,11 +20,13 @@ struct Plasma {
     yindex2: u8,
     xindex1: u8,
     xindex2: u8,
-    xbuffer: [u8; 40],
-    ybuffer: [u8; 25],
+    xbuffer: [u8; Self::COLS],
+    ybuffer: [u8; Self::ROWS],
 }
 
 impl Plasma {
+    const COLS: usize = 40;
+    const ROWS: usize = 25;
     /// Create new instance and initialize character set at given address
     pub fn new(charset_address: u16) -> Self {
         Self::make_charset(charset_address as *mut u8);
@@ -35,14 +35,13 @@ impl Plasma {
             yindex2: 0,
             xindex1: 0,
             xindex2: 0,
-            xbuffer: [0; 40],
-            ybuffer: [0; 25],
+            xbuffer: [0; Self::COLS],
+            ybuffer: [0; Self::ROWS],
         }
     }
     /// Generate stochastic character set
     fn make_charset(charset_address: *mut u8) {
         c64::sid().start_random_generator();
-
         let generate_char = |sine| {
             let mut pattern: u8 = 0;
             [1, 2, 4, 8, 16, 32, 64, 128]
@@ -55,13 +54,9 @@ impl Plasma {
         repeat_element(SINETABLE.iter().copied(), 8)
             .map(generate_char)
             .enumerate()
-            .for_each(|(i, pattern)| {
-                unsafe {
-                    charset_address.add(i).write_volatile(pattern);
-                }
-                if i % 64 == 0 {
-                    print!(".");
-                }
+            .for_each(|(i, pattern)| unsafe {
+                charset_address.add(i).write_volatile(pattern);
+                c64::vic2().border_color.write(i as u8);
             });
     }
 
@@ -98,29 +93,16 @@ impl Plasma {
 #[start]
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     const CHARSET: u16 = 0x2000; // Custom charset
-    const SCREEN1: u16 = 0x2800; // Set up two character screens...
-    const SCREEN2: u16 = 0x2c00; // ...for double buffering
-    const PAGE1: u8 =
-        vic2::ScreenBank::from_address(SCREEN1).bits() | vic2::CharsetBank::from(CHARSET).bits();
-    const PAGE2: u8 =
-        vic2::ScreenBank::from_address(SCREEN2).bits() | vic2::CharsetBank::from(CHARSET).bits();
-
+    const PAGE: u8 = vic2::ScreenBank::from_address(c64::DEFAULT_VIDEO_ADDR).bits()
+        | vic2::CharsetBank::from(CHARSET).bits();
     let mut plasma = Plasma::new(CHARSET);
-
+    unsafe { c64::vic2().screen_and_charset_bank.write(PAGE) };
     loop {
-        plasma.render(SCREEN1 as *mut u8);
-        unsafe { c64::vic2().screen_and_charset_bank.write(PAGE1) };
-        plasma.render(SCREEN2 as *mut u8);
-        unsafe { c64::vic2().screen_and_charset_bank.write(PAGE2) };
+        plasma.render(c64::DEFAULT_VIDEO_MEMORY);
     }
 }
 
 #[panic_handler]
 fn panic(_: &PanicInfo) -> ! {
-    loop {
-        unsafe {
-            c64::vic2().border_color.write(RED);
-            c64::vic2().border_color.write(BLACK);
-        }
-    }
+    loop {}
 }
