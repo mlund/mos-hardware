@@ -80,14 +80,14 @@ pub const DEFAULT_VIDEO_MATRIX: *mut [u8; 25 * 40] = (0x0400) as _;
 /// Individual sprite shape pointers can be calculated with
 /// `vic2::to_sprite_pointer()`.
 pub const DEFAULT_SPRITE_PTR: [*mut u8; 8] = [
-    (0x0400 + 0x3F8) as *mut u8,
-    (0x0400 + 0x3F8 + 1) as *mut u8,
-    (0x0400 + 0x3F8 + 2) as *mut u8,
-    (0x0400 + 0x3F8 + 3) as *mut u8,
-    (0x0400 + 0x3F8 + 4) as *mut u8,
-    (0x0400 + 0x3F8 + 5) as *mut u8,
-    (0x0400 + 0x3F8 + 6) as *mut u8,
-    (0x0400 + 0x3F8 + 7) as *mut u8,
+    (0x0400 + 0x3F8) as _,
+    (0x0400 + 0x3F8 + 1) as _,
+    (0x0400 + 0x3F8 + 2) as _,
+    (0x0400 + 0x3F8 + 3) as _,
+    (0x0400 + 0x3F8 + 4) as _,
+    (0x0400 + 0x3F8 + 5) as _,
+    (0x0400 + 0x3F8 + 6) as _,
+    (0x0400 + 0x3F8 + 7) as _,
 ];
 
 /// Default upper case font in the CHARROM (0x1000)
