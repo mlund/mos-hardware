@@ -24,9 +24,10 @@
 //! Like the original C65, it also has a Commodore 64 mode with a level of compatibility
 //! similar to that of the Commodore 128 running in C64 mode
 
+use crate::petscii;
 use crate::sid::*;
 use crate::vic2::*;
-use crate::{peek, petscii, poke};
+use volatile_register::RW;
 
 pub mod iomap;
 pub mod libc;
@@ -201,33 +202,38 @@ pub const fn math_accelerator() -> &'static math::MathAccelerator {
     unsafe { &*MATH_ACCELERATOR }
 }
 
-/// Set CPU speed to 1 Mhz
-pub fn speed_mode1() {
-    unsafe {
-        let mut val: u8 = peek!(0xd031 as *mut u8) & 0b1011_1111; // unset FAST bit
-        poke!(0xd031 as *mut u8, val);
-        val = peek!(0xd054 as *mut u8) & 0b1011_1111; // unset VFAST bit
-        poke!(0xd054 as *mut u8, val);
-    }
+/// Control CPU clock speed
+#[repr(u8)]
+#[derive(Copy, Clone, PartialEq, Default)]
+pub enum CPUSpeed {
+    /// 1 Mhz clock frequency
+    Slow,
+    /// 3.5 Mhz clock frequency
+    Medium,
+    /// 40 Mhz clock frequency (default)
+    #[default]
+    Fast,
 }
 
-/// Set CPU speed to 3.5 Mhz
-pub fn speed_mode3() {
-    unsafe {
-        let mut val: u8 = peek!(0xd031 as *mut u8) | 0b0100_0000; // set FAST bit
-        poke!(0xd031 as *mut u8, val);
-        val = peek!(0xd054 as *mut u8) & 0b1011_1111; // unset VFAST
-        poke!(0xd054 as *mut u8, val);
-    }
-}
-
-/// Set CPU speed to 40 Mhz
-pub fn speed_mode40() {
-    unsafe {
-        let mut val: u8 = peek!(0xd031 as *mut u8) | 0b0100_0000; // set FAST bit
-        poke!(0xd031 as *mut u8, val);
-        val = peek!(0xd054 as *mut u8) | 0b0100_0000; // set VFAST bit
-        poke!(0xd054 as *mut u8, val);
+impl CPUSpeed {
+    /// Set CPU speed
+    pub fn set(&self) {
+        const VICIV_CTRLB: *mut RW<u8> = 0xd031 as _;
+        const VICIV_CTRLC: *mut RW<u8> = 0xd054 as _;
+        match self {
+            Self::Slow => unsafe {
+                (*VICIV_CTRLB).modify(|m| m & 0b1011_1111);
+                (*VICIV_CTRLC).modify(|m| m & 0b1011_1111);
+            },
+            Self::Medium => unsafe {
+                (*VICIV_CTRLB).modify(|m| m | 0b0100_0000);
+                (*VICIV_CTRLC).modify(|m| m & 0b1011_1111);
+            },
+            Self::Fast => unsafe {
+                (*VICIV_CTRLB).modify(|m| m | 0b0100_0000);
+                (*VICIV_CTRLC).modify(|m| m | 0b0100_0000);
+            },
+        }
     }
 }
 

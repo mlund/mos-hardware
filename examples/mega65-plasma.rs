@@ -91,7 +91,7 @@ fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     const CHARSET_ADDRESS: u16 = 0x3000;
     let mut plasma = Plasma::new(CHARSET_ADDRESS);
     mega65::set_charset_address(CHARSET_ADDRESS);
-    mega65::speed_mode3(); // reduce cpu speed
+    mega65::CPUSpeed::Medium.set();
     loop {
         plasma.render(mega65::DEFAULT_SCREEN);
     }
