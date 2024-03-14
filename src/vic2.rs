@@ -176,22 +176,39 @@ impl CharsetBank {
 bitflags! {
     /// All possible screen memory locations
     pub struct ScreenBank: u8 {
+        /// Memory address 0x0000
         const AT_0000 = 0b0000_0000;
+        /// Memory address 0x0400
         const AT_0400 = 0b0001_0000;
+        /// Memory address 0x0800
         const AT_0800 = 0b0010_0000;
+        /// Memory address 0x0C00
         const AT_0C00 = 0b0011_0000;
+        /// Memory address 0x1000
         const AT_1000 = 0b0100_0000;
+        /// Memory address 0x1400
         const AT_1400 = 0b0101_0000;
+        /// Memory address 0x1800
         const AT_1800 = 0b0110_0000;
+        /// Memory address 0x1C00
         const AT_1C00 = 0b0111_0000;
+        /// Memory address 0x2000
         const AT_2000 = 0b1000_0000;
+        /// Memory address 0x2400
         const AT_2400 = 0b1001_0000;
+        /// Memory address 0x2800
         const AT_2800 = 0b1010_0000;
+        /// Memory address 0x2C00
         const AT_2C00 = 0b1011_0000;
+        /// Memory address 0x3000
         const AT_3000 = 0b1100_0000;
+        /// Memory address 0x3400
         const AT_3400 = 0b1101_0000;
+        /// Memory address 0x3800
         const AT_3800 = 0b1110_0000;
+        /// Memory address 0x3C00
         const AT_3C00 = 0b1111_0000;
+        /// Default screen memory address at 0x0800
         const DEFAULT = Self::AT_0800.bits;
     }
 }
