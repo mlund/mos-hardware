@@ -16,6 +16,7 @@
 
 use super::MATH_STATUS;
 use bitflags::bitflags;
+use num_integer::Integer;
 use volatile_register::{RO, WO};
 
 bitflags! {
@@ -44,27 +45,32 @@ pub struct MathAccelerator {
     pub multout: RO<u64>, // 0x10
 }
 
+/// Marker trait to limit integer size to `u8`, `u16`, or `u32`
+pub trait Max32BitInteger: Integer {}
+impl Max32BitInteger for u8 {}
+impl Max32BitInteger for u16 {}
+impl Max32BitInteger for u32 {}
+
 impl MathAccelerator {
-    /// 32 bit multiplication using hardware multiplier
-    ///
-    /// Cycles: 1
-    pub fn multiply(&self, a: u32, b: u32) -> u64 {
+    /// Hardware multiplication for `u8`, `u16`, or `u32`
+    #[inline]
+    pub fn multiply<T: Max32BitInteger>(&self, a: T, b: T) -> T {
         unsafe {
-            self.multin_a.write(a);
-            self.multin_b.write(b);
+            (&self.multin_a as *const _ as *mut T).write_volatile(a);
+            (&self.multin_b as *const _ as *mut T).write_volatile(b);
+            (&self.multout as *const _ as *mut T).read_volatile()
         }
-        self.multout.read()
     }
 
-    /// 32 bit multiplication and division using hardware multiplier
+    /// Hardware 32 bit multiplication and division
     ///
     /// Returns a tuple with:
-    /// 1. 64-bit `a x b` product
-    /// 2. 32-bit whole part of `a / b`;
+    /// 1. 32-bit `a x b` (truncated) product
+    /// 2. 32-bit whole part of `a / b`
     /// 3. 32-bit fractional part of `a / b`
     ///
     /// Cycles: less than 20
-    pub fn multiply_divide(&self, a: u32, b: u32) -> (u64, u32, u32) {
+    pub fn multiply_divide(&self, a: u32, b: u32) -> (u32, u32, u32) {
         let product = self.multiply(a, b);
         while unsafe { &(*MATH_STATUS) }
             .read()

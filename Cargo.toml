@@ -38,6 +38,7 @@ volatile-register = "0.2"
 const-str = "0.5"
 rand_core = "0.6"
 genio = {version = "0.2", default-features = false}
+num-integer = {version = "0.1", default-features = false}
 
 [dev-dependencies]
 rand = {version = "0.8", default-features = false}
