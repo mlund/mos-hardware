@@ -34,6 +34,7 @@ pub mod libc;
 pub mod math;
 mod memory;
 pub mod random;
+pub mod vic4;
 pub use memory::*;
 
 /// Default system palette
