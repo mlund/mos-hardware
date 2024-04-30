@@ -21,10 +21,12 @@ debug = 2
 codegen-units = 1
 
 [profile.release]
+strip = true
 opt-level = "s"
 lto = true
 debug = 2
 panic = "abort"
+codegen-units = 1
 
 [lib]
 doctest = false
