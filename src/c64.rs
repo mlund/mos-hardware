@@ -135,13 +135,6 @@ bitflags! {
     }
 }
 
-pub enum VicBank {
-    Region0000 = 0x11, // Bank 0
-    Region4000 = 0x10, // Bank 1
-    Region8000 = 0x01, // Bank 2
-    RegionC000 = 0x00, // Bank 3
-}
-
 bitflags! {
     /// Bit mask for VIC II bank selection
     ///
@@ -149,14 +142,18 @@ bitflags! {
     ///
     /// # Examples
     /// ~~~
-    /// set_vic_bank(cia::VicBankSelect::VIC_C000);
+    /// set_vic_bank(cia::VicBankSelect::RegionC000);
     /// ~~~
     #[derive(Clone, Copy)]
     pub struct VicBankSelect: u8 {
-        const VIC_C000 = 0b0000_0000;
-        const VIC_8000 = 0b0000_0001;
-        const VIC_4000 = 0b0000_0010;
-        const VIC_0000 = 0b0000_0011;
+        /// Bank 3: 0xC000-0xFFFF
+        const RegionC000 = 0;
+        /// Bank 2: 0x8000-0xBFFF
+        const Region8000 = 1;
+        /// Bank 1: 0x4000-0x7FFF
+        const Region4000 = 2;
+        /// Bank 0: 0x0000-0x3FFF (default)
+        const Region0000 = 3;
    }
 }
 
