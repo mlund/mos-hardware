@@ -48,9 +48,9 @@ const_assert!(size_of::<TimeOfDay>() == 4);
 /// providing for parallel and serial I/O capabilities as well as timers and a
 /// Time-of-Day (TOD) clock. The device's most prominent use was in the Commodore 64
 /// and Commodore 128(D), each of which included two CIA chips.
-pub struct MOSComplexInterfaceAdapter6526 {
-    pub port_a: RW<GameController>,    // 0x00
-    pub port_b: RW<GameController>,    // 0x01
+pub struct MOSComplexInterfaceAdapter6526<T1: Copy, T2: Copy> {
+    pub port_a: RW<T1>,                // 0x00
+    pub port_b: RW<T2>,                // 0x01
     pub data_direction_port_a: RW<u8>, // 0x02
     pub data_direction_port_b: RW<u8>, // 0x03
     pub timer_a: RW<u16>,              // 0x04
@@ -174,5 +174,51 @@ impl GameController {
         let position = JoystickPosition::new(*self);
         let fire = self.complement().contains(Self::FIRE);
         (position, fire)
+    }
+}
+
+bitflags! {
+    /// I/O bits
+    /// 
+    /// - RS-232: TXD Output
+    /// serial bus Output (0=High/Inactive, 1=Low/Active)
+    /// - ATN OUT
+    /// - CLOCK OUT
+    /// - DATA OUT
+    /// serial bus input (0=Low/Active, 1=High/Inactive)
+    /// - CLOCK IN
+    /// - DATA IN
+    #[derive(Clone, Copy)]
+    pub struct SerialBusAccess: u8 {
+        const TXD_OUT  = 0b0000_0100;
+        const ATN_OUT  = 0b0000_1000;
+        const CLK_OUT  = 0b0001_0000;
+        const DTA_OUT  = 0b0010_0000;
+        const CLK_IN   = 0b0100_0000;
+        const DTA_IN   = 0b1000_0000;
+    }
+}
+
+bitflags! {
+    /// I/O bits for RS-232 pins
+    ///
+    /// - 0 RXD I
+    /// - 1 RTS O
+    /// - 2 DTR O
+    /// - 3 RI IO
+    /// - 4 DCD IO
+    /// - 5 User Port Pin J IO
+    /// - 6 CTS R
+    /// - 7 DSR R
+    #[derive(Clone, Copy)]
+    pub struct RS232Access: u8 {
+        const RXD  = 0b0000_0001;
+        const RTS  = 0b0000_0010;
+        const DTR  = 0b0000_0100;
+        const RI   = 0b0000_1000;
+        const DCD  = 0b0001_0000;
+        const UP_J = 0b0010_0000;
+        const CTS  = 0b0100_0000;
+        const DSR  = 0b1000_0000;
     }
 }

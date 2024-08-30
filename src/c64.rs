@@ -112,10 +112,10 @@ pub const SID: *const MOSSoundInterfaceDevice = (0xd400) as _;
 pub const COLOR_RAM: *mut u8 = (0xd800) as _;
 
 /// Pointer to first complex interface adapter (0xdc00)
-pub const CIA1: *const MOSComplexInterfaceAdapter6526 = (0xdc00) as _;
+pub const CIA1: *const MOSComplexInterfaceAdapter6526<GameController, GameController> = (0xdc00) as _;
 
 /// Pointer to second complex interface adapter (0xdd00)
-pub const CIA2: *const MOSComplexInterfaceAdapter6526 = (0xdd00) as _;
+pub const CIA2: *const MOSComplexInterfaceAdapter6526<VicBankSelect, RS232Access> = (0xdd00) as _;
 
 /// Pointer to the KERNAL ROM memory area (0xe000 - 0xffff)
 pub const KERNAL_ROM: *mut [u8; 8192] = (0xe000) as _;
@@ -135,11 +135,26 @@ bitflags! {
     }
 }
 
-pub enum VicBank {
-    Region0000 = 0x11, // Bank 0
-    Region4000 = 0x10, // Bank 1
-    Region8000 = 0x01, // Bank 2
-    RegionC000 = 0x00, // Bank 3
+bitflags! {
+    /// Bit mask for VIC II bank selection
+    ///
+    /// Select one of four memory ranges that VIC II sees.
+    ///
+    /// # Examples
+    /// ~~~
+    /// set_vic_bank(cia::VicBankSelect::RegionC000);
+    /// ~~~
+    #[derive(Clone, Copy)]
+    pub struct VicBankSelect: u8 {
+        /// Bank 3: 0xC000-0xFFFF
+        const RegionC000 = 0;
+        /// Bank 2: 0x8000-0xBFFF
+        const Region8000 = 1;
+        /// Bank 1: 0x4000-0x7FFF
+        const Region4000 = 2;
+        /// Bank 0: 0x0000-0x3FFF (default)
+        const Region0000 = 3;
+   }
 }
 
 extern "C" {
@@ -212,12 +227,12 @@ pub const fn sid() -> &'static MOSSoundInterfaceDevice {
 }
 
 /// Get reference to CIA1 chip
-pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526 {
+pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526<GameController, GameController> {
     unsafe { &*CIA1 }
 }
 
 /// Get reference to CIA2 chip
-pub const fn cia2() -> &'static MOSComplexInterfaceAdapter6526 {
+pub const fn cia2() -> &'static MOSComplexInterfaceAdapter6526<VicBankSelect, RS232Access> {
     unsafe { &*CIA2 }
 }
 
@@ -241,5 +256,17 @@ pub fn set_lower_case() {
 pub fn set_upper_case() {
     unsafe {
         vic2().screen_and_charset_bank.write(21);
+    }
+}
+
+/// Select one of four memory ranges that VIC II sees.
+pub fn set_vic_bank(bank: VicBankSelect) {
+    let dir_a = cia2().data_direction_port_a.read();
+    let port_a = cia2().port_a.read();
+    unsafe {
+        cia2().data_direction_port_a.write(dir_a | 0b11);
+        cia2()
+            .port_a
+            .write(port_a & VicBankSelect::VIC_0000.complement() | bank);
     }
 }
