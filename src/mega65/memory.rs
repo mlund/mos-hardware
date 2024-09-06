@@ -58,17 +58,17 @@ pub unsafe fn lcopy(source: u32, destination: u32, length: usize) {
 /// let mut bank = Allocator::new(0x40000);
 /// let a = Vec::<u8>::from([7, 9, 13]);
 /// let ptr = bank.write(a.as_slice()); // dma write
-/// let b = Vec::<u8>::from(ptr); // dma read
+/// let b = Vec::<u8>::from(ptr);       // dma read
 /// assert_eq!(a, b);
 /// ~~~
 ///
 /// `Vec<Ptr28>` can be traversed almost as if a vector of values:
 /// ~~~
-/// let cnt = Vec::from([bank.push(b"first"), bank.push(b"second")])
+/// let cnt = Vec::from([bank.push(b"First"), bank.push(b"Second")])
 ///      .iter()
 ///      .copied()
-///      .map(String::from) // dma write
-///      .filter(|s| s.starts_with('s'))
+///      .map(String::from) // dma read
+///      .filter(|s| s.starts_with('F'))
 ///      .count();
 /// assert_eq!(cnt, 1);
 /// ~~~
