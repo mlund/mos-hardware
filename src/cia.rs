@@ -62,7 +62,7 @@ pub struct MOSComplexInterfaceAdapter6526<T1: Copy, T2: Copy> {
     pub control_b: RW<u8>,             // 0x0f
 }
 
-const_assert!(size_of::<MOSComplexInterfaceAdapter6526>() == 16);
+const_assert!(size_of::<MOSComplexInterfaceAdapter6526<GameController, GameController>>() == 16);
 
 /// Enum for joystick positions
 pub enum JoystickPosition {
@@ -188,7 +188,6 @@ bitflags! {
     /// serial bus input (0=Low/Active, 1=High/Inactive)
     /// - CLOCK IN
     /// - DATA IN
-    #[derive(Clone, Copy)]
     pub struct SerialBusAccess: u8 {
         const TXD_OUT  = 0b0000_0100;
         const ATN_OUT  = 0b0000_1000;
@@ -210,7 +209,6 @@ bitflags! {
     /// - 5 User Port Pin J IO
     /// - 6 CTS R
     /// - 7 DSR R
-    #[derive(Clone, Copy)]
     pub struct RS232Access: u8 {
         const RXD  = 0b0000_0001;
         const RTS  = 0b0000_0010;
