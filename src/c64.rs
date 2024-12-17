@@ -144,7 +144,6 @@ bitflags! {
     /// ~~~
     /// set_vic_bank(cia::VicBankSelect::RegionC000);
     /// ~~~
-    #[derive(Clone, Copy)]
     pub struct VicBankSelect: u8 {
         /// Bank 3: 0xC000-0xFFFF
         const RegionC000 = 0;
@@ -267,6 +266,6 @@ pub fn set_vic_bank(bank: VicBankSelect) {
         cia2().data_direction_port_a.write(dir_a | 0b11);
         cia2()
             .port_a
-            .write(port_a & VicBankSelect::VIC_0000.complement() | bank);
+            .write(port_a & VicBankSelect::Region0000.complement() | bank);
     }
 }
