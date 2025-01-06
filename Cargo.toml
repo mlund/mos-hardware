@@ -42,7 +42,7 @@ num-integer = {version = "0.1", default-features = false}
 
 [dev-dependencies]
 rand = {version = "0.8", default-features = false}
-itertools = {version = "0.12", default-features = false}
+itertools = {version = "0.14", default-features = false}
 mos-alloc = "0.2"
 ufmt-stdio = "0.4"
 
