@@ -112,49 +112,13 @@ pub const SID: *const MOSSoundInterfaceDevice = (0xd400) as _;
 pub const COLOR_RAM: *mut u8 = (0xd800) as _;
 
 /// Pointer to first complex interface adapter (0xdc00)
-pub const CIA1: *const MOSComplexInterfaceAdapter6526<GameController, GameController> = (0xdc00) as _;
+pub const CIA1: *const MOSComplexInterfaceAdapter6526_1 = (0xdc00) as _;
 
 /// Pointer to second complex interface adapter (0xdd00)
-pub const CIA2: *const MOSComplexInterfaceAdapter6526<VicBankSelect, RS232Access> = (0xdd00) as _;
+pub const CIA2: *const MOSComplexInterfaceAdapter6526_2 = (0xdd00) as _;
 
 /// Pointer to the KERNAL ROM memory area (0xe000 - 0xffff)
 pub const KERNAL_ROM: *mut [u8; 8192] = (0xe000) as _;
-
-bitflags! {
-    /// Flags for the `CIA1::control_a` register (0xdc0e)
-    pub struct CIA1ControlAFlags: u8 {
-        /// Start (1) or stop (0) timer A
-        const START         = 0b00000001; // bit 0
-        const PBON          = 0b00000010;
-        const OUTMODE       = 0b00000100;
-        const RUNMODE       = 0b00001000;
-        const FORCE_LOAD    = 0b00010000;
-        const INMODE        = 0b00100000;
-        const SERIAL_OUTPUT = 0b01000000;
-        const FIFTY_HZ_RTC  = 0b10000000;
-    }
-}
-
-bitflags! {
-    /// Bit mask for VIC II bank selection
-    ///
-    /// Select one of four memory ranges that VIC II sees.
-    ///
-    /// # Examples
-    /// ~~~
-    /// set_vic_bank(cia::VicBankSelect::RegionC000);
-    /// ~~~
-    pub struct VicBankSelect: u8 {
-        /// Bank 3: 0xC000-0xFFFF
-        const RegionC000 = 0;
-        /// Bank 2: 0x8000-0xBFFF
-        const Region8000 = 1;
-        /// Bank 1: 0x4000-0x7FFF
-        const Region4000 = 2;
-        /// Bank 0: 0x0000-0x3FFF (default)
-        const Region0000 = 3;
-   }
-}
 
 extern "C" {
     // defined in c to allow assembly and interrupt attribute
@@ -226,12 +190,12 @@ pub const fn sid() -> &'static MOSSoundInterfaceDevice {
 }
 
 /// Get reference to CIA1 chip
-pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526<GameController, GameController> {
+pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526_1 {
     unsafe { &*CIA1 }
 }
 
 /// Get reference to CIA2 chip
-pub const fn cia2() -> &'static MOSComplexInterfaceAdapter6526<VicBankSelect, RS232Access> {
+pub const fn cia2() -> &'static MOSComplexInterfaceAdapter6526_2 {
     unsafe { &*CIA2 }
 }
 
@@ -259,13 +223,29 @@ pub fn set_upper_case() {
 }
 
 /// Select one of four memory ranges that VIC II sees.
-pub fn set_vic_bank(bank: VicBankSelect) {
-    let dir_a = cia2().data_direction_port_a.read();
-    let port_a = cia2().port_a.read();
+///
+/// # Arguments
+/// * `bank` - VIC bank to select:
+///   - `CIA2PortA::VIC_BANK_0` for $0000-$3FFF
+///   - `CIA2PortA::VIC_BANK_1` for $4000-$7FFF  
+///   - `CIA2PortA::VIC_BANK_2` for $8000-$BFFF
+///   - `CIA2PortA::VIC_BANK_3` for $C000-$FFFF
+///
+/// # Example
+/// ```rust
+/// // Switch to bank 1 ($4000-$7FFF)
+/// set_vic_bank(CIA2PortA::VIC_BANK_1);
+/// ```
+pub fn set_vic_bank(bank: CIA2PortA) {
+    let mut dir_a = cia2().data_direction_port_a.read();
+    let mut port_a = cia2().port_a.read();
     unsafe {
-        cia2().data_direction_port_a.write(dir_a | 0b11);
-        cia2()
-            .port_a
-            .write(port_a & VicBankSelect::Region0000.complement() | bank);
+        // Configure bits 0-1 as outputs for VIC bank control
+        dir_a.set_raw(dir_a.raw() | 0b11);
+        cia2().data_direction_port_a.write(dir_a);
+
+        // Set the VIC bank using the provided constant
+        port_a.set_vic_bank(bank.bits() & 0b11);
+        cia2().port_a.write(port_a);
     }
 }
