@@ -51,27 +51,34 @@ pub struct TimeOfDay {
 const_assert!(size_of::<TimeOfDay>() == 4);
 
 impl TimeOfDay {
+    /// Set time with BCD validation
+    pub fn validate_bcd_bool(hours: u8, minutes: u8, seconds: u8, tenths: u8) -> bool {
+        // Compact BCD validation
+        let is_valid_bcd = |val: u8| (val >> 4) <= 9 && (val & 0x0F) <= 9;
+
+        // Single expression validation
+        is_valid_bcd(hours)
+            && hours >= 0x01
+            && hours <= 0x12
+            && is_valid_bcd(minutes)
+            && minutes <= 0x59
+            && is_valid_bcd(seconds)
+            && seconds <= 0x59
+            && is_valid_bcd(tenths)
+            && (tenths & 0x0F) <= 9
+    }
+
     /// Validate that values are in valid BCD format
     pub fn validate_bcd(&self) -> bool {
         let tenths = self.tenths.read();
         let seconds = self.seconds.read();
         let minutes = self.minutes.read();
-        let hours = self.get_hour_bcd();
+        let hours = self.get_hour_bcd() & 0b0111_1111; // remove pm
 
-        // Check BCD format (each nibble must be 0-9)
-        let is_valid_bcd = |val: u8| {
-            let high = (val >> 4) & 0x0F;
-            let low = val & 0x0F;
-            high <= 9 && low <= 9
-        };
-
-        (tenths & 0x0F) <= 9 &&    // 0-9 tenths
-        is_valid_bcd(seconds) && seconds <= 0x59 &&         // 00-59 seconds  
-        is_valid_bcd(minutes) && minutes <= 0x59 &&         // 00-59 minutes
-        is_valid_bcd(hours) && hours >= 0x01 && hours <= 0x12 // 01-12 hours
+        Self::validate_bcd_bool(hours, minutes, seconds, tenths)
     }
 
-    /// Set time with BCD validation - Zero allocation version (fastest)
+    /// Set time with BCD validation
     pub fn set_time_bcd_bool(
         &mut self,
         hours: u8,
@@ -80,20 +87,7 @@ impl TimeOfDay {
         tenths: u8,
         pm: bool,
     ) -> bool {
-        // Compact BCD validation
-        let is_valid_bcd = |val: u8| (val >> 4) <= 9 && (val & 0x0F) <= 9;
-
-        // Single expression validation
-        if !(is_valid_bcd(hours)
-            && hours >= 0x01
-            && hours <= 0x12
-            && is_valid_bcd(minutes)
-            && minutes <= 0x59
-            && is_valid_bcd(seconds)
-            && seconds <= 0x59
-            && is_valid_bcd(tenths)
-            && (tenths & 0x0F) <= 9)
-        {
+        if !Self::validate_bcd_bool(hours, minutes, seconds, tenths) {
             return false;
         }
 
@@ -150,6 +144,8 @@ bitflags! {
         const TIMER_B          = 0b0000_0010;
         /// Bit 0: IRQ occurred (read only)
         const IRQ              = 0b0000_0001;
+
+        const DISABLE_ALL      = 0b0111_1111;
     }
 }
 
@@ -663,8 +659,6 @@ bitflags::bitflags! {
 }
 
 impl CIA2DirA {
-    pub const SERIAL_STANDARD: Self = Self::DEFAULT; // Kernal standard
-
     pub fn raw(self) -> u8 {
         self.bits()
     }
@@ -677,7 +671,7 @@ impl Default for CIA2DirA {
     /// Standard Kernal configuration: $3F
     /// DATA/CLOCK IN as inputs, everything else as outputs
     fn default() -> Self {
-        Self::SERIAL_STANDARD
+        Self::DEFAULT
     }
 }
 
