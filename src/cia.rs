@@ -681,12 +681,12 @@ impl Default for CIA2DirA {
 pub struct CIA2DirB(u8);
 
 impl CIA2DirB {
-    pub fn default_as_user_port(&mut self) {
-        self.0 = (GPIOPinsDir::DEFAULT).bits();
+    pub fn default_as_user_port() -> Self {
+        Self((GPIOPinsDir::DEFAULT).bits())
     }
 
-    pub fn default_as_rs232(&mut self) {
-        self.0 = (RS232AccessDir::DEFAULT).bits();
+    pub fn default_as_rs232() -> Self {
+        Self((RS232AccessDir::DEFAULT).bits())
     }
 
     pub fn raw(self) -> u8 {
