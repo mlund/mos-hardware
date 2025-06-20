@@ -53,13 +53,14 @@
 #![allow(clippy::bad_bit_mask)]
 #![feature(const_trait_impl)]
 extern crate alloc;
-extern crate static_assertions;
 
 #[cfg(feature = "c64")]
 pub mod c64;
 pub mod cbm_kernal;
 #[cfg(feature = "cia")]
 pub mod cia;
+#[cfg(feature = "c64")]
+pub mod cpu6510;
 #[cfg(feature = "cx16")]
 pub mod cx16;
 #[cfg(feature = "mega65")]
