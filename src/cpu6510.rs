@@ -83,14 +83,20 @@ bitflags! {
     ///
     /// The 6510 CPU has a 6-bit I/O port (bits 0-5). Bits 6-7 are not connected in the C64.
     /// Three-word combination constants like `RAM_IO_KERNAL` refer to banking configurations
-    /// of what is visible at addresses `$A000-BFFF`, `$D000-DFFF`, and `$E000-FFFF`.
-    /// Regardless of `0x0001`, the VIC-II chip *always* sees the `CHARROM` at `$1000-1FFF` and `$9000-9FFF`,
+    /// of what is visible at addresses `0xA000-0xBFFF`, `0xD000-0xDFFF`, and `0xE000-0xFFFF`.
+    /// Regardless of `0x0001`, the VIC-II chip *always* sees the `CHARROM` at `0x1000-0x1FFF` and `0x9000-0x9FFF`,
     /// and RAM everywhere else.
     ///
     /// Memory banking is controlled by bits 0-2:
     /// - Bit 0: LORAM (0=BASIC ROM disabled, 1=BASIC ROM enabled)
     /// - Bit 1: HIRAM (0=KERNAL ROM disabled, 1=KERNAL ROM enabled)
-    /// - Bit 2: CHAREN (0=Character ROM visible at $D000, 1=I/O visible at $D000)
+    /// - Bit 2: CHAREN (0=Character ROM at 0xD000 if any ROM active, otherwise RAM; 1=I/O at 0xD000)
+    ///
+    /// **For 0xD000-0xDFFF, the logic is:**
+    /// 1. If **CHAREN = 1** → **I/O** (always, regardless of LORAM/HIRAM)
+    /// 2. If **CHAREN = 0** AND **at least one ROM active** → **Character ROM**
+    /// 3. If **CHAREN = 0** AND **no ROM active** → **RAM**
+    /// **The critical special case:** When CHAREN = 0 and LORAM = HIRAM = 0 (RAM_RAM_RAM configuration), you get RAM at 0xD000 instead of Character ROM, which breaks the simple logic "CHAREN = 0 → Character ROM".
     ///
     /// Datasette control uses bits 3-5:
     /// - Bit 3: Datasette signal (usually input)
@@ -136,13 +142,13 @@ bitflags! {
         const RAM_IO_KERNAL        = 0b0011_0110;
 
         // Individual memory banking bits
-        /// Bit 0: LORAM - BASIC ROM control (1=enabled, 0=disabled)
+        /// Bit 0: LORAM 0xA000-0xBFFF - BASIC ROM control (1=enabled, 0=disabled)
         const LORAM                = 0b0000_0001;
 
-        /// Bit 1: HIRAM - KERNAL ROM control (1=enabled, 0=disabled)
+        /// Bit 1: HIRAM 0xE000-0xFFFF - KERNAL ROM control (1=enabled, 0=disabled)
         const HIRAM                = 0b0000_0010;
 
-        /// Bit 2: CHAREN - Character ROM/I/O control (1=I/O, 0=Character ROM)
+        /// Bit 2: CHAREN 0xD000-0xDFFF - Character ROM/I/O control (1=I/O, 0=Character ROM if any ROM active, otherwise RAM)
         const CHAREN               = 0b0000_0100;
 
         // Datasette control bits (bits 3-5)
