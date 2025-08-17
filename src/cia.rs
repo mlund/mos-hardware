@@ -174,6 +174,18 @@ bitflags! {
 
 // === CIA ================================
 
+/// CIA control part
+#[repr(C, packed)]
+pub struct CIAControlBlock {
+    pub timer_a: RW<u16>,                // 0x04 - Timer A
+    pub timer_b: RW<u16>,                // 0x06 - Timer B
+    pub time_of_day: TimeOfDay,          // 0x08-0x0B - TOD Clock
+    pub serial_shift: RW<u8>,            // 0x0C - Serial shift register
+    pub interrupt: RW<InterruptControl>, // 0x0D - Interrupt control and flags
+    pub control_a: RW<TimerControl>,     // 0x0E - Timer A control register
+    pub control_b: RW<TimerControl>,     // 0x0F - Timer B control register
+}
+
 #[repr(C, packed)]
 /// Registers for the MOS Technology Complex Interface Adapter 6526
 ///
@@ -188,13 +200,7 @@ pub struct CIA<PortA: Copy, PortB: Copy, DirA: Copy, DirB: Copy> {
     pub port_b: RW<PortB>,
     pub data_direction_port_a: RW<DirA>, // 0x02 - Data Direction Register A
     pub data_direction_port_b: RW<DirB>, // 0x03 - Data Direction Register B
-    pub timer_a: RW<u16>,                // 0x04 - Timer A
-    pub timer_b: RW<u16>,                // 0x06 - Timer B
-    pub time_of_day: TimeOfDay,          // 0x08-0x0B - TOD Clock
-    pub serial_shift: RW<u8>,            // 0x0C - Serial shift register
-    pub interrupt: RW<InterruptControl>, // 0x0D - Interrupt control and flags
-    pub control_a: RW<TimerControl>,     // 0x0E - Timer A control register
-    pub control_b: RW<TimerControl>,     // 0x0F - Timer B control register
+    pub control: CIAControlBlock,
 }
 
 // === CIA1 ================================
@@ -755,15 +761,15 @@ impl MOSComplexInterfaceAdapter6526_1 {
     pub fn reset(&mut self) {
         unsafe {
             // Disable Interrupt
-            self.interrupt.write(InterruptControl::DISABLE_ALL);
+            self.control.interrupt.write(InterruptControl::DISABLE_ALL);
 
             // Turn on STOP key (bit 7 low)
             self.port_a.write(Default::default());
 
             // Shut off timers
             let timer_off = TimerControl::empty();
-            self.control_a.write(timer_off);
-            self.control_b.write(timer_off);
+            self.control.control_a.write(timer_off);
+            self.control.control_b.write(timer_off);
 
             // Configure ports
             // Keyboard inputs (CIA1 Port B = inputs)
@@ -777,13 +783,14 @@ impl MOSComplexInterfaceAdapter6526_1 {
     pub fn enable_keyboard(&mut self) {
         unsafe {
             // Enable IRQ
-            self.interrupt
+            self.control
+                .interrupt
                 .write(InterruptControl::SET_CLEAR | InterruptControl::IRQ);
             // save only tod bit
-            let todin = self.control_a.read() & TimerControl::TODIN;
+            let todin = self.control.control_a.read() & TimerControl::TODIN;
             // enable timer 1
             let timer1_added = todin | TimerControl::LOAD | TimerControl::START;
-            self.control_a.write(timer1_added);
+            self.control.control_a.write(timer1_added);
         }
     }
 }
@@ -793,12 +800,12 @@ impl MOSComplexInterfaceAdapter6526_2 {
     pub fn reset(&mut self) {
         unsafe {
             // Disable Interrupt
-            self.interrupt.write(InterruptControl::DISABLE_ALL);
+            self.control.interrupt.write(InterruptControl::DISABLE_ALL);
 
             // Shut off timers
             let timer_off = TimerControl::empty();
-            self.control_a.write(timer_off);
-            self.control_b.write(timer_off);
+            self.control.control_a.write(timer_off);
+            self.control.control_b.write(timer_off);
 
             // User port (CIA2 Port B = no RS-232)
             self.data_direction_port_b

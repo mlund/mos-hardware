@@ -163,9 +163,19 @@ pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526_1 {
     unsafe { &*CIA1 }
 }
 
+/// Get reference to CIA1 control block
+pub const fn cia1_control() -> &'static CIAControlBlock {
+    unsafe { &(*CIA1).control }
+}
+
 /// Get reference to CIA2 chip
 pub const fn cia2() -> &'static MOSComplexInterfaceAdapter6526_2 {
     unsafe { &*CIA2 }
+}
+
+/// Get reference to CIA2 control block
+pub const fn cia2_control() -> &'static CIAControlBlock {
+    unsafe { &(*CIA2).control }
 }
 
 /// Clears screen, functional style (fill with SPACE character)
