@@ -168,8 +168,7 @@ pub struct Vic4 {
     pub debugc: RW<u8>,
 }
 
-/// __vic4__bindgen_ty_7__bindgen_ty_1
-pub struct Vic4BindgenTy7BindgenTy1 {
+pub struct __vic4__bindgen_ty_7__bindgen_ty_1 {
     ///Display Address Translater (DAT) Bitplane 0 port (offset 0x40)
     pub b0pix: u8,
     ///Display Address Translater (DAT) Bitplane 1 port (offset 0x41)
