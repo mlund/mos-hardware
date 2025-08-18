@@ -17,10 +17,13 @@
 //! Future information may be incorporated using the
 //! [Ultimate Commodore 64 Reference](https://github.com/mist64/c64ref)
 
+mod cpu6510;
+mod mos6526;
 use crate::cia::*;
-use crate::cpu6510::*;
 use crate::sid::*;
 use crate::vic2::*;
+use cpu6510::*;
+use mos6526::*;
 
 /// Pointer to CPU 6510
 pub const CPU: *const Cpu6510 = (0x0000) as _;
