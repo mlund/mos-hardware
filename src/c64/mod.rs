@@ -167,7 +167,7 @@ pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526_1 {
 }
 
 /// Get reference to CIA1 control block
-pub const fn cia1_control() -> &'static CIAControlBlock {
+pub const fn cia1_control() -> &'static Mos6526ControlBlock {
     unsafe { &(*CIA1).control }
 }
 
@@ -177,7 +177,7 @@ pub const fn cia2() -> &'static MOSComplexInterfaceAdapter6526_2 {
 }
 
 /// Get reference to CIA2 control block
-pub const fn cia2_control() -> &'static CIAControlBlock {
+pub const fn cia2_control() -> &'static Mos6526ControlBlock {
     unsafe { &(*CIA2).control }
 }
 

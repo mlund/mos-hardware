@@ -170,7 +170,7 @@ bitflags! {
 
 /// CIA control part
 #[repr(C, packed)]
-pub struct CIAControlBlock {
+pub struct Mos6526ControlBlock {
     pub timer_a: RW<u16>,                // 0x04 - Timer A
     pub timer_b: RW<u16>,                // 0x06 - Timer B
     pub time_of_day: TimeOfDay,          // 0x08-0x0B - TOD Clock
@@ -179,6 +179,8 @@ pub struct CIAControlBlock {
     pub control_a: RW<TimerControl>,     // 0x0E - Timer A control register
     pub control_b: RW<TimerControl>,     // 0x0F - Timer B control register
 }
+
+const_assert!(size_of::<Mos6526ControlBlock>() == 12);
 
 #[repr(C, packed)]
 /// Registers for the MOS Technology Complex Interface Adapter 6526
@@ -194,7 +196,7 @@ pub struct MOSComplexInterfaceAdapter6526<PortA: Copy, PortB: Copy, DirA: Copy, 
     pub port_b: RW<PortB>,
     pub data_direction_port_a: RW<DirA>, // 0x02 - Data Direction Register A
     pub data_direction_port_b: RW<DirB>, // 0x03 - Data Direction Register B
-    pub control: CIAControlBlock,
+    pub control: Mos6526ControlBlock,
 }
 
 // === CIA1 ================================
