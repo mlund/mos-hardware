@@ -85,13 +85,13 @@ impl TimeOfDay {
             return false;
         }
 
-        let h = if pm { hours | 0x80 } else { hours };
+        let hours = if pm { hours | 0x80 } else { hours };
 
         unsafe {
             self.tenths.write(tenths);
             self.seconds.write(seconds);
             self.minutes.write(minutes);
-            self.hours.write(h);
+            self.hours.write(hours);
         }
 
         true
@@ -103,13 +103,13 @@ impl TimeOfDay {
 
     /// set AM/PM
     pub fn set_pm(&mut self, pm: bool) {
-        let mut h = self.hours.read();
+        let mut hours = self.hours.read();
         if pm {
-            h |= 0x80;
+            hours |= 0x80;
         } else {
-            h &= 0x7F;
+            hours &= 0x7F;
         }
-        unsafe { self.hours.write(h) };
+        unsafe { self.hours.write(hours) };
     }
 
     /// get hours without PM flag (BCD format)
