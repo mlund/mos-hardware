@@ -145,10 +145,9 @@ pub struct MOSSoundInterfaceDevice {
 const_assert!(size_of::<MOSSoundInterfaceDevice>() == 0x1d);
 
 impl MOSSoundInterfaceDevice {
-    /// Reset like Kernal
+    /// Reset like Kernal: turn off SID
     pub fn reset(&self) {
         unsafe {
-            // Turn off SID
             self.volume_filter_mode.write(0);
         }
     }
