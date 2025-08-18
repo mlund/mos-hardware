@@ -168,7 +168,7 @@ bitflags! {
 
 // === CIA ================================
 
-/// CIA control part
+/// MOSComplexInterfaceAdapter6526 control part
 #[repr(C, packed)]
 pub struct Mos6526ControlBlock {
     pub timer_a: RW<u16>,                // 0x04 - Timer A
