@@ -128,7 +128,6 @@ bitflags! {
     /// Dual behavior:
     /// - Read: shows active interrupt sources
     /// - Write: configures which IRQ sources to enable/disable
-    #[derive(Default)]
     pub struct InterruptControl: u8 {
         /// Bit 7: Set (1) or Clear (0) mode for writing
         const SET_CLEAR        = 0b1000_0000;
