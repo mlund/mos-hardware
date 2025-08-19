@@ -208,13 +208,15 @@ pub struct MOSComplexInterfaceAdapter6526<PortA: Copy, PortB: Copy, DirA: Copy, 
 #[derive(Copy, Clone, Default)]
 pub struct CIA1PortA(u8);
 
-impl CIA1PortA {
-    pub const fn as_keyboard_column(self) -> KeyboardColumn {
-        KeyboardColumn::from_bits_truncate(self.0)
+impl const From<CIA1PortA> for KeyboardColumn {
+    fn from(pa: CIA1PortA) -> Self {
+        KeyboardColumn::from_bits_truncate(pa.into())
     }
+}
 
-    pub const fn as_joystick(self) -> GameController {
-        GameController::from_bits_truncate(self.0)
+impl const From<CIA1PortA> for GameController {
+    fn from(pa: CIA1PortA) -> Self {
+        GameController::from_bits_truncate(pa.into())
     }
 }
 
@@ -247,13 +249,15 @@ impl const From<CIA1PortA> for u8 {
 #[derive(Copy, Clone, Default)]
 pub struct CIA1PortB(u8);
 
-impl CIA1PortB {
-    pub const fn as_keyboard_row(self) -> KeyboardRow {
-        KeyboardRow::from_bits_truncate(self.0)
+impl const From<CIA1PortB> for KeyboardRow {
+    fn from(pa: CIA1PortB) -> Self {
+        KeyboardRow::from_bits_truncate(pa.into())
     }
+}
 
-    pub const fn as_joystick(self) -> GameController {
-        GameController::from_bits_truncate(self.0)
+impl const From<CIA1PortB> for GameController {
+    fn from(pa: CIA1PortB) -> Self {
+        GameController::from_bits_truncate(pa.into())
     }
 }
 
@@ -573,13 +577,15 @@ impl const From<CIA2PortA> for u8 {
 #[derive(Copy, Clone, Default)]
 pub struct CIA2PortB(u8);
 
-impl CIA2PortB {
-    pub const fn as_user_port(self) -> GPIOPins {
-        GPIOPins::from_bits_truncate(self.0)
+impl const From<CIA2PortB> for GPIOPins {
+    fn from(pb: CIA2PortB) -> Self {
+        GPIOPins::from_bits_truncate(pb.into())
     }
+}
 
-    pub const fn as_rs232(self) -> RS232Access {
-        RS232Access::from_bits_truncate(self.0)
+impl const From<CIA2PortB> for RS232Access {
+    fn from(pb: CIA2PortB) -> Self {
+        RS232Access::from_bits_truncate(pb.into())
     }
 }
 
