@@ -219,15 +219,23 @@ pub fn set_upper_case() {
 /// set_vic_bank(CIA2PortA::VIC_BANK_1);
 /// ```
 pub fn set_vic_bank(bank: CIA2PortA) {
-    let mut dir_a = cia2().data_direction_port_a.read();
-    let mut port_a = cia2().port_a.read();
-    unsafe {
-        // Configure bits 0-1 as outputs for VIC bank control
-        dir_a.set_raw(dir_a.raw() | 0b11);
-        cia2().data_direction_port_a.write(dir_a);
+    // Secure argument input
+    let bank = u8::from(bank) & 0b11;
 
-        // Set the VIC bank using the provided constant
-        port_a.set_vic_bank(bank.bits() & 0b11);
+    // Configure for VIC bank control
+    let mut dir_a = cia2().data_direction_port_a.read();
+    dir_a = dir_a | CIA2DirA::VA15_DIR | CIA2DirA::VA14_DIR;
+
+    let mut port_a = cia2().port_a.read();
+
+    unsafe {
+        cia2().data_direction_port_a.write(dir_a);
+    }
+
+    // Set the VIC bank using the provided constant
+    port_a.set_vic_bank(bank);
+
+    unsafe {
         cia2().port_a.write(port_a);
     }
 }

@@ -207,27 +207,36 @@ pub struct MOSComplexInterfaceAdapter6526<PortA: Copy, PortB: Copy, DirA: Copy, 
 pub struct CIA1PortA(u8);
 
 impl CIA1PortA {
-    pub fn as_keyboard_column(self) -> KeyboardColumn {
+    pub const fn as_keyboard_column(self) -> KeyboardColumn {
         KeyboardColumn::from_bits_truncate(self.0)
     }
 
-    pub fn as_joystick(self) -> GameController {
+    pub const fn as_joystick(self) -> GameController {
         GameController::from_bits_truncate(self.0)
     }
+}
 
-    pub fn from_keyboard_column(col: KeyboardColumn) -> Self {
+impl const From<KeyboardColumn> for CIA1PortA {
+    fn from(col: KeyboardColumn) -> Self {
         Self(col.bits())
     }
+}
 
-    pub fn from_joystick(joy: GameController) -> Self {
+impl const From<GameController> for CIA1PortA {
+    fn from(joy: GameController) -> Self {
         Self(joy.bits())
     }
+}
 
-    pub fn raw(self) -> u8 {
-        self.0
+impl const From<u8> for CIA1PortA {
+    fn from(value: u8) -> Self {
+        Self(value)
     }
-    pub fn set_raw(&mut self, value: u8) {
-        self.0 = value;
+}
+
+impl const From<CIA1PortA> for u8 {
+    fn from(cia1: CIA1PortA) -> u8 {
+        cia1.0
     }
 }
 
@@ -237,27 +246,36 @@ impl CIA1PortA {
 pub struct CIA1PortB(u8);
 
 impl CIA1PortB {
-    pub fn as_keyboard_row(self) -> KeyboardRow {
+    pub const fn as_keyboard_row(self) -> KeyboardRow {
         KeyboardRow::from_bits_truncate(self.0)
     }
 
-    pub fn as_joystick(self) -> GameController {
+    pub const fn as_joystick(self) -> GameController {
         GameController::from_bits_truncate(self.0)
     }
+}
 
-    pub fn from_keyboard_row(row: KeyboardRow) -> Self {
+impl const From<KeyboardColumn> for CIA1PortB {
+    fn from(row: KeyboardColumn) -> Self {
         Self(row.bits())
     }
+}
 
-    pub fn from_joystick(joy: GameController) -> Self {
+impl const From<GameController> for CIA1PortB {
+    fn from(joy: GameController) -> Self {
         Self(joy.bits())
     }
+}
 
-    pub fn raw(self) -> u8 {
-        self.0
+impl const From<u8> for CIA1PortB {
+    fn from(value: u8) -> Self {
+        Self(value)
     }
-    pub fn set_raw(&mut self, value: u8) {
-        self.0 = value;
+}
+
+impl const From<CIA1PortB> for u8 {
+    fn from(cia1: CIA1PortB) -> u8 {
+        cia1.0
     }
 }
 
@@ -269,18 +287,23 @@ pub struct CIA1DirA(u8);
 impl CIA1DirA {
     pub const KEYBOARD: Self = Self(0b0000_0000); // For Column input
     pub const JOYSTICK: Self = Self(0b0001_1111); // For Joystick #2 input
+}
 
-    pub fn raw(self) -> u8 {
-        self.0
-    }
-    pub fn set_raw(&mut self, value: u8) {
-        self.0 = value;
+impl const Default for CIA1DirA {
+    fn default() -> Self {
+        Self::KEYBOARD
     }
 }
 
-impl Default for CIA1DirA {
-    fn default() -> Self {
-        Self::KEYBOARD
+impl const From<u8> for CIA1DirA {
+    fn from(value: u8) -> Self {
+        Self(value)
+    }
+}
+
+impl const From<CIA1DirA> for u8 {
+    fn from(cia1: CIA1DirA) -> u8 {
+        cia1.0
     }
 }
 
@@ -292,18 +315,23 @@ pub struct CIA1DirB(u8);
 impl CIA1DirB {
     pub const KEYBOARD: Self = Self(0b1111_1111); // For Row input
     pub const JOYSTICK: Self = Self(0b0001_1111); // For Joystick #1 input
+}
 
-    pub fn raw(self) -> u8 {
-        self.0
-    }
-    pub fn set_raw(&mut self, value: u8) {
-        self.0 = value;
+impl const Default for CIA1DirB {
+    fn default() -> Self {
+        Self::KEYBOARD
     }
 }
 
-impl Default for CIA1DirB {
-    fn default() -> Self {
-        Self::KEYBOARD
+impl const From<u8> for CIA1DirB {
+    fn from(value: u8) -> Self {
+        Self(value)
+    }
+}
+
+impl const From<CIA1DirB> for u8 {
+    fn from(cia1: CIA1DirB) -> u8 {
+        cia1.0
     }
 }
 
@@ -507,7 +535,7 @@ bitflags! {
 
 impl CIA2PortA {
     /// WARN: Configure bits 0-1 as input for VIC bank control (see CIA2::data_direction_port_a)
-    pub fn get_vic_bank(self) -> u8 {
+    pub const fn get_vic_bank(self) -> u8 {
         self.bits() & 0b0000_0011
     }
 
@@ -518,18 +546,23 @@ impl CIA2PortA {
         let new_bits = masked_self | masked_bank;
         *self = Self::from_bits_truncate(new_bits);
     }
+}
 
-    pub fn raw(self) -> u8 {
-        self.bits()
-    }
-    pub fn set_raw(&mut self, value: u8) {
-        *self = Self::from_bits(value).unwrap();
+impl const Default for CIA2PortA {
+    fn default() -> Self {
+        Self::DATA_OUT | Self::CLOCK_OUT | Self::ATN_OUT | Self::PA2 | Self::VIC_BANK_0
     }
 }
 
-impl Default for CIA2PortA {
-    fn default() -> Self {
-        Self::DATA_OUT | Self::CLOCK_OUT | Self::ATN_OUT | Self::PA2 | Self::VIC_BANK_0
+impl const From<u8> for CIA2PortA {
+    fn from(value: u8) -> Self {
+        Self::from_bits(value).unwrap()
+    }
+}
+
+impl const From<CIA2PortA> for u8 {
+    fn from(cia2: CIA2PortA) -> u8 {
+        cia2.bits()
     }
 }
 
@@ -539,27 +572,36 @@ impl Default for CIA2PortA {
 pub struct CIA2PortB(u8);
 
 impl CIA2PortB {
-    pub fn as_user_port(self) -> GPIOPins {
+    pub const fn as_user_port(self) -> GPIOPins {
         GPIOPins::from_bits_truncate(self.0)
     }
 
-    pub fn as_rs232(self) -> RS232Access {
+    pub const fn as_rs232(self) -> RS232Access {
         RS232Access::from_bits_truncate(self.0)
     }
+}
 
-    pub fn from_user_port(gpio: GPIOPins) -> Self {
+impl const From<GPIOPins> for CIA2PortB {
+    fn from(gpio: GPIOPins) -> Self {
         Self(gpio.bits())
     }
+}
 
-    pub fn from_rs232(rs232: RS232Access) -> Self {
+impl const From<RS232Access> for CIA2PortB {
+    fn from(rs232: RS232Access) -> Self {
         Self(rs232.bits())
     }
+}
 
-    pub fn raw(self) -> u8 {
-        self.0
+impl const From<u8> for CIA2PortB {
+    fn from(value: u8) -> Self {
+        Self(value)
     }
-    pub fn set_raw(&mut self, value: u8) {
-        self.0 = value;
+}
+
+impl const From<CIA2PortB> for u8 {
+    fn from(cia2: CIA2PortB) -> u8 {
+        cia2.0
     }
 }
 
@@ -660,20 +702,23 @@ bitflags::bitflags! {
     }
 }
 
-impl CIA2DirA {
-    pub fn raw(self) -> u8 {
-        self.bits()
-    }
-    pub fn set_raw(&mut self, value: u8) {
-        *self = Self::from_bits_truncate(value);
-    }
-}
-
-impl Default for CIA2DirA {
+impl const Default for CIA2DirA {
     /// Standard Kernal configuration: $3F
     /// DATA/CLOCK IN as inputs, everything else as outputs
     fn default() -> Self {
         Self::DEFAULT
+    }
+}
+
+impl const From<u8> for CIA2DirA {
+    fn from(value: u8) -> Self {
+        Self::from_bits_truncate(value)
+    }
+}
+
+impl const From<CIA2DirA> for u8 {
+    fn from(cia2: CIA2DirA) -> u8 {
+        cia2.bits()
     }
 }
 
@@ -683,19 +728,36 @@ impl Default for CIA2DirA {
 pub struct CIA2DirB(u8);
 
 impl CIA2DirB {
-    pub fn default_as_user_port() -> Self {
+    pub const fn default_as_user_port() -> Self {
         Self((GPIOPinsDir::DEFAULT).bits())
     }
 
-    pub fn default_as_rs232() -> Self {
+    pub const fn default_as_rs232() -> Self {
         Self((RS232AccessDir::DEFAULT).bits())
     }
+}
 
-    pub fn raw(self) -> u8 {
-        self.0
+impl const From<GPIOPinsDir> for CIA2DirB {
+    fn from(gpio: GPIOPinsDir) -> Self {
+        Self(gpio.bits())
     }
-    pub fn set_raw(&mut self, value: u8) {
-        self.0 = value;
+}
+
+impl const From<RS232AccessDir> for CIA2DirB {
+    fn from(rs232: RS232AccessDir) -> Self {
+        Self(rs232.bits())
+    }
+}
+
+impl const From<u8> for CIA2DirB {
+    fn from(value: u8) -> Self {
+        Self(value)
+    }
+}
+
+impl const From<CIA2DirB> for u8 {
+    fn from(cia2: CIA2DirB) -> u8 {
+        cia2.0
     }
 }
 
@@ -746,7 +808,7 @@ bitflags! {
     }
 }
 
-impl Default for RS232AccessDir {
+impl const Default for RS232AccessDir {
     fn default() -> Self {
         Self::DEFAULT
     }
