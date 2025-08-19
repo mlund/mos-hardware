@@ -36,10 +36,14 @@ use volatile_register::RW;
 /// the encoding/decoding process.
 #[repr(C, packed)]
 pub struct TimeOfDay {
-    pub tenths: RW<u8>,  // 0x08
-    pub seconds: RW<u8>, // 0x09
-    pub minutes: RW<u8>, // 0x0a
-    pub hours: RW<u8>,   // 0x0b
+    /// 0x08
+    pub tenths: RW<u8>,
+    /// 0x09
+    pub seconds: RW<u8>,
+    /// 0x0a
+    pub minutes: RW<u8>,
+    /// 0x0b
+    pub hours: RW<u8>,
 }
 
 const_assert!(size_of::<TimeOfDay>() == 4);
@@ -138,7 +142,7 @@ bitflags! {
         const TIMER_B          = 0b0000_0010;
         /// Bit 0: IRQ occurred (read only)
         const IRQ              = 0b0000_0001;
-
+        /// Disable all irq
         const DISABLE_ALL      = 0b0111_1111;
     }
 }
@@ -173,13 +177,20 @@ pub const TIMER_OFF: TimerControl = TimerControl::empty();
 /// MOSComplexInterfaceAdapter6526 control part
 #[repr(C, packed)]
 pub struct Mos6526ControlBlock {
-    pub timer_a: RW<u16>,                // 0x04 - Timer A
-    pub timer_b: RW<u16>,                // 0x06 - Timer B
-    pub time_of_day: TimeOfDay,          // 0x08-0x0B - TOD Clock
-    pub serial_shift: RW<u8>,            // 0x0C - Serial shift register
-    pub interrupt: RW<InterruptControl>, // 0x0D - Interrupt control and flags
-    pub control_a: RW<TimerControl>,     // 0x0E - Timer A control register
-    pub control_b: RW<TimerControl>,     // 0x0F - Timer B control register
+    /// 0x04 - Timer A
+    pub timer_a: RW<u16>,
+    /// 0x06 - Timer B
+    pub timer_b: RW<u16>,
+    /// 0x08-0x0B - TOD Clock                
+    pub time_of_day: TimeOfDay,
+    // 0x0C - Serial shift register
+    pub serial_shift: RW<u8>,
+    // 0x0D - Interrupt control and flags
+    pub interrupt: RW<InterruptControl>,
+    // 0x0E - Timer A control register
+    pub control_a: RW<TimerControl>,
+    // 0x0F - Timer B control register
+    pub control_b: RW<TimerControl>,
 }
 
 const_assert!(size_of::<Mos6526ControlBlock>() == 12);
@@ -196,8 +207,11 @@ pub struct MOSComplexInterfaceAdapter6526<PortA: Copy, PortB: Copy, DirA: Copy, 
     pub port_a: RW<PortA>,
     /// 0x01 - Port B I/O
     pub port_b: RW<PortB>,
-    pub data_direction_port_a: RW<DirA>, // 0x02 - Data Direction Register A
-    pub data_direction_port_b: RW<DirB>, // 0x03 - Data Direction Register B
+    /// 0x02 - Data Direction Register A
+    pub data_direction_port_a: RW<DirA>,
+    /// 0x03 - Data Direction Register B
+    pub data_direction_port_b: RW<DirB>,
+    /// 0x04... Control Block
     pub control: Mos6526ControlBlock,
 }
 
@@ -532,10 +546,14 @@ bitflags! {
         const VA14      = 0b0000_0001;
 
         /// VIC Bank helpers (note: inverted logic)
-        const VIC_BANK_0 = 0b0000_0011; // $0000-$3FFF
-        const VIC_BANK_1 = 0b0000_0010; // $4000-$7FFF
-        const VIC_BANK_2 = 0b0000_0001; // $8000-$BFFF
-        const VIC_BANK_3 = 0b0000_0000; // $C000-$FFFF
+        /// $0000-$3FFF
+        const VIC_BANK_0 = 0b0000_0011;
+        /// $4000-$7FFF
+        const VIC_BANK_1 = 0b0000_0010;
+        /// $8000-$BFFF
+        const VIC_BANK_2 = 0b0000_0001;
+        /// $C000-$FFFF
+        const VIC_BANK_3 = 0b0000_0000;
     }
 }
 
@@ -667,7 +685,7 @@ bitflags! {
 }
 
 bitflags::bitflags! {
-    /// /// CIA2 Data Direction A - Serial Bus configuration
+    /// CIA2 Data Direction A - Serial Bus configuration
     ///
     /// Controls the direction of each bit in CIA2 Port A:
     /// - 0 = Input (read from external signal)
@@ -803,14 +821,22 @@ bitflags! {
 bitflags! {
     /// RS-232 pins
     pub struct RS232AccessDir: u8 {
-        const RXD_DIR  = 0b0000_0001; // Bit 0: Receive Data (pin C)
-        const RTS_DIR  = 0b0000_0010; // Bit 1: Request To Send (pin D)
-        const DTR_DIR  = 0b0000_0100; // Bit 2: Data Terminal Ready (pin E)
-        const RI_DIR   = 0b0000_1000; // Bit 3: Ring Indicator (pin F)
-        const DCD_DIR  = 0b0001_0000; // Bit 4: Data Carrier Detect (pin H)
-        const UP_J_DIR = 0b0010_0000; // Bit 5: User Port (pin J)
-        const CTS_DIR  = 0b0100_0000; // Bit 6: Clear To Send (pin K)
-        const DSR_DIR  = 0b1000_0000; // Bit 7: Data Set Ready (pin L)
+        /// Bit 0: Receive Data (pin C)
+        const RXD_DIR  = 0b0000_0001;
+        /// Bit 1: Request To Send (pin D)
+        const RTS_DIR  = 0b0000_0010;
+        /// Bit 2: Data Terminal Ready (pin E)
+        const DTR_DIR  = 0b0000_0100;
+        /// Bit 3: Ring Indicator (pin F)
+        const RI_DIR   = 0b0000_1000;
+        /// Bit 4: Data Carrier Detect (pin H)
+        const DCD_DIR  = 0b0001_0000;
+        /// Bit 5: User Port (pin J)
+        const UP_J_DIR = 0b0010_0000;
+        /// Bit 6: Clear To Send (pin K)
+        const CTS_DIR  = 0b0100_0000;
+        /// Bit 7: Data Set Ready (pin L)
+        const DSR_DIR  = 0b1000_0000;
 
         const DEFAULT = 0b0000_0110;
     }
