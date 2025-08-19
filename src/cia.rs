@@ -674,21 +674,21 @@ bitflags! {
     /// CIA2 Port B - RS-232 pins
     #[repr(transparent)]
     pub struct RS232Access: u8 {
-        /// - 0 RXD I
+        /// 0 RXD I
         const RXD  = 0b0000_0001;
-        /// - 1 RTS O
+        /// 1 RTS O
         const RTS  = 0b0000_0010;
-        /// - 2 DTR O
+        /// 2 DTR O
         const DTR  = 0b0000_0100;
-        /// - 3 RI IO
+        /// 3 RI IO
         const RI   = 0b0000_1000;
-        /// - 4 DCD IO
+        /// 4 DCD IO
         const DCD  = 0b0001_0000;
-        /// - 5 User Port Pin J IO
+        /// 5 User Port Pin J IO
         const UP_J = 0b0010_0000;
-        /// - 6 CTS R
+        /// 6 CTS R
         const CTS  = 0b0100_0000;
-        /// - 7 DSR R
+        /// 7 DSR R
         const DSR  = 0b1000_0000;
     }
 }
