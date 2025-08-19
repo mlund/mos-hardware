@@ -228,7 +228,7 @@ pub fn set_vic_bank(bank: CIA2PortA) {
         // Configure for VIC bank control
         cia2()
             .data_direction_port_a
-            .modify(|dir_a| dir_a | CIA2DirA::VA15_DIR | CIA2DirA::VA14_DIR);
+            .modify(|dir_a| dir_a | CIA2DirectionA::VA15_DIR | CIA2DirectionA::VA14_DIR);
     }
 
     // Set the VIC bank using the provided constant

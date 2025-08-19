@@ -202,15 +202,20 @@ const_assert!(size_of::<Mos6526ControlBlock>() == 12);
 /// providing for parallel and serial I/O capabilities as well as timers and a
 /// Time-of-Day (TOD) clock. The device's most prominent use was in the Commodore 64
 /// and Commodore 128(D), each of which included two CIA chips.
-pub struct MOSComplexInterfaceAdapter6526<PortA: Copy, PortB: Copy, DirA: Copy, DirB: Copy> {
+pub struct MOSComplexInterfaceAdapter6526<
+    PortA: Copy,
+    PortB: Copy,
+    DirectionA: Copy,
+    DirectionB: Copy,
+> {
     /// 0x00 - Port A I/O
     pub port_a: RW<PortA>,
     /// 0x01 - Port B I/O
     pub port_b: RW<PortB>,
     /// 0x02 - Data Direction Register A
-    pub data_direction_port_a: RW<DirA>,
+    pub data_direction_port_a: RW<DirectionA>,
     /// 0x03 - Data Direction Register B
-    pub data_direction_port_b: RW<DirB>,
+    pub data_direction_port_b: RW<DirectionB>,
     /// 0x04... Control Block
     pub control: Mos6526ControlBlock,
 }
@@ -302,27 +307,27 @@ impl const From<CIA1PortB> for u8 {
 /// Keyboard or Joystick #2 configuration
 #[repr(transparent)]
 #[derive(Copy, Clone)]
-pub struct CIA1DirA(u8);
+pub struct CIA1DirectionA(u8);
 
-impl CIA1DirA {
+impl CIA1DirectionA {
     pub const KEYBOARD: Self = Self(0b0000_0000); // For Column input
     pub const JOYSTICK: Self = Self(0b0001_1111); // For Joystick #2 input
 }
 
-impl const Default for CIA1DirA {
+impl const Default for CIA1DirectionA {
     fn default() -> Self {
         Self::KEYBOARD
     }
 }
 
-impl const From<u8> for CIA1DirA {
+impl const From<u8> for CIA1DirectionA {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl const From<CIA1DirA> for u8 {
-    fn from(cia1: CIA1DirA) -> u8 {
+impl const From<CIA1DirectionA> for u8 {
+    fn from(cia1: CIA1DirectionA) -> u8 {
         cia1.0
     }
 }
@@ -330,27 +335,27 @@ impl const From<CIA1DirA> for u8 {
 /// Keyboard or Joystick #1 configuration
 #[repr(transparent)]
 #[derive(Copy, Clone)]
-pub struct CIA1DirB(u8);
+pub struct CIA1DirectionB(u8);
 
-impl CIA1DirB {
+impl CIA1DirectionB {
     pub const KEYBOARD: Self = Self(0b1111_1111); // For Row input
     pub const JOYSTICK: Self = Self(0b0001_1111); // For Joystick #1 input
 }
 
-impl const Default for CIA1DirB {
+impl const Default for CIA1DirectionB {
     fn default() -> Self {
         Self::KEYBOARD
     }
 }
 
-impl const From<u8> for CIA1DirB {
+impl const From<u8> for CIA1DirectionB {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl const From<CIA1DirB> for u8 {
-    fn from(cia1: CIA1DirB) -> u8 {
+impl const From<CIA1DirectionB> for u8 {
+    fn from(cia1: CIA1DirectionB) -> u8 {
         cia1.0
     }
 }
@@ -694,7 +699,7 @@ bitflags::bitflags! {
     /// This register configures which pins can be read from vs written to.
     /// Serial bus lines marked as "IN" should be inputs, "OUT" should be outputs.
     #[repr(transparent)]
-    pub struct CIA2DirA: u8 {
+    pub struct CIA2DirectionA: u8 {
         /// Bit 7: DATA IN direction (0=Input, 1=Output)
         /// Should be INPUT to read serial bus data
         const DATA_IN_DIR   = 0b1000_0000;
@@ -728,7 +733,7 @@ bitflags::bitflags! {
     }
 }
 
-impl const Default for CIA2DirA {
+impl const Default for CIA2DirectionA {
     /// Standard Kernal configuration: $3F
     /// DATA/CLOCK IN as inputs, everything else as outputs
     fn default() -> Self {
@@ -736,14 +741,14 @@ impl const Default for CIA2DirA {
     }
 }
 
-impl const From<u8> for CIA2DirA {
+impl const From<u8> for CIA2DirectionA {
     fn from(value: u8) -> Self {
         Self::from_bits_truncate(value)
     }
 }
 
-impl const From<CIA2DirA> for u8 {
-    fn from(cia2: CIA2DirA) -> u8 {
+impl const From<CIA2DirectionA> for u8 {
+    fn from(cia2: CIA2DirectionA) -> u8 {
         cia2.bits()
     }
 }
@@ -751,9 +756,9 @@ impl const From<CIA2DirA> for u8 {
 /// CIA2 Data Direction B - User Port ou RS-232 direction
 #[repr(transparent)]
 #[derive(Copy, Clone)]
-pub struct CIA2DirB(u8);
+pub struct CIA2DirectionB(u8);
 
-impl CIA2DirB {
+impl CIA2DirectionB {
     pub const fn default_as_user_port() -> Self {
         Self((GPIOPinsDir::DEFAULT).bits())
     }
@@ -763,26 +768,26 @@ impl CIA2DirB {
     }
 }
 
-impl const From<GPIOPinsDir> for CIA2DirB {
+impl const From<GPIOPinsDir> for CIA2DirectionB {
     fn from(gpio: GPIOPinsDir) -> Self {
         Self(gpio.bits())
     }
 }
 
-impl const From<RS232AccessDir> for CIA2DirB {
+impl const From<RS232AccessDir> for CIA2DirectionB {
     fn from(rs232: RS232AccessDir) -> Self {
         Self(rs232.bits())
     }
 }
 
-impl const From<u8> for CIA2DirB {
+impl const From<u8> for CIA2DirectionB {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl const From<CIA2DirB> for u8 {
-    fn from(cia2: CIA2DirB) -> u8 {
+impl const From<CIA2DirectionB> for u8 {
+    fn from(cia2: CIA2DirectionB) -> u8 {
         cia2.0
     }
 }

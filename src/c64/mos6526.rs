@@ -4,9 +4,9 @@ use static_assertions::const_assert;
 use crate::cia::*;
 
 pub type MOSComplexInterfaceAdapter6526_1 =
-    MOSComplexInterfaceAdapter6526<CIA1PortA, CIA1PortB, CIA1DirA, CIA1DirB>;
+    MOSComplexInterfaceAdapter6526<CIA1PortA, CIA1PortB, CIA1DirectionA, CIA1DirectionB>;
 pub type MOSComplexInterfaceAdapter6526_2 =
-    MOSComplexInterfaceAdapter6526<CIA2PortA, CIA2PortB, CIA2DirA, CIA2DirB>;
+    MOSComplexInterfaceAdapter6526<CIA2PortA, CIA2PortB, CIA2DirectionA, CIA2DirectionB>;
 
 const_assert!(size_of::<MOSComplexInterfaceAdapter6526_1>() == 16);
 const_assert!(size_of::<MOSComplexInterfaceAdapter6526_2>() == 16);
@@ -62,13 +62,13 @@ impl MOSComplexInterfaceAdapter6526_2 {
 
             // User port (CIA2 Port B = no RS-232)
             self.data_direction_port_b
-                .write(CIA2DirB::default_as_user_port()); // All inputs
+                .write(CIA2DirectionB::default_as_user_port()); // All inputs
 
             // Activate RS-232 TXD output and select VIC Bank 0
             self.port_a.write(CIA2PortA::default());
 
             // Set serial in/out, VA14/15 out
-            self.data_direction_port_a.write(CIA2DirA::default());
+            self.data_direction_port_a.write(CIA2DirectionA::default());
         }
     }
 
