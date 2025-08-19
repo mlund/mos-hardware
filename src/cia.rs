@@ -56,8 +56,7 @@ impl TimeOfDay {
 
         // Single expression validation
         is_valid_bcd(hours)
-            && hours >= 0x01
-            && hours <= 0x12
+            && (0x01..=0x12).contains(&hours)
             && is_valid_bcd(minutes)
             && minutes <= 0x59
             && is_valid_bcd(seconds)
