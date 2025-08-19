@@ -541,10 +541,10 @@ bitflags! {
         /// Bit 3: ATN OUT - Attention output line
         const ATN_OUT   = 0b0000_1000;
 
-        /// ----- I/O bit for GPIO pin -----
+        /// I/O bit for GPIO pin
         /// Bit 2: PA2 - User Port pin M, general-purpose I/O
         const PA2       = 0b0000_0100;
-        // ----- I/O bit for RS-232 pins -----
+        // I/O bit for RS-232 pins
         /// Bit 2: TXD OUT - RS-232 transmit data output (pin M)
         /// UART transmit data line for RS-232 interface
         const TXD_OUT  = 0b0000_0100;
