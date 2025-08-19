@@ -166,6 +166,8 @@ bitflags! {
     }
 }
 
+pub const TIMER_OFF: TimerControl = TimerControl::empty();
+
 // === CIA ================================
 
 /// MOSComplexInterfaceAdapter6526 control part

@@ -22,9 +22,8 @@ impl MOSComplexInterfaceAdapter6526_1 {
             self.port_a.write(Default::default());
 
             // Shut off timers
-            let timer_off = TimerControl::empty();
-            self.control.control_a.write(timer_off);
-            self.control.control_b.write(timer_off);
+            self.control.control_a.write(TIMER_OFF);
+            self.control.control_b.write(TIMER_OFF);
 
             // Configure ports
             // Keyboard inputs (CIA1 Port B = inputs)
