@@ -706,27 +706,27 @@ bitflags::bitflags! {
     pub struct CIA2DirectionA: u8 {
         /// Bit 7: DATA IN direction (0=Input, 1=Output)
         /// Should be INPUT to read serial bus data
-        const DATA_IN_DIR   = 0b1000_0000;
+        const DATA_IN   = 0b1000_0000;
         /// Bit 6: CLOCK IN direction (0=Input, 1=Output)
         /// Should be INPUT to read serial bus clock
-        const CLK_IN_DIR   = 0b0100_0000;
+        const CLK_IN   = 0b0100_0000;
         /// Bit 5: DATA OUT direction (0=Input, 1=Output)
         /// Should be OUTPUT to control serial bus data line
-        const DATA_OUT_DIR  = 0b0010_0000;
+        const DATA_OUT  = 0b0010_0000;
         /// Bit 4: CLOCK OUT direction (0=Input, 1=Output)
         /// Should be OUTPUT to control serial bus clock line
-        const CLK_OUT_DIR  = 0b0001_0000;
+        const CLK_OUT  = 0b0001_0000;
         /// Bit 3: ATN OUT direction (0=Input, 1=Output)
         /// Should be OUTPUT to control attention line
-        const ATN_OUT_DIR  = 0b0000_1000;
+        const ATN_OUT  = 0b0000_1000;
         /// Bit 2: PA2 - User Port pin M, general-purpose I/O
-        const PA2_OUT_DIR  = 0b0000_0100;
+        const PA2_OUT  = 0b0000_0100;
         /// Bit 1: VA15 direction (0=Input, 1=Output)
         /// Should be OUTPUT to control VIC bank switching
-        const VA15_DIR     = 0b0000_0010;
+        const VA15     = 0b0000_0010;
         /// Bit 0: VA14 direction (0=Input, 1=Output)
         /// Should be OUTPUT to control VIC bank switching
-        const VA14_DIR     = 0b0000_0001;
+        const VA14     = 0b0000_0001;
 
         /// Standard configuration: Serial IN/OUT + VA14/15 OUT
         /// Matches Kernal initialization: %00111111
@@ -807,21 +807,21 @@ bitflags! {
     /// Serial bus lines marked as "IN" should be inputs, "OUT" should be outputs.
     pub struct GPIOPinsDir: u8 {
         /// Bit 7: PB7 - User Port pin L, general-purpose I/O
-        const PIN_L_DIR = 0b1000_0000;
+        const PIN_L = 0b1000_0000;
         /// Bit 6: PB6 - User Port pin K, general-purpose I/O
-        const PIN_K_DIR = 0b0100_0000;
+        const PIN_K = 0b0100_0000;
         /// Bit 5: PB5 - User Port pin J, general-purpose I/O
-        const PIN_J_DIR = 0b0010_0000;
+        const PIN_J = 0b0010_0000;
         /// Bit 4: PB4 - User Port pin H, general-purpose I/O
-        const PIN_H_DIR = 0b0001_0000;
+        const PIN_H = 0b0001_0000;
         /// Bit 3: PB3 - User Port pin F, general-purpose I/O
-        const PIN_F_DIR = 0b0000_1000;
+        const PIN_F = 0b0000_1000;
         /// Bit 2: PB2 - User Port pin E, general-purpose I/O
-        const PIN_E_DIR = 0b0000_0100;
+        const PIN_E = 0b0000_0100;
         /// Bit 1: PB1 - User Port pin D, general-purpose I/O
-        const PIN_D_DIR = 0b0000_0010;
+        const PIN_D = 0b0000_0010;
         /// Bit 0: PB0 - User Port pin C, general-purpose I/O
-        const PIN_C_DIR = 0b0000_0001;
+        const PIN_C = 0b0000_0001;
 
         const DEFAULT   = 0b0000_0000;
     }
@@ -831,21 +831,21 @@ bitflags! {
     /// RS-232 pins
     pub struct RS232AccessDir: u8 {
         /// Bit 0: Receive Data (pin C)
-        const RXD_DIR  = 0b0000_0001;
+        const RXD  = 0b0000_0001;
         /// Bit 1: Request To Send (pin D)
-        const RTS_DIR  = 0b0000_0010;
+        const RTS  = 0b0000_0010;
         /// Bit 2: Data Terminal Ready (pin E)
-        const DTR_DIR  = 0b0000_0100;
+        const DTR  = 0b0000_0100;
         /// Bit 3: Ring Indicator (pin F)
-        const RI_DIR   = 0b0000_1000;
+        const RI   = 0b0000_1000;
         /// Bit 4: Data Carrier Detect (pin H)
-        const DCD_DIR  = 0b0001_0000;
+        const DCD  = 0b0001_0000;
         /// Bit 5: User Port (pin J)
-        const UP_J_DIR = 0b0010_0000;
+        const UP_J = 0b0010_0000;
         /// Bit 6: Clear To Send (pin K)
-        const CTS_DIR  = 0b0100_0000;
+        const CTS  = 0b0100_0000;
         /// Bit 7: Data Set Ready (pin L)
-        const DSR_DIR  = 0b1000_0000;
+        const DSR  = 0b1000_0000;
 
         const DEFAULT = 0b0000_0110;
     }
