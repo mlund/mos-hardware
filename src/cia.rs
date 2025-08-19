@@ -310,8 +310,10 @@ impl const From<CIA1PortB> for u8 {
 pub struct CIA1DirectionA(u8);
 
 impl CIA1DirectionA {
-    pub const KEYBOARD: Self = Self(0b0000_0000); // For Column input
-    pub const JOYSTICK: Self = Self(0b0001_1111); // For Joystick #2 input
+    /// For Column input
+    pub const KEYBOARD: Self = Self(0b0000_0000);
+    /// For Joystick #2 input
+    pub const JOYSTICK: Self = Self(0b0001_1111);
 }
 
 impl const Default for CIA1DirectionA {
@@ -338,8 +340,10 @@ impl const From<CIA1DirectionA> for u8 {
 pub struct CIA1DirectionB(u8);
 
 impl CIA1DirectionB {
-    pub const KEYBOARD: Self = Self(0b1111_1111); // For Row input
-    pub const JOYSTICK: Self = Self(0b0001_1111); // For Joystick #1 input
+    /// For Row input
+    pub const KEYBOARD: Self = Self(0b1111_1111);
+    /// For Joystick #1 input
+    pub const JOYSTICK: Self = Self(0b0001_1111);
 }
 
 impl const Default for CIA1DirectionB {
