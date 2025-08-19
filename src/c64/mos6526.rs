@@ -40,11 +40,11 @@ impl MOSComplexInterfaceAdapter6526_1 {
             self.control
                 .interrupt
                 .write(InterruptControl::SET_CLEAR | InterruptControl::IRQ);
-            // save only tod bit
-            let todin = self.control.control_a.read() & TimerControl::TODIN;
-            // enable timer 1
-            let timer1_added = todin | TimerControl::LOAD | TimerControl::START;
-            self.control.control_a.write(timer1_added);
+
+            // save only tod bit and enable timer 1
+            self.control
+                .control_a
+                .modify(|v| (v & TimerControl::TODIN) | TimerControl::LOAD | TimerControl::START);
         }
     }
 }
@@ -57,9 +57,8 @@ impl MOSComplexInterfaceAdapter6526_2 {
             self.control.interrupt.write(InterruptControl::DISABLE_ALL);
 
             // Shut off timers
-            let timer_off = TimerControl::empty();
-            self.control.control_a.write(timer_off);
-            self.control.control_b.write(timer_off);
+            self.control.control_a.write(TIMER_OFF);
+            self.control.control_b.write(TIMER_OFF);
 
             // User port (CIA2 Port B = no RS-232)
             self.data_direction_port_b
@@ -76,15 +75,14 @@ impl MOSComplexInterfaceAdapter6526_2 {
     /// set clock line low  (inverted)
     pub fn clkhi(&mut self) {
         unsafe {
-            self.port_a
-                .write(self.port_a.read() & !CIA2PortA::CLOCK_OUT);
+            self.port_a.modify(|v| v & !CIA2PortA::CLOCK_OUT);
         }
     }
 
     /// set clock line high (inverted)
     pub fn clklo(&mut self) {
         unsafe {
-            self.port_a.write(self.port_a.read() | CIA2PortA::CLOCK_OUT);
+            self.port_a.modify(|v| v | CIA2PortA::CLOCK_OUT);
         }
     }
 }

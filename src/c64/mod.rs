@@ -222,14 +222,13 @@ pub fn set_vic_bank(bank: CIA2PortA) {
     // Secure argument input
     let bank = u8::from(bank) & 0b11;
 
-    // Configure for VIC bank control
-    let mut dir_a = cia2().data_direction_port_a.read();
-    dir_a = dir_a | CIA2DirA::VA15_DIR | CIA2DirA::VA14_DIR;
-
     let mut port_a = cia2().port_a.read();
 
     unsafe {
-        cia2().data_direction_port_a.write(dir_a);
+        // Configure for VIC bank control
+        cia2()
+            .data_direction_port_a
+            .modify(|dir_a| dir_a | CIA2DirA::VA15_DIR | CIA2DirA::VA14_DIR);
     }
 
     // Set the VIC bank using the provided constant
