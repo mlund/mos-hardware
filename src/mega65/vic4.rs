@@ -1,7 +1,5 @@
 use bitflags::bitflags;
-use core::mem::size_of;
-use static_assertions::const_assert;
-use volatile_register::{RO, RW};
+use volatile_register::RW;
 
 bitflags! {
     /// VIC-III control flags for `0xD031`
@@ -169,6 +167,7 @@ pub struct Vic4 {
     /// hsync/vsync polarity (offset 0x7C)
     pub debugc: RW<u8>,
 }
+
 pub struct __vic4__bindgen_ty_7__bindgen_ty_1 {
     ///Display Address Translater (DAT) Bitplane 0 port (offset 0x40)
     pub b0pix: u8,

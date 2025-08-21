@@ -51,15 +51,13 @@ fn main() {
     //_make_cbm_kernal_bindings();
     #[cfg(feature = "c64")]
     cc::Build::new()
-        .compiler("clang")
-        .target("mos-c64")
+        .compiler("mos-c64-clang")
         .file("src/irq.c")
         .compile("irq");
 
     #[cfg(feature = "mega65")]
     cc::Build::new()
-        .compiler("clang")
-        .target("mos-mega65")
+        .compiler("mos-mega65-clang")
         .include("src/mega65/libc")
         .include("/usr/local/mos-platform/common/include")
         .files([

@@ -53,7 +53,6 @@
 #![allow(clippy::bad_bit_mask)]
 #![feature(const_trait_impl)]
 extern crate alloc;
-extern crate static_assertions;
 
 #[cfg(feature = "c64")]
 pub mod c64;

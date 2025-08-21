@@ -95,8 +95,8 @@ be subject to significant changes.
 - [Commodore 64](https://www.c64-wiki.com/wiki/C64):
   - [x] `sid`
   - [x] `vic2`
-  - [x] `cia` (partially)
-  - [x] `c64` memory map (particlly)
+  - [x] `cia`
+  - [x] `c64` memory map (partially)
   - [x] PSID file support for SID music
   - [x] Random number trait (`RngCore`)
 - [Commander X16](https://www.commanderx16.com)

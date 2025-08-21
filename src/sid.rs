@@ -18,7 +18,6 @@
 //! Commodore 64, Commodore 128 and Commodore MAX Machine home computers.
 //! It was one of the first sound chips of its kind to be included in a home computer.
 
-use crate::*;
 use bitflags::bitflags;
 use core::mem::size_of;
 use rand_core::{Error, RngCore};
@@ -146,6 +145,13 @@ pub struct MOSSoundInterfaceDevice {
 const_assert!(size_of::<MOSSoundInterfaceDevice>() == 0x1d);
 
 impl MOSSoundInterfaceDevice {
+    /// Reset like Kernal: turn off SID
+    pub fn reset(&self) {
+        unsafe {
+            self.volume_filter_mode.write(0);
+        }
+    }
+
     /// Start noise generation on SID channel 3.
     ///
     /// Example:
