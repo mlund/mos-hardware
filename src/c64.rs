@@ -17,16 +17,49 @@
 //! Future information may be incorporated using the
 //! [Ultimate Commodore 64 Reference](https://github.com/mist64/c64ref)
 
-mod cpu6510;
-mod mos6526;
 use crate::cia::*;
 use crate::sid::*;
 use crate::vic2::*;
-use cpu6510::*;
-use mos6526::*;
+use bitflags::bitflags;
+use volatile_register::RW;
 
-/// Pointer to CPU 6510
-pub const CPU: *const Cpu6510 = (0x0000) as _;
+bitflags! {
+    /// Control flags for the CPU port `R6510` at 0x0001
+    ///
+    /// Three-word combination constants like `RAM_IO_KERNAL` refer to banking configurations
+    /// of what is visible at addresses `$A000-BFFF`, `$D000-DFFF`, and `$E000-FFFF`.
+    /// Regardless of `0x0001`, the VIC-II chip *always* sees the `CHARROM` at `$1000-1FFF` and `$9000-9FFF`,
+    /// and RAM everywhere else.
+    ///
+    /// [More information](https://codebase64.org/doku.php?id=base:memory_management).
+    ///
+    /// # Examples
+    ///
+    /// Here's an example that makes the RAM available "under" both the BASIC and KERNAL
+    /// ROMs located at 0xA000-0xBFFF and 0xE000-0xFFFF.
+    /// The VIC, SID, and CIA I/O devices are left accessible at 0xD000-0xDFFF:
+    /// ~~~
+    /// (*CPU_PORT).write(CpuPortFlags::RAM_IO_RAM);
+    /// assert_eq!(CpuPortFlags::RAM_IO_RAM.bits(), 0x35);
+    /// assert_eq!(CpuPortFlags::RAM_IO_KERNAL.bitw(), 0x36);
+    /// ~~~
+    pub struct CpuPortFlags: u8 {
+        const DEFAULT              = Self::BASIC_IO_KERNAL.bits;
+        const BASIC_IO_KERNAL      = 0b00110111;
+        const RAM_RAM_RAM          = 0b00110000;
+        const RAM_CHAR_RAM         = 0b00110001;
+        const RAM_CHAR_KERNAL      = 0b00110010;
+        const BASIC_CHAR_KERNAL    = 0b00110011;
+        const RAM_IO_RAM           = 0b00110101;
+        const RAM_IO_KERNAL        = 0b00110110;
+        const DATASETTE_SIGNAL     = 0b00001000; // bit 3
+        const DATASETTE_BUTTON_OFF = 0b00010000; // bit 4
+        const DATASETTE_MOTOR_OFF  = 0b00100000; // bit 5
+    }
+}
+
+/// Pointer to the `R6510` register for 6510 I/O (0x0001)
+pub const CPU_PORT: *mut RW<CpuPortFlags> = (0x0001) as _;
 
 /// Default video memory address (0x0400)
 pub const DEFAULT_VIDEO_ADDR: u16 = 0x0400;
@@ -79,13 +112,49 @@ pub const SID: *const MOSSoundInterfaceDevice = (0xd400) as _;
 pub const COLOR_RAM: *mut u8 = (0xd800) as _;
 
 /// Pointer to first complex interface adapter (0xdc00)
-pub const CIA1: *const MOSComplexInterfaceAdapter6526_1 = (0xdc00) as _;
+pub const CIA1: *const MOSComplexInterfaceAdapter6526<GameController, GameController> = (0xdc00) as _;
 
 /// Pointer to second complex interface adapter (0xdd00)
-pub const CIA2: *const MOSComplexInterfaceAdapter6526_2 = (0xdd00) as _;
+pub const CIA2: *const MOSComplexInterfaceAdapter6526<VicBankSelect, RS232Access> = (0xdd00) as _;
 
 /// Pointer to the KERNAL ROM memory area (0xe000 - 0xffff)
 pub const KERNAL_ROM: *mut [u8; 8192] = (0xe000) as _;
+
+bitflags! {
+    /// Flags for the `CIA1::control_a` register (0xdc0e)
+    pub struct CIA1ControlAFlags: u8 {
+        /// Start (1) or stop (0) timer A
+        const START         = 0b00000001; // bit 0
+        const PBON          = 0b00000010;
+        const OUTMODE       = 0b00000100;
+        const RUNMODE       = 0b00001000;
+        const FORCE_LOAD    = 0b00010000;
+        const INMODE        = 0b00100000;
+        const SERIAL_OUTPUT = 0b01000000;
+        const FIFTY_HZ_RTC  = 0b10000000;
+    }
+}
+
+bitflags! {
+    /// Bit mask for VIC II bank selection
+    ///
+    /// Select one of four memory ranges that VIC II sees.
+    ///
+    /// # Examples
+    /// ~~~
+    /// set_vic_bank(cia::VicBankSelect::RegionC000);
+    /// ~~~
+    pub struct VicBankSelect: u8 {
+        /// Bank 3: 0xC000-0xFFFF
+        const RegionC000 = 0;
+        /// Bank 2: 0x8000-0xBFFF
+        const Region8000 = 1;
+        /// Bank 1: 0x4000-0x7FFF
+        const Region4000 = 2;
+        /// Bank 0: 0x0000-0x3FFF (default)
+        const Region0000 = 3;
+   }
+}
 
 extern "C" {
     // defined in c to allow assembly and interrupt attribute
@@ -146,11 +215,6 @@ pub enum Keyboard {
     CursorLeft = 0x9d,
 }
 
-/// Get reference to CPU register
-pub const fn cpu() -> &'static Cpu6510 {
-    unsafe { &*CPU }
-}
-
 /// Get reference to VIC2 chip
 pub const fn vic2() -> &'static MOSVideoInterfaceControllerII {
     unsafe { &*VIC }
@@ -162,23 +226,13 @@ pub const fn sid() -> &'static MOSSoundInterfaceDevice {
 }
 
 /// Get reference to CIA1 chip
-pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526_1 {
+pub const fn cia1() -> &'static MOSComplexInterfaceAdapter6526<GameController, GameController> {
     unsafe { &*CIA1 }
 }
 
-/// Get reference to CIA1 control block
-pub const fn cia1_control() -> &'static Mos6526ControlBlock {
-    unsafe { &(*CIA1).control }
-}
-
 /// Get reference to CIA2 chip
-pub const fn cia2() -> &'static MOSComplexInterfaceAdapter6526_2 {
+pub const fn cia2() -> &'static MOSComplexInterfaceAdapter6526<VicBankSelect, RS232Access> {
     unsafe { &*CIA2 }
-}
-
-/// Get reference to CIA2 control block
-pub const fn cia2_control() -> &'static Mos6526ControlBlock {
-    unsafe { &(*CIA2).control }
 }
 
 /// Clears screen, functional style (fill with SPACE character)
@@ -205,36 +259,13 @@ pub fn set_upper_case() {
 }
 
 /// Select one of four memory ranges that VIC II sees.
-///
-/// # Arguments
-/// * `bank` - VIC bank to select:
-///   - `CIA2PortA::VIC_BANK_0` for $0000-$3FFF
-///   - `CIA2PortA::VIC_BANK_1` for $4000-$7FFF  
-///   - `CIA2PortA::VIC_BANK_2` for $8000-$BFFF
-///   - `CIA2PortA::VIC_BANK_3` for $C000-$FFFF
-///
-/// # Example
-/// ```rust
-/// // Switch to bank 1 ($4000-$7FFF)
-/// set_vic_bank(CIA2PortA::VIC_BANK_1);
-/// ```
-pub fn set_vic_bank(bank: CIA2PortA) {
-    // Secure argument input
-    let bank = u8::from(bank) & 0b11;
-
-    let mut port_a = cia2().port_a.read();
-
+pub fn set_vic_bank(bank: VicBankSelect) {
+    let dir_a = cia2().data_direction_port_a.read();
+    let port_a = cia2().port_a.read();
     unsafe {
-        // Configure for VIC bank control
+        cia2().data_direction_port_a.write(dir_a | 0b11);
         cia2()
-            .data_direction_port_a
-            .modify(|dir_a| dir_a | CIA2DirectionA::VA15 | CIA2DirectionA::VA14);
-    }
-
-    // Set the VIC bank using the provided constant
-    port_a.set_vic_bank(bank);
-
-    unsafe {
-        cia2().port_a.write(port_a);
+            .port_a
+            .write(port_a & VicBankSelect::Region0000.complement() | bank);
     }
 }
