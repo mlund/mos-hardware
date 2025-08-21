@@ -73,10 +73,7 @@ impl SmoothScroll {
     /// Move screen ONE pixel to the left (cycle in the interval 7..0)
     #[inline]
     fn move_pixel(&mut self) {
-        self.displacement = match self.displacement.checked_sub(1) {
-            Some(x) => x,
-            None => 7,
-        };
+        self.displacement = self.displacement.checked_sub(1).unwrap_or(7);
         let mut mask = c64::vic2().control_x.read();
         mask.set(ControlXFlags::XSCROLL, false);
         mask = ControlXFlags::from_bits(mask.bits() + self.displacement).unwrap();
