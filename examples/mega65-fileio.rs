@@ -34,7 +34,7 @@ use ufmt_stdio::*;
 /// that implements a `Read` trait.
 pub fn open_sd(filename: &CStr) -> Result<u8, FileError> {
     unsafe { libc::closeall() };
-    match unsafe { libc::open(filename.as_ptr()) } {
+    match unsafe { libc::open(filename.as_ptr() as *mut i8) } {
         0xff => Err(FileError::IOError),
         file_handle => Ok(file_handle),
     }
