@@ -168,6 +168,7 @@ pub struct Vic4 {
     pub debugc: RW<u8>,
 }
 
+#[allow(non_camel_case_types)]
 pub struct __vic4__bindgen_ty_7__bindgen_ty_1 {
     ///Display Address Translater (DAT) Bitplane 0 port (offset 0x40)
     pub b0pix: u8,
