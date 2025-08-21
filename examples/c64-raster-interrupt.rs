@@ -15,7 +15,7 @@
 //! C64 Raster Interrupt example 1
 
 #![no_std]
-#![feature(start)]
+#![no_main]
 
 extern crate mos_alloc;
 
@@ -34,8 +34,8 @@ pub extern "C" fn called_every_frame() {
     unsafe { c64::vic2().border_color.write(BLACK) };
 }
 
-#[start]
-fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+#[no_mangle]
+extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
     const TRIGGER_LINE: u8 = 100;
     c64::hardware_raster_irq(TRIGGER_LINE);
     loop {}

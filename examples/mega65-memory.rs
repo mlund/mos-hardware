@@ -17,7 +17,7 @@
 //! Illustrates DMA copy etc.
 
 #![no_std]
-#![feature(start)]
+#![no_main]
 extern crate alloc;
 extern crate mos_alloc;
 
@@ -28,8 +28,8 @@ use core::str;
 use mos_hardware::mega65::*;
 use ufmt_stdio::*;
 
-#[start]
-fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+#[no_mangle]
+extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
     set_upper_case();
 
     // Integer sizes

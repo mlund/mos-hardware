@@ -15,7 +15,7 @@
 //! Classic C64 Sprite and scroll example
 
 #![no_std]
-#![feature(start)]
+#![no_main]
 
 extern crate alloc;
 extern crate mos_alloc;
@@ -203,8 +203,8 @@ pub extern "C" fn called_every_frame() {
     MUSIC.play(); // excluded from border color profiling
 }
 
-#[start]
-fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+#[no_mangle]
+extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
     // unsafe {
     //     mos_hardware::mega65::libc::mega65_io_enable();
     // }

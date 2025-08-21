@@ -15,7 +15,7 @@
 //! C64 Sprite Example
 
 #![no_std]
-#![feature(start)]
+#![no_main]
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
@@ -46,8 +46,8 @@ const RUST_LOGO: [u8; 63] = [
     254, 127, 241, 254, 62, 0, 60, 29, 0, 184, 15, 129, 240, 7, 255, 224, 1, 255, 128, 0, 90, 0,
 ];
 
-#[start]
-fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+#[no_mangle]
+extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
     const SPRITE_ADDRESS: u16 = 0x2000;
     const SPRITE_PTR: u8 = to_sprite_pointer(SPRITE_ADDRESS);
 
