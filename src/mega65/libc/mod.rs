@@ -1,7 +1,6 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-
 //! Bindings for the MEGA65-libc library
 //!
 //! This exposes the [mega65-libc](https://github.com/MEGA65/mega65-libc) library
@@ -18,3 +17,8 @@
 //! }
 //! ~~~
 include!("bindings.rs");
+
+// On `mrkits/rust-mos:d6ed9aa89-7d9eac4-9c135159` `c_uint` is 16-bit
+// See also `mos-mega65-clang -dM -E - < /dev/null | grep __SIZEOF`
+use static_assertions::const_assert_eq;
+const_assert_eq!(core::mem::size_of::<core::ffi::c_uint>(), 2);
