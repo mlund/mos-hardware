@@ -25,6 +25,8 @@ use crate::vic2::*;
 use cpu6510::*;
 use mos6526::*;
 
+pub use cpu6510::{CPU_PORT, CPU_PORT_DDR};
+
 /// Pointer to CPU 6510
 pub const CPU: *const Cpu6510 = (0x0000) as _;
 
