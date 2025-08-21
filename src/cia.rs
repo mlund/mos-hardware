@@ -397,6 +397,7 @@ bitflags::bitflags! {
 // --- Control Port ----------------------------
 
 /// Enum for joystick positions
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub enum JoystickPosition {
     Up,
     Down,

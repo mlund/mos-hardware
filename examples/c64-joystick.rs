@@ -20,6 +20,7 @@ extern crate mos_alloc;
 
 use core::panic::PanicInfo;
 use mos_hardware::c64;
+use mos_hardware::cia::GameController;
 use mos_hardware::cia::JoystickPosition;
 use ufmt_stdio::*;
 
@@ -27,10 +28,12 @@ use ufmt_stdio::*;
 fn _main(_argc: isize, _argv: *const *const u8) -> isize {
     println!("WIGGLE JOYSTICK IN PORT 2!");
     loop {
-        let port_a = c64::cia1().port_a.read();
-        while port_a == c64::cia1().port_a.read() {}
+        let controller1: GameController = c64::cia1().port_a.read().into();
 
-        let (position, fire) = port_a.read_joystick();
+        let (position, fire) = controller1.read_joystick();
+        while (position, fire) == controller1.read_joystick() {}
+
+        let (position, fire) = controller1.read_joystick();
         let message = match position {
             JoystickPosition::Up => "NORTH",
             JoystickPosition::Down => "SOUTH",
