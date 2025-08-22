@@ -23,7 +23,7 @@
 //! - `get_real_time_clock()` returns zero values
 
 #![no_std]
-#![feature(start)]
+#![no_main]
 extern crate mos_alloc;
 
 use core::panic::PanicInfo;
@@ -32,8 +32,8 @@ use mos_hardware::screen_codes_null;
 use rand::seq::SliceRandom;
 use ufmt_stdio::*;
 
-#[start]
-fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+#[no_mangle]
+extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
     conio_init();
     set_border_color(libc::COLOUR_BROWN as u8);
     clear_screen();

@@ -17,7 +17,7 @@
 //! Preliminary and unstable test of file I/O
 
 #![no_std]
-#![feature(start)]
+#![no_main]
 
 extern crate alloc;
 extern crate mos_alloc;
@@ -40,8 +40,8 @@ pub fn open_sd(filename: &CStr) -> Result<u8, FileError> {
     }
 }
 
-#[start]
-fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+#[no_mangle]
+extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
     set_lower_case();
 
     let filename = CString::new("galaxy").unwrap();

@@ -15,7 +15,7 @@
 //! Simple C64 PSID play example
 
 #![no_std]
-#![feature(start)]
+#![no_main]
 
 extern crate mos_alloc;
 
@@ -28,8 +28,8 @@ impl sid::SidTune for SidFile {
     const BYTES: &'static [u8] = core::include_bytes!("../assets/last_hero.sid");
 }
 
-#[start]
-fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+#[no_mangle]
+extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
     let music = SidFile;
     unsafe {
         music.to_memory();

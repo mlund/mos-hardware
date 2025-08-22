@@ -5,7 +5,7 @@
 //! - Porting to Rust by Mikael Lund aka Wombat (2022)
 
 #![no_std]
-#![feature(start)]
+#![no_main]
 
 extern crate mos_alloc;
 
@@ -90,8 +90,8 @@ impl Plasma {
     }
 }
 
-#[start]
-fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+#[no_mangle]
+extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
     const CHARSET: u16 = 0x2000; // Custom charset
     const PAGE: u8 = vic2::ScreenBank::from_address(c64::DEFAULT_VIDEO_ADDR).bits()
         | vic2::CharsetBank::from(CHARSET).bits();

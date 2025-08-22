@@ -5,7 +5,7 @@
 //! - Porting to Rust by Mikael Lund aka Wombat (2022)
 
 #![no_std]
-#![feature(start)]
+#![no_main]
 
 extern crate mos_alloc;
 extern crate mos_hardware;
@@ -86,8 +86,8 @@ impl Plasma {
     }
 }
 
-#[start]
-fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+#[no_mangle]
+extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
     const CHARSET_ADDRESS: u16 = 0x3000;
     let mut plasma = Plasma::new(CHARSET_ADDRESS);
     mega65::set_charset_address(CHARSET_ADDRESS);

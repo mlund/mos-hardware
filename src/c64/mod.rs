@@ -105,13 +105,17 @@ extern "C" {
 ///
 /// # Examples
 /// ```
+/// #![no_std]
+/// #![no_main]
+/// ...
+///
 /// #[no_mangle]
 /// pub unsafe extern fn called_every_frame() {
 ///    ...
 /// }
 ///
-/// #[start]
-/// fn _main(_argc: isize, _argv: *const *const u8) -> isize {
+/// #[no_mangle]
+/// extern "C" fn main(_argc: core::ffi::c_int, _argv: *const *const u8) -> core::ffi::c_int {
 ///    c64::hardware_raster_irq(100); // trigger at raster line 100
 ///    loop {}                        // let's not return to dead BASIC
 /// }

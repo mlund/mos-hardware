@@ -225,37 +225,37 @@ pub struct MOSComplexInterfaceAdapter6526<
 #[derive(Copy, Clone, Default)]
 pub struct CIA1PortA(u8);
 
-impl const From<CIA1PortA> for KeyboardColumn {
+impl From<CIA1PortA> for KeyboardColumn {
     fn from(pa: CIA1PortA) -> Self {
         KeyboardColumn::from_bits_truncate(pa.into())
     }
 }
 
-impl const From<CIA1PortA> for GameController {
+impl From<CIA1PortA> for GameController {
     fn from(pa: CIA1PortA) -> Self {
         GameController::from_bits_truncate(pa.into())
     }
 }
 
-impl const From<KeyboardColumn> for CIA1PortA {
+impl From<KeyboardColumn> for CIA1PortA {
     fn from(col: KeyboardColumn) -> Self {
         Self(col.bits())
     }
 }
 
-impl const From<GameController> for CIA1PortA {
+impl From<GameController> for CIA1PortA {
     fn from(joy: GameController) -> Self {
         Self(joy.bits())
     }
 }
 
-impl const From<u8> for CIA1PortA {
+impl From<u8> for CIA1PortA {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl const From<CIA1PortA> for u8 {
+impl From<CIA1PortA> for u8 {
     fn from(cia1: CIA1PortA) -> u8 {
         cia1.0
     }
@@ -266,37 +266,37 @@ impl const From<CIA1PortA> for u8 {
 #[derive(Copy, Clone, Default)]
 pub struct CIA1PortB(u8);
 
-impl const From<CIA1PortB> for KeyboardRow {
+impl From<CIA1PortB> for KeyboardRow {
     fn from(pa: CIA1PortB) -> Self {
         KeyboardRow::from_bits_truncate(pa.into())
     }
 }
 
-impl const From<CIA1PortB> for GameController {
+impl From<CIA1PortB> for GameController {
     fn from(pa: CIA1PortB) -> Self {
         GameController::from_bits_truncate(pa.into())
     }
 }
 
-impl const From<KeyboardColumn> for CIA1PortB {
+impl From<KeyboardColumn> for CIA1PortB {
     fn from(row: KeyboardColumn) -> Self {
         Self(row.bits())
     }
 }
 
-impl const From<GameController> for CIA1PortB {
+impl From<GameController> for CIA1PortB {
     fn from(joy: GameController) -> Self {
         Self(joy.bits())
     }
 }
 
-impl const From<u8> for CIA1PortB {
+impl From<u8> for CIA1PortB {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl const From<CIA1PortB> for u8 {
+impl From<CIA1PortB> for u8 {
     fn from(cia1: CIA1PortB) -> u8 {
         cia1.0
     }
@@ -320,13 +320,13 @@ impl const Default for CIA1DirectionA {
     }
 }
 
-impl const From<u8> for CIA1DirectionA {
+impl From<u8> for CIA1DirectionA {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl const From<CIA1DirectionA> for u8 {
+impl From<CIA1DirectionA> for u8 {
     fn from(cia1: CIA1DirectionA) -> u8 {
         cia1.0
     }
@@ -350,13 +350,13 @@ impl const Default for CIA1DirectionB {
     }
 }
 
-impl const From<u8> for CIA1DirectionB {
+impl From<u8> for CIA1DirectionB {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl const From<CIA1DirectionB> for u8 {
+impl From<CIA1DirectionB> for u8 {
     fn from(cia1: CIA1DirectionB) -> u8 {
         cia1.0
     }
@@ -397,6 +397,7 @@ bitflags::bitflags! {
 // --- Control Port ----------------------------
 
 /// Enum for joystick positions
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub enum JoystickPosition {
     Up,
     Down,
@@ -585,13 +586,13 @@ impl const Default for CIA2PortA {
     }
 }
 
-impl const From<u8> for CIA2PortA {
+impl From<u8> for CIA2PortA {
     fn from(value: u8) -> Self {
         Self::from_bits(value).unwrap()
     }
 }
 
-impl const From<CIA2PortA> for u8 {
+impl From<CIA2PortA> for u8 {
     fn from(cia2: CIA2PortA) -> u8 {
         cia2.bits()
     }
@@ -602,37 +603,37 @@ impl const From<CIA2PortA> for u8 {
 #[derive(Copy, Clone, Default)]
 pub struct CIA2PortB(u8);
 
-impl const From<CIA2PortB> for GPIOPins {
+impl From<CIA2PortB> for GPIOPins {
     fn from(pb: CIA2PortB) -> Self {
         GPIOPins::from_bits_truncate(pb.into())
     }
 }
 
-impl const From<CIA2PortB> for RS232Access {
+impl From<CIA2PortB> for RS232Access {
     fn from(pb: CIA2PortB) -> Self {
         RS232Access::from_bits_truncate(pb.into())
     }
 }
 
-impl const From<GPIOPins> for CIA2PortB {
+impl From<GPIOPins> for CIA2PortB {
     fn from(gpio: GPIOPins) -> Self {
         Self(gpio.bits())
     }
 }
 
-impl const From<RS232Access> for CIA2PortB {
+impl From<RS232Access> for CIA2PortB {
     fn from(rs232: RS232Access) -> Self {
         Self(rs232.bits())
     }
 }
 
-impl const From<u8> for CIA2PortB {
+impl From<u8> for CIA2PortB {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl const From<CIA2PortB> for u8 {
+impl From<CIA2PortB> for u8 {
     fn from(cia2: CIA2PortB) -> u8 {
         cia2.0
     }
@@ -743,13 +744,13 @@ impl const Default for CIA2DirectionA {
     }
 }
 
-impl const From<u8> for CIA2DirectionA {
+impl From<u8> for CIA2DirectionA {
     fn from(value: u8) -> Self {
         Self::from_bits_truncate(value)
     }
 }
 
-impl const From<CIA2DirectionA> for u8 {
+impl From<CIA2DirectionA> for u8 {
     fn from(cia2: CIA2DirectionA) -> u8 {
         cia2.bits()
     }
@@ -770,25 +771,25 @@ impl CIA2DirectionB {
     }
 }
 
-impl const From<GPIOPinsDir> for CIA2DirectionB {
+impl From<GPIOPinsDir> for CIA2DirectionB {
     fn from(gpio: GPIOPinsDir) -> Self {
         Self(gpio.bits())
     }
 }
 
-impl const From<RS232AccessDir> for CIA2DirectionB {
+impl From<RS232AccessDir> for CIA2DirectionB {
     fn from(rs232: RS232AccessDir) -> Self {
         Self(rs232.bits())
     }
 }
 
-impl const From<u8> for CIA2DirectionB {
+impl From<u8> for CIA2DirectionB {
     fn from(value: u8) -> Self {
         Self(value)
     }
 }
 
-impl const From<CIA2DirectionB> for u8 {
+impl From<CIA2DirectionB> for u8 {
     fn from(cia2: CIA2DirectionB) -> u8 {
         cia2.0
     }
